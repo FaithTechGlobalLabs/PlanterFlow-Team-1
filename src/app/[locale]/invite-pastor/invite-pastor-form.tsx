@@ -4,12 +4,13 @@ import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { InviteLinkNotice } from "@/components/invite-link-notice";
 import { FormError } from "@/components/ui/FormError";
 import { invitePastor } from "./actions";
 
 export function InvitePastorForm() {
   const t = useTranslations();
-  const [state, formAction, isPending] = useActionState<{ error?: string }, FormData>(
+  const [state, formAction, isPending] = useActionState<{ error?: string; inviteLink?: string; email?: string }, FormData>(
     invitePastor,
     {}
   );
@@ -37,6 +38,10 @@ export function InvitePastorForm() {
       />
 
       <FormError>{state?.error && t(state.error)}</FormError>
+
+      {state?.inviteLink && (
+        <InviteLinkNotice link={state.inviteLink} email={state.email ?? ""} />
+      )}
 
       <Button
         variant="primary"
