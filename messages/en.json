@@ -1,0 +1,210 @@
+{
+  "brand": {
+    "name": "FIRST FRUITS",
+    "network": "WITH SEND NETWORK"
+  },
+  "login": {
+    "welcome": "WELCOME TO FIRST FRUITS",
+    "headline_desktop": "A place to grow. Together.",
+    "headline_mobile": "Grow together.",
+    "subline_desktop": "Steward the vision. Share the journey. Find support when it matters.",
+    "subline_mobile": "Your church planting journey, supported.",
+    "welcome_back": "Welcome back",
+    "your_journey": "Your church planting journey starts here.",
+    "email_label": "Email",
+    "email_placeholder": "name@church.org",
+    "password_label": "Password",
+    "password_placeholder": "Enter your password",
+    "sign_in": "Sign in",
+    "accept_invitation": "Accept invitation",
+    "forgot_password": "Forgot password?",
+    "invitation_note": "Invitation only · Contact your catalyst for access.",
+    "errors": {
+      "required": "Email and password are required",
+      "invalid": "Email or password did not match.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "common": {
+    "back_to_login": "Back to login",
+    "sign_out": "Sign out",
+    "language_english": "English"
+  },
+  "invite": {
+    "eyebrow": "INVITED BY {name}",
+    "catalyst": {
+      "title": "You belong here.",
+      "subline": "Your role is already assigned. No application required.",
+      "card_title": "Welcome, catalyst",
+      "card_body": "{name} invited you to serve church planters in {region}.",
+      "chip": "Role: Catalyst"
+    },
+    "planter": {
+      "title": "Your church has a place here.",
+      "subline": "Pastor · {church} · Assigned catalyst {catalyst}",
+      "subline_no_church": "Pastor · Assigned catalyst {catalyst}",
+      "card_title": "Accept your invitation",
+      "card_body": "{name} invited you to grow your church with First Fruits.",
+      "chip": "Role: Pastor"
+    },
+    "name_label": "Your name",
+    "name_placeholder": "Alex Morgan",
+    "language_label": "Preferred language",
+    "password_label": "Create password",
+    "password_placeholder": "Create a secure password",
+    "submit": "Accept and continue",
+    "footnote": "Accept with the invited email. Invitation expires in 7 days.",
+    "session_note": "Open the link from your invitation email to continue.",
+    "errors": {
+      "required": "Name and password are required",
+      "password": "Password must be at least 8 characters",
+      "session": "Open the link from your invitation email, using the invited address.",
+      "generic": "Something went wrong. Please try again."
+    },
+    "unavailable": {
+      "title": "This invitation needs to be reissued.",
+      "subline": "The invitation may have expired or been revoked. Contact the person who invited you.",
+      "card_title": "Invitation unavailable",
+      "card_body": "This link no longer works. Ask the person who invited you to send a new invitation."
+    },
+    "no_token": {
+      "title": "Open the link from your invitation.",
+      "subline": "Invitations arrive by email with your assigned role.",
+      "card_title": "Check your inbox",
+      "card_body": "The link in your invitation email signs you in and brings you to the right place."
+    }
+  },
+  "onboarding": {
+    "catalyst": {
+      "eyebrow": "ONE QUICK STEP",
+      "title": "Your garden is ready.",
+      "subline": "We have connected your role and region.",
+      "card_body": "Your churches and shared commitments will appear here.",
+      "chip": "Assigned by {name}",
+      "contact_label": "Contact preference",
+      "contact_placeholder": "Email · Weekly summary",
+      "submit": "Open my garden",
+      "invite": "Invite a pastor",
+      "errors": {
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "church": {
+      "eyebrow": "STEP 1 OF 2 · YOUR CHURCH",
+      "title": "Tell us what is taking root.",
+      "subline": "Your catalyst, {name}, will walk with you.",
+      "subline_no_catalyst": "Your catalyst will walk with you.",
+      "card_title": "Church basics",
+      "card_body": "A few details so your tree can take its first shape.",
+      "name_label": "Church name",
+      "name_placeholder": "Hope Church",
+      "city_label": "City",
+      "city_placeholder": "Surrey",
+      "start_label": "Planting start date",
+      "vision_label": "Your vision",
+      "vision_placeholder": "A church for every neighbourhood.",
+      "submit": "Continue",
+      "errors": {
+        "required": "Church name, city and planting start date are required",
+        "date": "Enter a valid planting start date",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "firstGoal": {
+      "eyebrow": "STEP 2 OF 2 · ONE NEXT STEP",
+      "title": "Start small. Grow faithfully.",
+      "subline": "Choose one objective and a practical next step.",
+      "card_title": "Your first goal",
+      "card_body": "You do not need a goal in every category today.",
+      "category_label": "Category",
+      "goal_label": "Goal",
+      "goal_placeholder": "Host two neighbourhood dinners",
+      "due_label": "By when?",
+      "checkpoint_label": "Expected checkpoint",
+      "checkpoint_placeholder": "One dinner by October 15",
+      "note": "Visible to you and your catalyst. Team access can be added later.",
+      "submit": "Enter my garden",
+      "errors": {
+        "required": "Choose a category, a goal and a date",
+        "generic": "Something went wrong. Please try again."
+      }
+    }
+  },
+  "invitePastor": {
+    "eyebrow": "GROW YOUR GARDEN",
+    "title": "Invite a church planter.",
+    "subline": "Their church will be linked to your portfolio automatically.",
+    "card_title": "Pastor invitation",
+    "assigned": "Assigned catalyst: {name}",
+    "email_label": "Pastor email",
+    "email_placeholder": "pastor@hopechurch.ca",
+    "church_label": "Church name (optional)",
+    "church_placeholder": "Hope Church",
+    "welcome_label": "Personal welcome",
+    "welcome_placeholder": "Looking forward to walking alongside you.",
+    "submit": "Send invitation",
+    "footnote": "Pastor can invite their own team after accepting.",
+    "errors": {
+      "email": "Enter a valid email address",
+      "exists": "This email already has an account.",
+      "generic": "Something went wrong. Please try again.",
+      "rate_limit": "Too many invitation emails were sent recently. Wait an hour and try again."
+    },
+    "sent": {
+      "title": "An invitation is on its way.",
+      "subline": "The invited person will receive their assigned role and a link.",
+      "card_title": "Invitation sent",
+      "card_body": "{email} will receive their assigned role and a link to accept.",
+      "primary": "Open my garden",
+      "again": "Invite another pastor"
+    }
+  },
+  "inviteCatalyst": {
+    "eyebrow": "GROW THE TEAM",
+    "title": "Invite a catalyst.",
+    "subline": "They will support church planters in your organization.",
+    "card_title": "Catalyst invitation",
+    "assigned": "Inviting as: {name}",
+    "email_label": "Catalyst email",
+    "email_placeholder": "catalyst@network.org",
+    "welcome_label": "Personal welcome (optional)",
+    "welcome_placeholder": "Excited to serve alongside you.",
+    "admin_checkbox": "Also make this person an admin",
+    "submit": "Send invitation",
+    "footnote": "Catalysts can invite pastors. Admins can also invite catalysts.",
+    "errors": {
+      "email": "Enter a valid email address",
+      "exists": "This email already has an account.",
+      "generic": "Something went wrong. Please try again.",
+      "rate_limit": "Too many invitation emails were sent recently. Wait an hour and try again."
+    },
+    "sent": {
+      "title": "An invitation is on its way.",
+      "subline": "The invited person will receive their assigned role and a link.",
+      "card_title": "Invitation sent",
+      "card_body": "{email} will receive their assigned role and a link to accept.",
+      "primary": "Open my garden",
+      "again": "Invite another catalyst"
+    }
+  },
+  "home": {
+    "catalyst": {
+      "eyebrow": "YOUR GARDEN",
+      "subline": "Catalyst garden is coming next. Your churches will appear here.",
+      "invite": "Invite a pastor",
+      "invite_catalyst": "Invite a catalyst",
+      "chip_admin": "Role: Admin"
+    },
+    "planter": {
+      "eyebrow": "YOUR CHURCH",
+      "subline": "Church dashboard is coming next. Your goals will appear here.",
+      "stage": {
+        "seed": "Seed · first 3 months",
+        "sprout": "Sprout · 3–12 months",
+        "sapling": "Sapling · year 1–2",
+        "young": "Young tree · year 2–3",
+        "established": "Established · year 3+"
+      }
+    }
+  }
+}
