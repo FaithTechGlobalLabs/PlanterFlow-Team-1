@@ -7,7 +7,16 @@ import { routing } from "@/i18n/routing";
 const handleI18n = createMiddleware(routing);
 const localePattern = new RegExp(`^/(${routing.locales.join("|")})(?=/|$)`);
 
+// The non-localized invitation flow (/invite/<token>, /invite/welcome) lives
+// outside [locale]; localized invites use /<locale>/invite/... and still go
+// through the proxy below.
+const legacyInvitePattern = /^\/invite(?:\/|$)/;
+
 export async function proxy(request: NextRequest) {
+  if (legacyInvitePattern.test(request.nextUrl.pathname)) {
+    return NextResponse.next();
+  }
+
   const response = handleI18n(request);
   if (response.status >= 300 && response.status < 400) {
     return response;
