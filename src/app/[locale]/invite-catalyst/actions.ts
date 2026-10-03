@@ -67,9 +67,14 @@ export async function inviteCatalyst(
   if (inviteError) {
     await admin.from("invitations").delete().eq("id", invitation.id);
 
+    console.error("[invite-catalyst] inviteUserByEmail failed:", inviteError.code, inviteError.message);
+
     const errorMessage = inviteError.message || "";
     if (/already been registered|already exists/i.test(errorMessage)) {
       return { error: "inviteCatalyst.errors.exists" };
+    }
+    if (inviteError.code === "over_email_send_rate_limit" || /rate limit/i.test(errorMessage)) {
+      return { error: "inviteCatalyst.errors.rate_limit" };
     }
     return { error: "inviteCatalyst.errors.generic" };
   }

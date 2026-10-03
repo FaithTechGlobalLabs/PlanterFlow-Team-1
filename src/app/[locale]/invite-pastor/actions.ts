@@ -68,9 +68,14 @@ export async function invitePastor(
   if (inviteError) {
     await admin.from("invitations").delete().eq("id", invitation.id);
 
+    console.error("[invite-pastor] inviteUserByEmail failed:", inviteError.code, inviteError.message);
+
     const errorMessage = inviteError.message || "";
     if (/already been registered|already exists/i.test(errorMessage)) {
       return { error: "invitePastor.errors.exists" };
+    }
+    if (inviteError.code === "over_email_send_rate_limit" || /rate limit/i.test(errorMessage)) {
+      return { error: "invitePastor.errors.rate_limit" };
     }
     return { error: "invitePastor.errors.generic" };
   }

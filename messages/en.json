@@ -147,7 +147,8 @@
     "errors": {
       "email": "Enter a valid email address",
       "exists": "This email already has an account.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "rate_limit": "Too many invitation emails were sent recently. Wait an hour and try again."
     },
     "sent": {
       "title": "An invitation is on its way.",
@@ -174,7 +175,8 @@
     "errors": {
       "email": "Enter a valid email address",
       "exists": "This email already has an account.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "rate_limit": "Too many invitation emails were sent recently. Wait an hour and try again."
     },
     "sent": {
       "title": "An invitation is on its way.",
