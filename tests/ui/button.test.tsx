@@ -22,4 +22,18 @@ describe("Button", () => {
     const button = container.querySelector("button");
     expect(button).toBeDisabled();
   });
+
+  it("greys out a disabled button and keeps enabled ones colored", () => {
+    const { container } = render(
+      <>
+        <Button variant="primary" disabled>Off</Button>
+        <Button variant="primary">On</Button>
+      </>
+    );
+    const [off, on] = Array.from(container.querySelectorAll("button"));
+    expect(off.className).toContain("bg-[var(--color-border)]");
+    expect(off.className).toContain("cursor-not-allowed");
+    expect(off.className).not.toContain("bg-[var(--color-blue)]");
+    expect(on.className).toContain("bg-[var(--color-blue)]");
+  });
 });
