@@ -2,7 +2,7 @@
 
 **Issue:** [#12 Globe login](https://github.com/FaithTechGlobalLabs/PlanterFlow-Team-1/issues/12)  
 **Figma:** [Desktop (1200px)](https://www.figma.com/design/cqiy3n6u8ZcIduE17bYoTG/Planter-Flow?node-id=6-2) | [Mobile (390px)](https://www.figma.com/design/cqiy3n6u8ZcIduE17bYoTG/Planter-Flow?node-id=10-404)  
-**Status:** ✓ Implemented, build passing
+**Status:** Login and recovery integration implemented; automated tests and types pass. Current Windows production build is blocked by SWC native-cache permissions; browser and hosted authentication verification are pending.
 
 ## Intent
 
@@ -81,7 +81,7 @@ Redirects:
 - Validates required fields
 - Calls `supabase.auth.signInWithPassword()`
 - Maps errors to generic message
-- Redirects to `/` on success
+- Redirects to the current locale's home page on success
 
 ## Testing
 
@@ -111,7 +111,37 @@ Keep root width/height attributes; never override with 100% × 100%.
 
 ## Next
 
-- #13 Password Recovery → `/en/recover`
+- #13 Password Recovery → implemented at `/en/recover`; verify email delivery and hosted callback
 - #49 Invite Acceptance → `/en/invite`
 - #2 Church Dashboard → Replace `/en` placeholder
 - #6 Catalyst Garden → Interactive globe
+
+## Hosting handoff — October 3, 2026
+
+Hadi is working on the login integration on `codex/login-supabase-integration`, based on `origin/feat/login-page`. Sid owns the hosting configuration. These changes are local and have not been deployed.
+
+Configure these variables in the application's hosting environment, then rebuild/redeploy:
+
+| Variable | Value / source |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://uqxkoqekpvdyucuiccxh.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | This project's publishable key from Supabase; legacy `NEXT_PUBLIC_SUPABASE_ANON_KEY` is also supported |
+| `NEXT_PUBLIC_SITE_URL` | The actual HTTPS app origin, without a path; use `http://localhost:3000` only locally |
+| `SUPABASE_SECRET_KEY` or `SUPABASE_SERVICE_ROLE_KEY` | Project server credential, entered directly in hosting settings. Never use a `NEXT_PUBLIC_` prefix or commit it |
+
+The server credential is required for invitations and the existing privileged onboarding operations. Email/password login and password recovery use the public connection. A credential installed on the host is not available to a local development server; local invitation testing still needs its own ignored environment configuration.
+
+In Supabase Authentication URL Configuration, set Site URL to the deployed app origin. Add redirect URLs for `https://<app-host>/auth/callback**` and `https://<app-host>/*/invite/**`. If testing locally, also add `http://localhost:3000/auth/callback**` and `http://localhost:3000/*/invite/**`. Use the exact host; do not broadly allow all deployed domains. Current locale routing is English only; the other requested languages remain separate implementation work.
+
+The `20261003155911_restrict_profile_permissions.sql` migration has already been applied to the shared Supabase project and verified with a rolled-back impersonation test. Users can edit their personal profile fields but cannot promote their role, change organization, or grant themselves admin access. The existing base schema was already present before this integration; do not blindly replay the original migration against it.
+
+### Acceptance check with Hadi and Sid
+
+1. An existing confirmed user signs in and reaches the correct onboarding or home screen.
+2. Refresh and navigation retain the session; sign out prevents access to protected pages.
+3. Incorrect credentials show a generic error, without revealing account existence.
+4. Request recovery for a team-owned test account; open the email in the same browser, set a new password, sign out, and sign in with it. PKCE recovery depends on the originating browser's cookies.
+5. With Sid's server credential installed, an authorized Catalyst invites a team-owned test account; acceptance provisions the expected organization and role, then onboarding completes.
+6. Verify the same flow on the hosted URL, including expired links and mobile layout.
+
+Local validation: 14 test files / 58 tests passed, TypeScript passed, lint had no errors and eight existing image warnings. Tests mock authentication responses; they do not prove a real account can sign in or that email is delivered. The Windows build currently fails while loading `@swc/core` because its native cache rejects local directory permissions. No real sign-in, invitation email, recovery email, or browser acceptance test has been completed in this integration session. Existing invitation acceptance uses multiple database writes and is not yet transactional.

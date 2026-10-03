@@ -16,10 +16,12 @@ export function OnboardingPage({
   children,
 }: OnboardingPageProps) {
   return (
-    <main className="min-h-screen bg-[var(--color-canvas)] p-8 md:p-10 flex flex-col gap-4">
+    <main className="onboarding-shell">
       <BrandNav />
+      <div className="onboarding-content">
       <PageHeader eyebrow={eyebrow} title={title} subline={subline} />
       {children}
+      </div>
     </main>
   );
 }

@@ -17,6 +17,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Next enforces this import boundary at build time; unit tests run outside RSC.
+      "server-only": path.resolve(__dirname, "./tests/server-only.ts"),
     },
   },
 });

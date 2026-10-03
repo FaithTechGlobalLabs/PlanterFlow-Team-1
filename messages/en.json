@@ -22,8 +22,10 @@
     "errors": {
       "required": "Email and password are required",
       "invalid": "Email or password did not match.",
-      "generic": "Something went wrong. Please try again."
-    }
+      "generic": "Something went wrong. Please try again.",
+      "rate_limit": "Too many attempts. Please wait a moment and try again."
+    },
+    "signing_in": "Signing in..."
   },
   "common": {
     "back_to_login": "Back to login",
@@ -205,6 +207,34 @@
         "young": "Young tree · year 2–3",
         "established": "Established · year 3+"
       }
+    }
+  },
+  "authSetup": {
+    "title": "Invitations are being connected",
+    "description": "Invitation setup is not available on this server yet. Please contact your Catalyst.",
+    "card_title": "Your account is safe",
+    "body": "Existing members can still sign in. New invitations will be available when setup is complete."
+  },
+  "recover": {
+    "title": "Reset your password",
+    "description": "We will send a secure link to your account email.",
+    "card_title": "Your email address",
+    "send": "Send reset link",
+    "sent": "If an account exists for this email, you will receive a password reset link. Open it in this browser.",
+    "update_title": "Choose a new password",
+    "update_description": "Open your reset link first, then enter your new password below.",
+    "password": "New password",
+    "confirm_password": "Confirm new password",
+    "save": "Save password",
+    "saving": "Please wait...",
+    "updated": "Your password has been updated.",
+    "continue": "Continue to my account",
+    "errors": {
+      "email": "Enter a valid email address.",
+      "password": "Use at least 8 characters.",
+      "match": "The passwords do not match.",
+      "link": "This reset link is missing or expired. Please request a new link.",
+      "generic": "We could not complete this request. Please try again shortly."
     }
   }
 }

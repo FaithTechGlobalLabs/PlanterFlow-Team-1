@@ -12,32 +12,33 @@ export function AuthHashListener() {
 
   useEffect(() => {
     const hash = window.location.hash;
+    const params = new URLSearchParams(hash.slice(1));
+    const isRecovery = params.get("type") === "recovery";
+    const failurePath = isRecovery ? "/recover?error=link" : "/invite/unavailable";
 
     if (hash.includes("error=")) {
-      router.replace("/invite/unavailable");
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+      router.replace(failurePath);
       return;
     }
     if (!hash.includes("access_token=")) return;
 
-    const params = new URLSearchParams(hash.slice(1));
     const accessToken = params.get("access_token");
     const refreshToken = params.get("refresh_token");
     if (!accessToken || !refreshToken) {
-      router.replace("/invite/unavailable");
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+      router.replace(failurePath);
       return;
     }
 
-    let cancelled = false;
+    // Strip credentials immediately; StrictMode's second effect sees no hash.
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
     createClient()
       .auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
       .then(({ error }) => {
-        if (cancelled) return;
-        router.replace(error ? "/invite/unavailable" : "/");
-      });
-
-    return () => {
-      cancelled = true;
-    };
+        router.replace(error ? failurePath : isRecovery ? "/recover/update" : "/");
+      })
+      .catch(() => router.replace(failurePath));
   }, [router]);
 
   return null;

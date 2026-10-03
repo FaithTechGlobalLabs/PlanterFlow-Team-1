@@ -1,0 +1,1 @@
+export default function Loading() { return <main className="m-auto p-12" role="status"><h1 className="text-2xl">Opening your workspace…</h1><p className="mt-3">Gathering your objectives, progress, and conversations.</p></main>; }

@@ -2,8 +2,8 @@
 
 import { redirect } from "@/i18n/routing";
 import { getLocale } from "next-intl/server";
-import { headers } from "next/headers";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { getSiteUrl } from "@/lib/auth/site-url";
+import { createAdminClient, hasAdminCredentials } from "@/lib/supabase/admin";
 import { getSessionProfile } from "@/lib/auth/session";
 import { validateInviteCatalyst } from "@/lib/validation/onboarding";
 
@@ -28,7 +28,9 @@ export async function inviteCatalyst(
     return { error: "inviteCatalyst.errors.generic" };
   }
 
+  if (!hasAdminCredentials()) return { error: "authSetup.description" };
   const admin = createAdminClient();
+  const origin = getSiteUrl();
 
   const { data: invitation, error: insertError } = await admin
     .from("invitations")
@@ -48,12 +50,7 @@ export async function inviteCatalyst(
     return { error: "inviteCatalyst.errors.generic" };
   }
 
-  const headersList = await headers();
-  const protocol = headersList.get("x-forwarded-proto") ?? "http";
-  const host =
-    headersList.get("x-forwarded-host") ?? headersList.get("host") ?? "localhost:3000";
   const locale = await getLocale();
-  const origin = `${protocol}://${host}`;
   const redirectTo = `${origin}/${locale}/invite/${invitation.token}`;
 
   const { error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {

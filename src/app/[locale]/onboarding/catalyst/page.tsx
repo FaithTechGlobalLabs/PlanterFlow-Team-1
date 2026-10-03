@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/routing";
 import { requireRole } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, hasAdminCredentials } from "@/lib/supabase/admin";
 import { OnboardingPage } from "@/components/onboarding-page";
 import { FormCard } from "@/components/ui/FormCard";
 import { Status } from "@/components/ui/Status";
@@ -29,8 +29,7 @@ export default async function CatalystOnboardingPage({ params }: PageProps) {
     .eq("id", profile.org_id)
     .single();
 
-  const admin = createAdminClient();
-  const { data: invitation } = await admin
+  const { data: invitation } = hasAdminCredentials() ? await createAdminClient()
     .from("invitations")
     .select("invited_by_name")
     .ilike("email", user.email!)
@@ -38,7 +37,7 @@ export default async function CatalystOnboardingPage({ params }: PageProps) {
     .not("accepted_at", "is", null)
     .order("accepted_at", { ascending: false })
     .limit(1)
-    .maybeSingle();
+    .maybeSingle() : { data: null };
 
   const chipText = invitation?.invited_by_name
     ? t("onboarding.catalyst.chip", { name: invitation.invited_by_name })

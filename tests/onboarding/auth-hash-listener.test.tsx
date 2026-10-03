@@ -53,6 +53,14 @@ describe("AuthHashListener", () => {
     expect(replace).not.toHaveBeenCalled();
   });
 
+  it("strips tokens from history and keeps recovery out of onboarding", async () => {
+    setSession.mockResolvedValue({ error: null });
+    window.location.hash = "#access_token=acc123&refresh_token=ref456&type=recovery";
+    render(<AuthHashListener />);
+    expect(window.location.hash).toBe("");
+    await waitFor(() => expect(replace).toHaveBeenCalledWith("/recover/update"));
+  });
+
   it("sends the user to the unavailable page if the session cannot be set", async () => {
     setSession.mockResolvedValue({ error: new Error("bad token") });
     window.location.hash = "#access_token=acc123&refresh_token=ref456";

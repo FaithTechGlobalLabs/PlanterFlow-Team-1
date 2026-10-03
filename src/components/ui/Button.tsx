@@ -25,12 +25,12 @@ export function Button({
   className = "",
 }: ButtonProps) {
   const baseClasses =
-    "flex items-center justify-center h-12 px-4 rounded-[var(--radius-card)] text-[13px] font-bold leading-[1.4] transition-opacity";
+    "flex items-center justify-center min-h-12 px-4 py-3 rounded-[var(--radius-card)] text-[13px] font-bold leading-[1.4] transition-colors disabled:opacity-60 disabled:cursor-wait";
   const widthClass = fullWidth ? "w-full" : "self-start";
   const variantClasses =
     variant === "primary"
-      ? "bg-[var(--color-blue)] text-white"
-      : "bg-[var(--color-sage)] text-[var(--color-ink)]";
+      ? "bg-[var(--color-green)] text-white hover:bg-[var(--color-navy)]"
+      : "bg-[var(--color-sage)] text-[var(--color-ink)] border border-[var(--color-border)] hover:bg-white";
 
   const combinedClasses = `${baseClasses} ${widthClass} ${variantClasses} ${className}`;
 

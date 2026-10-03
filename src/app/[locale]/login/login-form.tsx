@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { FormError } from "@/components/ui/FormError";
 import { signIn } from "./actions";
+import { Link } from "@/i18n/routing";
 
 export function LoginForm() {
   const t = useTranslations();
@@ -13,7 +14,7 @@ export function LoginForm() {
   const [state, formAction, isPending] = useActionState<{ error?: string }, FormData>(signIn, {});
 
   return (
-    <form action={formAction} className="flex flex-col gap-4 w-full md:w-[450px] bg-white p-6 rounded-[var(--radius-card)]">
+    <form action={formAction} aria-busy={isPending} className="login-form">
       <h2 className="text-[22px] font-bold text-[var(--color-ink)]">
         {t("login.welcome_back")}
       </h2>
@@ -24,6 +25,7 @@ export function LoginForm() {
       <Input
         name="email"
         type="email"
+        autoComplete="email"
         label={t("login.email_label")}
         placeholder={t("login.email_placeholder")}
         value={email}
@@ -34,6 +36,7 @@ export function LoginForm() {
       <Input
         name="password"
         type="password"
+        autoComplete="current-password"
         label={t("login.password_label")}
         placeholder={t("login.password_placeholder")}
         required
@@ -46,8 +49,12 @@ export function LoginForm() {
         type="submit"
         disabled={isPending}
       >
-        {isPending ? "Signing in..." : t("login.sign_in")}
+        {isPending ? t("login.signing_in") : t("login.sign_in")}
       </Button>
+
+      <Link href="/recover" className="text-sm text-[var(--color-blue)] underline">
+        {t("login.forgot_password")}
+      </Link>
 
       <Button
         variant="secondary"
