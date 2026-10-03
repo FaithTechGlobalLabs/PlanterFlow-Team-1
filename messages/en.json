@@ -206,5 +206,12 @@
         "established": "Established · year 3+"
       }
     }
+  },
+  "inviteLink": {
+    "title": "The invitation email couldn't be sent.",
+    "body": "Send this link to {email} yourself. They can use it to accept the invitation.",
+    "field_label": "Invitation link",
+    "copy": "Copy link",
+    "copied": "Copied"
   }
 }

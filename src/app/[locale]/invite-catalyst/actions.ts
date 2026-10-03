@@ -5,10 +5,13 @@ import { getLocale } from "next-intl/server";
 import { headers } from "next/headers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getSessionProfile } from "@/lib/auth/session";
+import { generateInviteLink } from "@/lib/invite-link";
 import { validateInviteCatalyst } from "@/lib/validation/onboarding";
 
 interface ActionState {
   error?: string;
+  inviteLink?: string;
+  email?: string;
 }
 
 export async function inviteCatalyst(
@@ -65,14 +68,24 @@ export async function inviteCatalyst(
   });
 
   if (inviteError) {
-    await admin.from("invitations").delete().eq("id", invitation.id);
-
     console.error("[invite-catalyst] inviteUserByEmail failed:", inviteError.code, inviteError.message);
 
     const errorMessage = inviteError.message || "";
     if (/already been registered|already exists/i.test(errorMessage)) {
+      await admin.from("invitations").delete().eq("id", invitation.id);
       return { error: "inviteCatalyst.errors.exists" };
     }
+
+    // The email couldn't be sent, so hand the inviter the link to share themselves.
+    const inviteLink = await generateInviteLink(admin, email, redirectTo, {
+      invitation_token: invitation.token,
+      invited_by_name: profile.display_name,
+    });
+    if (inviteLink) {
+      return { inviteLink, email };
+    }
+
+    await admin.from("invitations").delete().eq("id", invitation.id);
     if (inviteError.code === "over_email_send_rate_limit" || /rate limit/i.test(errorMessage)) {
       return { error: "inviteCatalyst.errors.rate_limit" };
     }
