@@ -64,6 +64,16 @@ export default async function CatalystOnboardingPage({ params }: PageProps) {
         >
           {t("onboarding.catalyst.invite")}
         </Button>
+        {profile.is_admin && (
+          <Button
+            variant="secondary"
+            href="/invite-catalyst"
+            fullWidth={false}
+            className="min-w-[222px]"
+          >
+            {t("home.catalyst.invite_catalyst")}
+          </Button>
+        )}
       </FormCard>
     </OnboardingPage>
   );
