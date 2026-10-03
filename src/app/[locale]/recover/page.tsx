@@ -1,13 +1,14 @@
-import { Link } from "@/i18n/routing";
+import { getTranslations } from "next-intl/server";
+import { OnboardingPage } from "@/components/onboarding-page";
+import { FormCard } from "@/components/ui/FormCard";
+import { RecoveryForm } from "./recovery-form";
 
-export default function RecoverPage() {
+export default async function RecoverPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  const t = await getTranslations();
+  const { error } = await searchParams;
   return (
-    <main className="flex flex-col items-center justify-center gap-4 px-6 py-24 text-center min-h-screen">
-      <h1 className="text-2xl font-bold">Password Recovery</h1>
-      <p className="text-[var(--color-muted)]">Coming soon.</p>
-      <Link href="/login" className="text-[var(--color-blue)] underline">
-        Back to login
-      </Link>
-    </main>
+    <OnboardingPage title={t("recover.title")} subline={t("recover.description")}>
+      <FormCard title={t("recover.card_title")}><RecoveryForm invalidLink={error === "link"} /></FormCard>
+    </OnboardingPage>
   );
 }

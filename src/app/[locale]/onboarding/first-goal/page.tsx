@@ -39,6 +39,7 @@ export default async function FirstGoalPage({ params }: PageProps) {
     .from("objective_categories")
     .select("id, title")
     .eq("org_id", profile.org_id)
+    .eq("kind", "objective")
     .order("sort_order", { ascending: true });
 
   return (

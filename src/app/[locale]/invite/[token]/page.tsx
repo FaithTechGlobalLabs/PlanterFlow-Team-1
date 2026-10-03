@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/routing";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, hasAdminCredentials } from "@/lib/supabase/admin";
+import { AuthSetupPending } from "@/components/auth-setup-pending";
 import { getSessionProfile } from "@/lib/auth/session";
 import { invitationStatus } from "@/lib/invitations";
 import { OnboardingPage } from "@/components/onboarding-page";
@@ -14,6 +15,7 @@ interface PageProps {
 
 export default async function InviteTokenPage({ params }: PageProps) {
   const { locale, token } = await params;
+  if (!hasAdminCredentials()) return <AuthSetupPending />;
   const admin = createAdminClient();
   const t = await getTranslations();
 

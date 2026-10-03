@@ -1,6 +1,7 @@
 "use server";
 
-import { redirect } from "next/navigation";
+import { redirect } from "@/i18n/routing";
+import { getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 
 interface SignInState {
@@ -18,23 +19,17 @@ export async function signIn(
     return { error: "login.errors.required" };
   }
 
-  const supabase = await createClient();
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    if (
-      error.message === "Invalid login credentials" ||
-      error.message === "Email not confirmed"
-    ) {
-      return { error: "login.errors.invalid" };
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      if (error.status === 429) return { error: "login.errors.rate_limit" };
+      return { error: error.status && error.status >= 500 ? "login.errors.generic" : "login.errors.invalid" };
     }
+  } catch {
     return { error: "login.errors.generic" };
   }
 
-  redirect("/");
-  return {};
+  const locale = await getLocale();
+  return redirect({ href: "/", locale });
 }

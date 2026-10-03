@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/.pnpm-store/
 /.pnp
 .pnp.*
 .yarn/*
@@ -46,12 +47,3 @@ next-env.d.ts
 
 # Supabase CLI local state
 supabase/.temp/
-
-# Playwright test output
-test-results/
-playwright-report/
-
-# OpenNext / Cloudflare
-.open-next/
-.wrangler/
-.dev.vars

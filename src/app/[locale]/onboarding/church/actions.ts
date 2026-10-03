@@ -3,7 +3,7 @@
 import { redirect } from "@/i18n/routing";
 import { getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, hasAdminCredentials } from "@/lib/supabase/admin";
 import { getSessionProfile } from "@/lib/auth/session";
 import { validateChurch } from "@/lib/validation/onboarding";
 
@@ -28,6 +28,7 @@ export async function saveChurch(
     return { error: "onboarding.church.errors.generic" };
   }
 
+  if (!hasAdminCredentials()) return { error: "authSetup.description" };
   const { data: invitation } = await createAdminClient()
     .from("invitations")
     .select("invited_by")

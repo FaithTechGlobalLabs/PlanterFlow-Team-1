@@ -2,7 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/routing";
 import { getSessionProfile } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, hasAdminCredentials } from "@/lib/supabase/admin";
+import { AuthSetupPending } from "@/components/auth-setup-pending";
 import { OnboardingPage } from "@/components/onboarding-page";
 import { FormCard } from "@/components/ui/FormCard";
 import { Status } from "@/components/ui/Status";
@@ -25,6 +26,7 @@ export default async function HomePage({ params }: PageProps) {
   }
 
   if (!profile) {
+    if (!hasAdminCredentials()) return <AuthSetupPending />;
     const admin = createAdminClient();
     const { data: invitation } = await admin
       .from("invitations")
@@ -60,6 +62,7 @@ export default async function HomePage({ params }: PageProps) {
         subline={t("home.catalyst.subline")}
       >
         <FormCard title={profile!.display_name}>
+          <Button variant="primary" href="/dashboard" fullWidth={false}>Open workspace</Button>
           <Status>
             {profile!.is_admin ? t("home.catalyst.chip_admin") : t("invite.catalyst.chip")}
           </Status>
@@ -118,6 +121,7 @@ export default async function HomePage({ params }: PageProps) {
       subline={t("home.planter.subline")}
     >
       <FormCard title={church.city ?? church.name}>
+        <Button variant="primary" href="/dashboard" fullWidth={false}>Open workspace</Button>
         <TreeSapling />
         <Status>{t(`home.planter.stage.${stage}`)}</Status>
         <p className="text-[15px] text-[var(--color-muted)]">{firstObjective?.title}</p>

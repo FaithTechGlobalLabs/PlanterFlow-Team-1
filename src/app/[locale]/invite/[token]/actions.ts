@@ -3,7 +3,7 @@
 import { redirect } from "@/i18n/routing";
 import { getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, hasAdminCredentials } from "@/lib/supabase/admin";
 import { validateAcceptInvitation } from "@/lib/validation/onboarding";
 import { invitationStatus } from "@/lib/invitations";
 
@@ -23,6 +23,7 @@ export async function acceptInvitation(
   const { name, password, locale } = validation.values;
   const token = formData.get("token")?.toString() || "";
 
+  if (!hasAdminCredentials()) return { error: "authSetup.description" };
   const admin = createAdminClient();
   const { data: invitation } = await admin
     .from("invitations")
