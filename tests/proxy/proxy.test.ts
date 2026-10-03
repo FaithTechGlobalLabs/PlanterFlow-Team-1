@@ -12,25 +12,19 @@ import { proxy } from "@/proxy";
 const call = (path: string) =>
   proxy(new NextRequest(new URL(path, "http://localhost:3000")));
 
-describe("proxy: non-localized invitation routes (#55)", () => {
-  it.each(["/invite/welcome", "/invite/abc123token", "/invite"])(
-    "passes %s through without a locale redirect or auth lookup",
-    async (path) => {
-      getUser.mockClear();
-      const res = await call(path);
-      expect(res.headers.get("location")).toBeNull();
-      expect(res.headers.get("x-middleware-next")).toBe("1");
-      expect(getUser).not.toHaveBeenCalled();
-    }
-  );
+describe("proxy: legacy non-localized invite links", () => {
+  it.each([
+    ["/invite/abc123token", "/en/invite/abc123token"],
+    ["/invite/welcome", "/en/invite/welcome"],
+    ["/invite", "/en/invite"],
+    ["/invite-pastor", "/en/invite-pastor"],
+  ])("redirects %s to %s", async (from, to) => {
+    const res = await call(from);
+    expect(new URL(res.headers.get("location")!).pathname).toBe(to);
+  });
 });
 
 describe("proxy: localized routes", () => {
-  it("still redirects /invite-pastor to the default locale", async () => {
-    const res = await call("/invite-pastor");
-    expect(res.headers.get("location")).toContain("/en/invite-pastor");
-  });
-
   it("keeps /en/invite/<token> public for signed-out users", async () => {
     getUser.mockResolvedValue({ data: { user: null } });
     const res = await call("/en/invite/abc123token");
