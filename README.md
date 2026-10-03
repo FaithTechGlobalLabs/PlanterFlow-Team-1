@@ -42,15 +42,30 @@ See [`docs/superpowers/specs/2026-10-02-first-fruits-design.md`](docs/superpower
 
 ## 📋 Requirements
 
-To be confirmed once the team settles the stack at pitch night. The proposed stack (see the design spec) needs:
-
-- Node.js 20+ and pnpm (we use pnpm, not npm)
-- A Supabase project (Postgres, Auth, Realtime)
+- Node.js 20+
+- pnpm 10+ (we use pnpm, not npm). Install with `corepack enable` or `npm i -g pnpm`.
+- A Supabase project (Postgres, Auth, Realtime) for anything beyond the landing page
 - A Vercel account for deploys
 
 ## 🚀 Getting Started
 
-Setup instructions land with the first application scaffold PR.
+```bash
+pnpm install
+cp .env.example .env.local   # fill in Supabase URL and keys
+pnpm dev                     # http://localhost:3000
+```
+
+Other scripts: `pnpm lint`, `pnpm build`.
+
+Project layout:
+
+```text
+src/app/              Next.js App Router pages and layouts
+src/lib/supabase/     client.ts (browser), server.ts (server components, actions, routes), admin.ts (service role, server only)
+docs/superpowers/specs/  Design spec
+```
+
+Stack: Next.js (App Router, TypeScript), Tailwind CSS, Supabase. Rationale and alternatives in the design spec.
 
 ## 🗓️ Hackathon schedule
 
