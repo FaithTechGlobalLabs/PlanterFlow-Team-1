@@ -63,7 +63,7 @@ Out of scope for the weekend: notifications (email or push), file attachments, m
 
 **Assumption A2.** Progress is logged as a free-text note plus an optional number (for example "3 coffee meetings"). No numeric targets or percent-complete yet. The Catalyst reads progress, the app does not score it.
 
-**Assumption A3.** Second demo language is Spanish unless the client names a different one at pitch night.
+**Assumption A3.** Second demo language is Korean unless the client names a different one at pitch night.
 
 ## 4. Roles and visibility
 
