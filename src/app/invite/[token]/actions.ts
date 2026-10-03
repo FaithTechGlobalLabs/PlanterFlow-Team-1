@@ -1,30 +1,22 @@
 "use server";
 
 import { redirect } from "next/navigation";
-// ASSUMPTION: adjust these import names to match your src/lib/supabase files.
+// ASSUMPTION: adjust these import names to match src/lib/supabase/*.
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { LANGUAGES } from "./data";
 
-export type JoinState = { error?: string };
+export type AcceptState = { error?: string };
 
-export async function joinChurch(
-  _prev: JoinState,
+export async function acceptInvite(
+  _prev: AcceptState,
   formData: FormData,
-): Promise<JoinState> {
+): Promise<AcceptState> {
   const token = String(formData.get("token") ?? "");
   const name = String(formData.get("name") ?? "").trim();
-  const language = String(formData.get("language") ?? "");
+  const password = String(formData.get("password") ?? "");
 
   if (name.length < 2) return { error: "Enter your name so your team knows who you are." };
-  if (!LANGUAGES.some((l) => l.code === language)) {
-    return { error: "Choose a language from the list." };
-  }
-
-  // profiles.id = auth user id, so the person must be signed in.
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Sign in first, then open your invite link again." };
+  if (password.length < 8) return { error: "Use a password with at least 8 characters." };
 
   const admin = createAdminClient();
   const invalid = { error: "This invite is no longer valid. Ask for a new link." };
@@ -36,12 +28,7 @@ export async function joinChurch(
     .maybeSingle();
   if (!invite || invite.accepted_at) return invalid;
 
-  // Stops anyone who merely has the link from taking someone else's seat.
-  if (invite.email.toLowerCase() !== user.email?.toLowerCase()) {
-    return { error: "This invite was sent to a different email address." };
-  }
-
-  // Claim the invite atomically so it can only be used once.
+  // Claim atomically so the invite works once, even on double-submit.
   const { data: claimed } = await admin
     .from("invitations")
     .update({ accepted_at: new Date().toISOString() })
@@ -51,19 +38,47 @@ export async function joinChurch(
     .maybeSingle();
   if (!claimed) return invalid;
 
-  const { error } = await admin.from("profiles").upsert({
-    id: user.id,
+  // Undo everything so the person can retry.
+  async function fail(message: string, userId?: string): Promise<AcceptState> {
+    if (userId) await admin.auth.admin.deleteUser(userId);
+    await admin.from("invitations").update({ accepted_at: null }).eq("id", invite!.id);
+    return { error: message };
+  }
+
+  // The account is created for the email on the invitation, never one from the form.
+  // email_confirm: the invite link was sent to that address, which is the confirmation.
+  const { data: created, error: createError } = await admin.auth.admin.createUser({
+    email: invite.email,
+    password,
+    email_confirm: true,
+  });
+  if (createError || !created.user) {
+    const exists = createError?.code === "email_exists" || /already/i.test(createError?.message ?? "");
+    return fail(
+      exists
+        ? "An account with this email already exists. Sign in instead."
+        : "We couldn't create your account. Try again.",
+    );
+  }
+  const userId = created.user.id;
+
+  // Start their session (sets the login cookie).
+  const supabase = await createClient();
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: invite.email,
+    password,
+  });
+  if (signInError) return fail("Account created but sign-in failed. Try again.", userId);
+
+  // org_id and role come from the invitation, not the form.
+  const { error: profileError } = await admin.from("profiles").insert({
+    id: userId,
     org_id: invite.org_id,
     role: invite.role,
     display_name: name,
-    locale: language,
+    locale: "en",
   });
+  if (profileError) return fail("We couldn't finish joining. Try again.", userId);
 
-  if (error) {
-    // Un-claim so they can retry.
-    await admin.from("invitations").update({ accepted_at: null }).eq("id", invite.id);
-    return { error: "We couldn't finish joining. Try again." };
-  }
-
-  redirect("/"); // TODO: role-based home, e.g. /dashboard
+  redirect("/invite/welcome");
 }

@@ -1,7 +1,7 @@
 import "server-only";
 // ASSUMPTION: adjust this import name to whatever src/lib/supabase/admin.ts exports.
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { Invite, Role } from "./data";
+import type { Invite, Role } from "../_shared/data";
 
 // Uses the service role because the person opening the link isn't a member
 // yet, so row-level security would (correctly) hide the invitations table.
