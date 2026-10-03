@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 // ASSUMPTION: adjust these import names to match src/lib/supabase/*.
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { inviteCutoff, isInviteExpired } from "../_shared/data";
 
 export type AcceptState = { error?: string };
 
@@ -23,17 +24,22 @@ export async function acceptInvite(
 
   const { data: invite } = await admin
     .from("invitations")
-    .select("id, org_id, role, email, accepted_at")
+    .select("id, org_id, role, email, accepted_at, created_at")
     .eq("token", token)
     .maybeSingle();
   if (!invite || invite.accepted_at) return invalid;
+  if (isInviteExpired(invite.created_at)) {
+    return { error: "This invite has expired. Ask for a new link." };
+  }
 
-  // Claim atomically so the invite works once, even on double-submit.
+  // Claim atomically: unused AND unexpired, decided in one statement, so the
+  // invite works once and can't be accepted after it expires.
   const { data: claimed } = await admin
     .from("invitations")
     .update({ accepted_at: new Date().toISOString() })
     .eq("id", invite.id)
     .is("accepted_at", null)
+    .gte("created_at", inviteCutoff()) // expiry enforced in the same statement as the claim
     .select("id")
     .maybeSingle();
   if (!claimed) return invalid;

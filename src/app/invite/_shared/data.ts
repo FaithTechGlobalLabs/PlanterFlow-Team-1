@@ -16,6 +16,19 @@ export const ROLE_LABELS: Record<Role, string> = {
   catalyst: "Catalyst",
 };
 
+// Invitations expire 7 days after invitations.created_at.
+export const INVITE_TTL_DAYS = 7;
+const INVITE_TTL_MS = INVITE_TTL_DAYS * 24 * 60 * 60 * 1000;
+
+// Oldest created_at that is still valid. Use in DB filters (.gte("created_at", ...)).
+export function inviteCutoff(): string {
+  return new Date(Date.now() - INVITE_TTL_MS).toISOString();
+}
+
+export function isInviteExpired(createdAt: string): boolean {
+  return new Date(createdAt).getTime() < Date.now() - INVITE_TTL_MS;
+}
+
 // Stored in profiles.locale as BCP-47 codes.
 export const LANGUAGES = [
   { code: "en", label: "English" },
