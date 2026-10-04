@@ -436,6 +436,26 @@
         "accepted": "Accepted",
         "expired": "Expired"
       }
+    },
+    "exportReport": {
+      "header": "FIRST FRUITS · AUTHORIZED PLANTER REPORT",
+      "churchMeta": "Church: {church}",
+      "exportDateMeta": "Export Date: {date}",
+      "checkInHistory": "Check-in History",
+      "noCheckIns": "No check-ins recorded yet.",
+      "checkInTitle": "Check-in · {date}",
+      "feeling": "Feeling",
+      "momentum": "Momentum",
+      "notes": "Notes",
+      "supportNeeded": "Support Needed",
+      "objectivesAndDialogue": "Objectives & Dialogue",
+      "noObjectives": "No objectives added yet.",
+      "progressUpdates": "Progress Updates:",
+      "dialogue": "Dialogue:",
+      "notAvailable": "N/A",
+      "generalCategory": "General",
+      "categoryHeader": "Category: {category}",
+      "recorded": "Recorded"
     }
   }
 }

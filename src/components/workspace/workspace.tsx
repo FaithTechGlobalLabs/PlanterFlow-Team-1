@@ -9,6 +9,7 @@ import type { Activity, Objective, WorkspaceData, SaveResult } from "@/lib/works
 import "./workspace.css";
 import { DashboardInsights } from "./dashboard-insights";
 import { ConversationThreadView } from "./conversation-thread-view";
+import { ExportReportButton } from "./export-report-button";
 type IconName = "home" | "leaf" | "heart" | "chat" | "arrow" | "plus" | "check" | "globe" | "close";
 export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
   const paths: Record<IconName, ReactNode> = {
@@ -159,7 +160,7 @@ useEffect(() => {
     <main className="ff-main">
       {preview && <div className="ff-preview-banner">Design preview · All names and activity are fictional. Saving is available in the connected workspace.</div>}
       <div className="ff-breadcrumb"><Icon name="home" size={14} /><span>Workspace</span><span>/</span><span>{objective ? "Objective detail" : view === "overview" ? "Overview" : view === "prayers" ? (isPeer ? "Shared prayers" : "Prayer & support") : view === "updates" ? (isPeer ? "Progress" : "Check-ins & progress") : "Objectives"}</span></div>
-      <div className="ff-page-heading"><div className="ff-page-heading-text"><p className="ff-eyebrow">{objective ? categoryTitle(objective.category_id) : isOwner ? `YOUR JOURNEY, ${data.planter.display_name.split(" ")[0].toUpperCase()}` : "WALKING ALONGSIDE"}</p><h1 className="ff-page-title">{heading}</h1><p className="ff-page-description">{objective ? objective.description || "Give this objective a little attention today." : "Notice the growth. Share the challenges. Take the next faithful step."}</p></div>{isOwner && !objective && <button
+      <div className="ff-page-heading"><div className="ff-page-heading-text"><p className="ff-eyebrow">{objective ? categoryTitle(objective.category_id) : isOwner ? `YOUR JOURNEY, ${data.planter.display_name.split(" ")[0].toUpperCase()}` : "WALKING ALONGSIDE"}</p><h1 className="ff-page-title">{heading}</h1><p className="ff-page-description">{objective ? objective.description || "Give this objective a little attention today." : "Notice the growth. Share the challenges. Take the next faithful step."}</p></div><div className="ff-page-heading-actions flex items-center gap-2">{!preview && <ExportReportButton planterId={data.planter.id} planterName={data.planter.display_name} />}{isOwner && !objective && <button
   className="ff-button ff-primary"
   onClick={() => {
     setEditObjective(null);
@@ -168,7 +169,7 @@ useEffect(() => {
 >
   <Icon name="plus" size={17} />
   Create objective
-</button>}</div>
+</button>}</div></div>
       {notice && <div className="ff-notice" role="status"><Icon name="check" size={18} />{notice}<button onClick={() => setNotice("")} aria-label="Dismiss notification"><Icon name="close" size={15} /></button></div>}
       {view === "overview" && <>
         <section

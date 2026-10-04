@@ -5,6 +5,7 @@ import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/Button";
 import { GardenScene } from "./garden-scene";
 import { ChurchPanel } from "./church-panel";
+import { ExportReportButton } from "@/components/workspace/export-report-button";
 import {
   needsPresence,
   type GardenChurch,
@@ -245,7 +246,7 @@ export function CatalystHome({
               worth remembering.
             </p>
           )}
-          <div className="garden-panel-actions">
+          <div className="garden-panel-actions flex flex-col gap-2">
             <Button
               variant="primary"
               href={`/catalyst/planters/${selected.pastorId}`}
@@ -260,6 +261,7 @@ export function CatalystHome({
             >
               Open church workspace
             </Button>
+            <ExportReportButton planterId={selected.pastorId} planterName={selected.pastorName} className="w-full" />
           </div>
         </ChurchPanel>
       )}

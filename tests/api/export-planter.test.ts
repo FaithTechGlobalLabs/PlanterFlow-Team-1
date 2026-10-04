@@ -36,6 +36,7 @@ const mocks = vi.hoisted(() => ({
   messages: [{ id: "msg-1", objective_id: "obj-1", author_id: "catalyst-1", body: "Great progress!", created_at: "2026-02-03" }],
   authors: [{ id: "catalyst-1", display_name: "Coach Olivia" }],
   assignedChurch: { id: "c1" } as any,
+  queryError: null as any,
 }));
 
 vi.mock("@/lib/auth/session", () => ({
@@ -49,11 +50,19 @@ vi.mock("@/lib/supabase/server", () => ({
         select: () => builder,
         eq: (_col: string, val: any) => {
           if (table === "profiles" && val === "planter-1") {
-            return { maybeSingle: async () => ({ data: mocks.planter }) };
+            return {
+              maybeSingle: async () =>
+                mocks.queryError
+                  ? { data: null, error: mocks.queryError }
+                  : { data: mocks.planter, error: null },
+            };
           }
           if (table === "churches" && val === "planter-1") {
             return {
-              maybeSingle: async () => ({ data: mocks.assignedChurch ? mocks.church : null }),
+              maybeSingle: async () =>
+                mocks.queryError
+                  ? { data: null, error: mocks.queryError }
+                  : { data: mocks.assignedChurch ? mocks.church : null, error: null },
               eq: () => builder,
             };
           }
@@ -62,18 +71,23 @@ vi.mock("@/lib/supabase/server", () => ({
         in: () => builder,
         order: () => builder,
         maybeSingle: async () => {
-          if (table === "profiles") return { data: mocks.planter };
-          if (table === "churches") return { data: mocks.assignedChurch ? mocks.church : null };
-          return { data: null };
+          if (mocks.queryError) return { data: null, error: mocks.queryError };
+          if (table === "profiles") return { data: mocks.planter, error: null };
+          if (table === "churches") return { data: mocks.assignedChurch ? mocks.church : null, error: null };
+          return { data: null, error: null };
         },
         then: (resolve: any) => {
-          if (table === "objective_categories") resolve({ data: mocks.categories });
-          else if (table === "objectives") resolve({ data: mocks.objectives });
-          else if (table === "check_ins") resolve({ data: mocks.checkIns });
-          else if (table === "progress_entries") resolve({ data: mocks.progress });
-          else if (table === "dialogue_messages") resolve({ data: mocks.messages });
-          else if (table === "profiles") resolve({ data: mocks.authors });
-          else resolve({ data: [] });
+          if (mocks.queryError) {
+            resolve({ data: null, error: mocks.queryError });
+            return;
+          }
+          if (table === "objective_categories") resolve({ data: mocks.categories, error: null });
+          else if (table === "objectives") resolve({ data: mocks.objectives, error: null });
+          else if (table === "check_ins") resolve({ data: mocks.checkIns, error: null });
+          else if (table === "progress_entries") resolve({ data: mocks.progress, error: null });
+          else if (table === "dialogue_messages") resolve({ data: mocks.messages, error: null });
+          else if (table === "profiles") resolve({ data: mocks.authors, error: null });
+          else resolve({ data: [], error: null });
         },
       };
       return builder;
@@ -90,6 +104,7 @@ beforeEach(() => {
   };
   mocks.planter = { id: "planter-1", display_name: "Alex Pastor", role: "planter", org_id: "org-1" };
   mocks.assignedChurch = { id: "c1" };
+  mocks.queryError = null;
 });
 
 describe("GET /api/export/planter/[id]", () => {
@@ -118,7 +133,7 @@ describe("GET /api/export/planter/[id]", () => {
     expect(res.status).toBe(403);
   });
 
-  it("allows access to the planter themselves", async () => {
+  it("allows access to the planter themselves (self-export)", async () => {
     mocks.session = {
       user: { id: "planter-1" },
       profile: { role: "planter", org_id: "org-1" },
@@ -127,6 +142,20 @@ describe("GET /api/export/planter/[id]", () => {
     const req = new Request("http://localhost/api/export/planter/planter-1?format=json");
     const res = await GET(req, { params: Promise.resolve({ id: "planter-1" }) });
     expect(res.status).toBe(200);
+
+    const data = await res.json();
+    expect(data.planter.id).toBe("planter-1");
+    expect(data.categoryGroups.length).toBe(1);
+    expect(data.categoryGroups[0].categoryTitle).toBe("Discipleship");
+  });
+
+  it("supports route alignment ending in .pdf", async () => {
+    const req = new Request("http://localhost/api/export/planter/planter-1.pdf?format=json");
+    const res = await GET(req, { params: Promise.resolve({ id: "planter-1.pdf" }) });
+    expect(res.status).toBe(200);
+
+    const data = await res.json();
+    expect(data.planter.id).toBe("planter-1");
   });
 
   it("allows assigned Catalyst and returns JSON data format when requested", async () => {
@@ -136,8 +165,7 @@ describe("GET /api/export/planter/[id]", () => {
 
     const data = await res.json();
     expect(data.planter.name).toBe("Alex Pastor");
-    expect(data.objectives.length).toBe(1);
-    expect(data.objectives[0].title).toBe("Launch Life Groups");
+    expect(data.categoryGroups[0].objectives[0].title).toBe("Launch Life Groups");
   });
 
   it("generates binary PDF export for assigned Catalyst", async () => {
@@ -145,10 +173,20 @@ describe("GET /api/export/planter/[id]", () => {
     const res = await GET(req, { params: Promise.resolve({ id: "planter-1" }) });
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toBe("application/pdf");
-    expect(res.headers.get("content-disposition")).toContain("filename=\"planter-report-planter-1.pdf\"");
+    expect(res.headers.get("content-disposition")).toContain('filename="planter-report-planter-1.pdf"');
 
     const buffer = await res.arrayBuffer();
     const pdfHeader = new TextDecoder().decode(buffer.slice(0, 4));
     expect(pdfHeader).toBe("%PDF");
+  });
+
+  it("handles Supabase query failures and returns 500 error", async () => {
+    mocks.queryError = { message: "Database connection failure", code: "500" };
+    const req = new Request("http://localhost/api/export/planter/planter-1");
+    const res = await GET(req, { params: Promise.resolve({ id: "planter-1" }) });
+    expect(res.status).toBe(500);
+
+    const data = await res.json();
+    expect(data.error).toBe("Failed to fetch database records.");
   });
 });
