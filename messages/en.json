@@ -200,14 +200,14 @@
   "home": {
     "catalyst": {
       "eyebrow": "YOUR GARDEN",
-      "subline": "Catalyst garden is coming next. Your churches will appear here.",
+      "subline": "Walk alongside the pastors and churches in your garden.",
       "invite": "Invite a pastor",
       "invite_catalyst": "Invite a catalyst",
       "chip_admin": "Role: Admin"
     },
     "planter": {
       "eyebrow": "YOUR CHURCH",
-      "subline": "Church dashboard is coming next. Your goals will appear here.",
+      "subline": "Tend your objectives and stay connected with your community.",
       "stage": {
         "seed": "Seed · first 3 months",
         "sprout": "Sprout · 3–12 months",
@@ -219,7 +219,7 @@
     },
     "team": {
       "eyebrow": "YOUR TEAM",
-      "subline": "Your team workspace is coming next.",
+      "subline": "You’re part of this church’s journey. Stay connected with your pastor.",
       "chip": "Role: Team member"
     }
   },
