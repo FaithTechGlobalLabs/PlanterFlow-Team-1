@@ -86,11 +86,16 @@ export default async function CatalystGardenPage({ params }: PageProps) {
     <OnboardingPage
       eyebrow={t("eyebrow", { region: org.data?.name ?? "" })}
       title={t(greetingKey(now), { name: profile.display_name })}
-      subline={t("summary", {
-        churches: garden.length,
-        support: garden.filter((c) => c.supportRequested).length,
-        due: garden.filter((c) => c.replyDue).length,
-      })}
+      // Don't report counts we couldn't load.
+      subline={
+        loadFailed
+          ? t("summary_unavailable")
+          : t("summary", {
+              churches: garden.length,
+              support: garden.filter((c) => c.supportRequested).length,
+              due: garden.filter((c) => c.replyDue).length,
+            })
+      }
     >
       {loadFailed && (
         <p role="alert" className="text-[15px] text-[var(--color-ink)]">
@@ -105,7 +110,9 @@ export default async function CatalystGardenPage({ params }: PageProps) {
 
         <section className="flex flex-col gap-4 rounded-[var(--radius-card)] bg-white p-6 w-full lg:max-w-[460px]">
           <h2 className="text-[22px] font-bold text-[var(--color-ink)]">{t("presence_title")}</h2>
-          {presence.length === 0 ? (
+          {loadFailed ? (
+            <p className="text-[15px] text-[var(--color-muted)]">{t("presence_unavailable")}</p>
+          ) : presence.length === 0 ? (
             <p className="text-[15px] text-[var(--color-muted)]">{t("presence_empty")}</p>
           ) : (
             <ul className="flex flex-col gap-3">
