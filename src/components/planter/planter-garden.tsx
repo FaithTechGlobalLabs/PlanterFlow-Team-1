@@ -35,7 +35,10 @@ export function PlanterGarden({
           {data.church?.vision ||
             "Keep tending what matters most, with the people beside you."}
         </p>
-        <span className="planter-stage">
+        <span
+          className={`planter-stage planter-stage--${summary.stage ?? "unknown"}`}
+          title="Planting age stage"
+        >
           {summary.stage ? stageLabels[summary.stage] : "Your planting journey"}
         </span>
         <p className="planter-tree-summary">
@@ -46,19 +49,24 @@ export function PlanterGarden({
         <div className="planter-branches" aria-label="Objective branches">
           {data.objectives.slice(0, 4).map((o) =>
             openObjective ? (
-              <button key={o.id} onClick={() => openObjective(o)}>
-                {o.title}
-                <span>
+              <button
+                key={o.id}
+                className={`plant-branch plant-branch--${o.status}`}
+                onClick={() => openObjective(o)}
+              >
+                <span className="plant-branch__title">{o.title}</span>
+                <span className={`plant-branch__status plant-branch__status--${o.status}`}>
                   {o.status === "done" ? "Completed · fruit" : o.status}
                 </span>
               </button>
             ) : (
               <Link
                 key={o.id}
+                className={`plant-branch plant-branch--${o.status}`}
                 href={`${preview ? "/preview" : "/dashboard"}?view=objectives&objective=${o.id}`}
               >
-                {o.title}
-                <span>
+                <span className="plant-branch__title">{o.title}</span>
+                <span className={`plant-branch__status plant-branch__status--${o.status}`}>
                   {o.status === "done" ? "Completed · fruit" : o.status}
                 </span>
               </Link>
