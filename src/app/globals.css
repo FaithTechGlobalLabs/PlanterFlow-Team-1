@@ -31,5 +31,851 @@ body {
 :where(a,button,input,select,textarea):focus-visible{outline:3px solid #50a790;outline-offset:4px}
 .brand-lockup{display:inline-flex;align-items:center;gap:10px;font-size:25px;font-weight:700;letter-spacing:-1px;white-space:nowrap}.brand-lockup img{flex-shrink:0}.brand-nav{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:74px;padding:16px 30px;background:var(--color-navy);color:white}.brand-nav>span{color:#c3d0c6;font-size:10px;letter-spacing:1.6px}
 .onboarding-shell,.login-shell{min-height:100vh;background:var(--color-canvas)}.onboarding-content{display:flex;flex-direction:column;gap:24px;max-width:960px;margin:0 auto;padding:48px 28px 64px}.onboarding-content h1{font-weight:500;letter-spacing:-1px}
-.login-layout{display:grid;grid-template-columns:1.1fr 1fr;max-width:1160px;margin:56px auto 32px;padding:0 28px;align-items:stretch;gap:36px}.login-story{position:relative;overflow:hidden;min-height:580px;padding:40px;border:1px solid #dce6ce;border-radius:20px;background:radial-gradient(ellipse at 75% 80%,#dfedc2,#f0f3e8 75%)}.login-eyebrow{font-size:10px;letter-spacing:1.8px;color:#527046;font-weight:700}.login-story h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(40px,4.2vw,58px);line-height:1.08;font-weight:400;letter-spacing:-2px;color:#344c31;max-width:430px;margin:22px 0}.login-intro{color:#596e50;max-width:330px;font-size:15px;line-height:1.8}.login-globe{position:relative;height:240px;margin:20px -40px 0;overflow:hidden}.login-sphere{width:290px;height:290px;position:absolute;left:50%;top:8px;transform:translateX(-40%) rotate(-14deg);border-radius:50%;overflow:hidden;background:radial-gradient(circle at 30% 25%,#f4f9dd,#d9e9b5 50%,#8bad86);box-shadow:inset -20px -16px 32px #54795128,12px 16px 40px #53754220}.login-land{position:absolute;inset:30px 22px;mask:url('/globe/continents.svg') center/100% 100% no-repeat;background:radial-gradient(#6e9c71 1.5px,transparent 1.8px) 0 0/5px 5px}.login-sphere span{position:absolute;inset:0 25%;border:1px solid #70946e30;border-radius:50%}.login-sphere span:last-child{inset:32% -5%}.login-story-note{position:relative;margin-top:18px;font-size:12px;color:#536c49}.login-form-region{display:flex;align-items:center}.login-form{display:flex;flex-direction:column;gap:18px;width:100%;padding:38px;background:white;border:1px solid var(--color-border);border-radius:18px;box-shadow:0 12px 35px #213e2a05}.login-form h2{font-size:28px;font-weight:500;letter-spacing:-.7px}.login-form input{background:#fcfdf9;border-radius:8px}.login-form a,.login-form button{border-radius:8px}.login-footer{display:flex;justify-content:center;gap:12px;color:var(--color-muted);padding:0 24px 28px;font-size:11px}
-@media(max-width:760px){.brand-nav{padding:14px 20px}.brand-nav>span{font-size:8px}.login-layout{grid-template-columns:1fr;margin-top:24px;padding:0 20px;gap:20px}.login-story{min-height:auto;padding:28px}.login-story h1{font-size:42px;max-width:340px}.login-globe,.login-story-note{display:none}.login-form{padding:28px}.onboarding-content{padding:32px 20px}}
+
+@media (max-width: 760px) {
+  .brand-nav { padding: 14px 20px; }
+  .brand-nav > span { font-size: 8px; }
+  .onboarding-content { padding: 32px 20px; }
+}
+
+.login-shell {
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background:
+    radial-gradient(
+      circle at 18% 28%,
+      rgba(222, 232, 207, 0.34),
+      transparent 28rem
+    ),
+    var(--color-canvas);
+}
+
+.login-layout {
+  width: min(1280px, calc(100% - 64px));
+  margin-inline: auto;
+  padding-block: clamp(28px, 4vh, 48px);
+
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.08fr)
+    minmax(420px, 0.92fr);
+  gap: clamp(36px, 3.5vw, 56px);
+  align-items: center;
+}
+
+.login-story {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-width: 0;
+
+  min-height: 660px;
+  padding:
+    32px
+    clamp(38px, 3.4vw, 56px)
+    28px;
+
+  display: grid;
+  grid-template-rows:
+    auto
+    minmax(360px, 1fr)
+    auto;
+
+  border: 1px solid #d9e3ce;
+  border-radius: 24px;
+
+  background:
+    radial-gradient(
+      circle at 20% 15%,
+      rgba(255, 255, 255, 0.82),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 68% 76%,
+      rgba(193, 219, 149, 0.26),
+      transparent 37%
+    ),
+    linear-gradient(
+      148deg,
+      #faf9f2 0%,
+      #f2f5e9 53%,
+      #eaf0dc 100%
+    );
+
+  box-shadow:
+    0 24px 64px rgba(31, 58, 39, 0.065),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.login-story::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: auto -15% -24% 24%;
+  height: 58%;
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(137, 174, 99, 0.14),
+      transparent 66%
+    );
+
+  filter: blur(18px);
+  pointer-events: none;
+}
+
+.login-copy {
+  width: min(100%, 470px);
+}
+
+.login-eyebrow {
+  margin: 0 0 14px;
+
+  color: #56744b;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.login-story h1 {
+  max-width: 470px;
+  margin: 0 0 18px;
+
+  color: #344f35;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(48px, 3.5vw, 56px);
+  font-weight: 400;
+  letter-spacing: -2.25px;
+  line-height: 1.02;
+}
+
+.login-intro {
+  width: min(100%, 390px);
+  margin: 0;
+
+  color: #5d7256;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.login-visual-stage {
+  /* Keep the sphere and its full motion envelope in their own layout row. */
+  min-height: 0;
+
+  display: grid;
+  place-items: center;
+}
+
+/* Living globe stage */
+
+.living-globe {
+  position: relative;
+  isolation: isolate;
+
+  width: min(100%, 460px);
+  min-height: 360px;
+  display: grid;
+  place-items: center;
+  padding-block: 8px 12px;
+  margin-inline: auto;
+}
+
+.living-globe__halo {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  bottom: 4px;
+
+  width: min(330px, 82%);
+  height: 92px;
+
+  transform: translateX(-50%);
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(130, 166, 91, 0.28) 0%,
+      rgba(130, 166, 91, 0.11) 43%,
+      transparent 72%
+    );
+
+  filter: blur(17px);
+}
+
+.living-globe__sphere {
+  position: relative;
+  z-index: 1;
+  width: min(340px, 100%);
+  aspect-ratio: 1;
+
+  overflow: hidden;
+  border-radius: 50%;
+
+  transform: translateY(0);
+  will-change: transform;
+
+  background:
+    radial-gradient(
+      circle at 30% 23%,
+      #dcebc7 0%,
+      #a3bf87 19%,
+      #618568 48%,
+      #2d5a4d 72%,
+      #173d35 100%
+    );
+
+  box-shadow:
+    inset 18px 15px 34px rgba(250, 251, 222, 0.24),
+    inset -30px -22px 46px rgba(12, 43, 42, 0.4),
+    0 25px 46px rgba(31, 64, 42, 0.2),
+    0 0 32px rgba(190, 218, 145, 0.12);
+
+  animation:
+    living-globe-float
+    14s
+    ease-in-out
+    infinite;
+}
+
+.living-globe__sphere::before {
+  content: "";
+  position: absolute;
+  z-index: 8;
+  inset: 1px;
+
+  border: 1px solid rgba(239, 247, 207, 0.36);
+  border-radius: 50%;
+
+  box-shadow:
+    inset 0 0 20px rgba(231, 243, 204, 0.14);
+
+  pointer-events: none;
+}
+
+.living-globe__surface {
+  position: absolute;
+  inset: 3%;
+
+  overflow: hidden;
+  border-radius: 50%;
+
+  will-change: transform;
+
+  animation:
+    living-globe-drift
+    24s
+    ease-in-out
+    infinite;
+}
+
+.living-globe__land {
+  position: absolute;
+  z-index: 1;
+  inset: 14% 9% 17%;
+
+  -webkit-mask:
+    url("/globe/continents.svg")
+    center / 100% 100%
+    no-repeat;
+
+  mask:
+    url("/globe/continents.svg")
+    center / 100% 100%
+    no-repeat;
+
+  background:
+    linear-gradient(
+      135deg,
+      #bed294 0%,
+      #8caf6c 43%,
+      #668f62 100%
+    );
+
+  filter:
+    drop-shadow(
+      0 4px 5px rgba(23, 61, 53, 0.2)
+    );
+
+  opacity: 0.94;
+}
+
+.living-globe__meridian,
+.living-globe__parallel {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+
+  border:
+    1px solid
+    rgba(228, 239, 198, 0.13);
+}
+
+.living-globe__meridian {
+  inset: 6% 31%;
+  border-radius: 50%;
+}
+
+.living-globe__parallel {
+  left: 5%;
+  right: 5%;
+  top: 29%;
+  height: 36%;
+
+  border-radius: 50%;
+}
+
+.living-globe__arcs {
+  position: absolute;
+  z-index: 3;
+  inset: 10%;
+
+  width: 80%;
+  height: 80%;
+
+  overflow: visible;
+}
+
+.living-globe__arcs path {
+  fill: none;
+
+  stroke: rgba(239, 247, 196, 0.46);
+  stroke-width: 0.55;
+  stroke-linecap: round;
+  stroke-dasharray: 2.2 3.8;
+
+  filter:
+    drop-shadow(
+      0 0 2px rgba(240, 248, 194, 0.34)
+    );
+
+  animation:
+    living-arc-breathe
+    9s
+    ease-in-out
+    infinite;
+}
+
+.living-globe__arcs path:nth-child(2) {
+  opacity: 0.72;
+  animation-delay: -4.5s;
+}
+
+/* Church-plant trees */
+
+.living-tree {
+  --tree-size: 34px;
+
+  position: absolute;
+  z-index: 5;
+
+  width: var(--tree-size);
+  height: calc(var(--tree-size) * 1.22);
+
+  transform: translate(-50%, -96%);
+  pointer-events: none;
+}
+
+.living-tree::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+
+  transform: scale(0.97);
+  transform-origin: 50% 100%;
+
+  background:
+    url("/globe/tree-sapling.svg")
+    center bottom / contain
+    no-repeat;
+
+  filter:
+    drop-shadow(
+      0 4px 4px rgba(24, 63, 52, 0.38)
+    )
+    drop-shadow(
+      0 0 5px rgba(221, 239, 157, 0.24)
+    );
+
+  animation:
+    living-tree-grow
+    5.6s
+    ease-in-out
+    infinite;
+}
+
+.living-tree__glow {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: -1px;
+
+  width: calc(var(--tree-size) * 0.9);
+  height: calc(var(--tree-size) * 0.32);
+
+  transform:
+    translateX(-50%)
+    scale(0.92);
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(231, 244, 166, 0.58) 0%,
+      rgba(199, 222, 116, 0.22) 46%,
+      transparent 74%
+    );
+
+  filter: blur(2px);
+
+  animation:
+    living-tree-glow
+    4.6s
+    ease-in-out
+    infinite;
+}
+
+.living-tree--north-america {
+  --tree-size: 38px;
+  left: 25%;
+  top: 38%;
+}
+
+.living-tree--south-america {
+  --tree-size: 31px;
+  left: 36%;
+  top: 68%;
+}
+
+.living-tree--europe {
+  --tree-size: 32px;
+  left: 54%;
+  top: 31%;
+}
+
+.living-tree--africa {
+  --tree-size: 38px;
+  left: 56%;
+  top: 58%;
+}
+
+.living-tree--asia {
+  --tree-size: 36px;
+  left: 73%;
+  top: 39%;
+}
+
+.living-tree--oceania {
+  --tree-size: 29px;
+  left: 80%;
+  top: 75%;
+}
+
+.living-tree--north-america::before {
+  animation-delay: -0.7s;
+}
+
+.living-tree--south-america::before {
+  animation-delay: -2.1s;
+}
+
+.living-tree--europe::before {
+  animation-delay: -3.2s;
+}
+
+.living-tree--africa::before {
+  animation-delay: -4.1s;
+}
+
+.living-tree--asia::before {
+  animation-delay: -1.5s;
+}
+
+.living-tree--oceania::before {
+  animation-delay: -2.7s;
+}
+
+.living-globe__specular {
+  position: absolute;
+  z-index: 7;
+  left: 14%;
+  top: 9%;
+
+  width: 39%;
+  height: 24%;
+
+  transform: rotate(-25deg);
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(255, 255, 255, 0.5) 0%,
+      rgba(249, 255, 220, 0.17) 46%,
+      transparent 72%
+    );
+
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.living-globe__shade {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      105deg,
+      transparent 48%,
+      rgba(16, 47, 45, 0.16) 68%,
+      rgba(10, 37, 37, 0.46) 100%
+    );
+
+  pointer-events: none;
+}
+
+.login-story-note {
+  margin: 0;
+
+  color: #5e7456;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+/* Login card */
+
+.login-form-region {
+  min-width: 0;
+
+  display: grid;
+  place-items: center;
+}
+
+.login-form {
+  width: 100%;
+  max-width: 480px;
+
+  padding: 40px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #d8e2d2;
+  border-radius: 22px;
+
+  box-shadow:
+    0 20px 52px rgba(28, 49, 34, 0.065);
+}
+
+.login-form h2 {
+  margin: 0;
+
+  color: #30493a;
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -0.8px;
+  line-height: 1.15;
+}
+
+.login-form > h2 + p {
+  margin-bottom: 5px;
+
+  color: #617468;
+  line-height: 1.6;
+}
+
+.login-form input {
+  background: #fcfdf9;
+  border-radius: 10px;
+}
+
+.login-form button,
+.login-form a {
+  border-radius: 10px;
+}
+
+.login-form > p:last-child {
+  margin-top: 2px;
+  line-height: 1.55;
+}
+
+.login-footer {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+
+  padding:
+    0
+    24px
+    24px;
+
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+/* Motion */
+
+@keyframes living-globe-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes living-globe-drift {
+  0%,
+  100% {
+    transform:
+      translate3d(-0.65%, 0, 0)
+      rotateZ(-0.45deg)
+      scale(1.018);
+  }
+
+  50% {
+    transform:
+      translate3d(0.65%, 0.15%, 0)
+      rotateZ(0.45deg)
+      scale(1.024);
+  }
+}
+
+@keyframes living-tree-grow {
+  0%,
+  100% {
+    transform: scale(0.97);
+  }
+
+  50% {
+    transform: scale(1.025);
+  }
+}
+
+@keyframes living-tree-glow {
+  0%,
+  100% {
+    opacity: 0.48;
+    transform:
+      translateX(-50%)
+      scale(0.92);
+  }
+
+  50% {
+    opacity: 0.82;
+    transform:
+      translateX(-50%)
+      scale(1.08);
+  }
+}
+
+@keyframes living-arc-breathe {
+  0%,
+  100% {
+    opacity: 0.46;
+  }
+
+  50% {
+    opacity: 0.72;
+  }
+}
+
+/* Compact desktop */
+
+@media (max-width: 1180px) {
+  .login-layout {
+    width: min(1120px, calc(100% - 48px));
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(390px, 0.82fr);
+    gap: 32px;
+  }
+
+  .login-story {
+    padding-inline: 38px;
+    min-height: 620px;
+    grid-template-rows: auto minmax(320px, 1fr) auto;
+  }
+
+  .login-story h1 {
+    font-size: clamp(46px, 4.8vw, 58px);
+  }
+
+  .living-globe__sphere {
+    width: min(300px, 100%);
+  }
+
+  .living-globe {
+    min-height: 320px;
+  }
+
+  .login-form {
+    padding: 36px;
+  }
+}
+
+/* Stack when the content can no longer breathe in two columns */
+
+@media (max-width: 1020px) {
+  .login-shell {
+    display: block;
+  }
+
+  .login-layout {
+    width: min(720px, calc(100% - 40px));
+    padding-block: 32px;
+
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .login-story {
+    height: auto;
+    min-height: 620px;
+  }
+
+  .login-form {
+    max-width: 480px;
+  }
+
+  .login-footer {
+    padding-bottom: 28px;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 680px) {
+  .login-shell .brand-nav {
+    min-height: 64px;
+    padding: 14px 20px;
+  }
+
+  .login-shell .brand-nav > span {
+    font-size: 8px;
+  }
+
+  .login-layout {
+    width: calc(100% - 32px);
+    padding-block: 20px 28px;
+    gap: 18px;
+  }
+
+  .login-story {
+    min-height: 0;
+    padding: 28px 24px 20px;
+
+    grid-template-rows:
+      auto
+      240px
+      auto;
+
+    border-radius: 20px;
+  }
+
+  .login-eyebrow {
+    margin-bottom: 14px;
+  }
+
+  .login-story h1 {
+    max-width: 340px;
+    margin-bottom: 17px;
+
+    font-size: 42px;
+    letter-spacing: -1.7px;
+  }
+
+  .login-intro {
+    max-width: 330px;
+
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .login-visual-stage {
+    padding-top: 0;
+  }
+
+  .living-globe {
+    width: min(100%, 310px);
+    min-height: 240px;
+    padding-block: 14px 6px;
+  }
+
+  .living-globe__sphere {
+    width: min(220px, 100%);
+  }
+
+  .living-globe__halo {
+    width: 215px;
+    height: 68px;
+  }
+
+  .living-tree {
+    --tree-size: 25px;
+  }
+
+  .living-tree--north-america {
+    --tree-size: 27px;
+  }
+
+  .living-tree--africa {
+    --tree-size: 27px;
+  }
+
+  .living-tree--asia {
+    --tree-size: 26px;
+  }
+
+  .living-tree--south-america,
+  .living-tree--oceania {
+    display: none;
+  }
+
+  .living-globe__arcs path:nth-child(2) {
+    display: none;
+  }
+
+  .login-story-note {
+    padding-top: 4px;
+  }
+
+  .login-form {
+    padding: 28px 24px;
+    border-radius: 20px;
+  }
+
+  .login-form h2 {
+    font-size: 27px;
+  }
+}
+
+@media (max-width: 420px) {
+  .login-story h1 {
+    font-size: 38px;
+  }
+}
+
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  .living-globe__sphere,
+  .living-globe__surface,
+  .living-tree::before,
+  .living-tree__glow,
+  .living-globe__arcs path {
+    animation: none !important;
+  }
+}

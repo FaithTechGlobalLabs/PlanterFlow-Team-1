@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import en from "../../messages/en.json";
 import { LoginForm } from "@/app/[locale]/login/login-form";
 
@@ -13,18 +13,39 @@ function renderForm() {
 }
 
 describe("LoginForm", () => {
-  it("renders email and password fields with a sign-in button", () => {
+  it("renders the existing email/password sign-in flow", () => {
     renderForm();
-    expect(screen.getByLabelText("Email")).toHaveAttribute("type", "email");
-    expect(screen.getByLabelText("Password")).toHaveAttribute("type", "password");
-    expect(screen.getByRole("button", { name: "Sign in" })).toBeInTheDocument();
+
+    expect(screen.getByLabelText("Email")).toHaveAttribute(
+      "type",
+      "email"
+    );
+
+    expect(screen.getByLabelText("Password")).toHaveAttribute(
+      "type",
+      "password"
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Sign in" })
+    ).toBeInTheDocument();
   });
 
-  it("links to the invitation page", () => {
+  it("preserves password recovery and invitation navigation", () => {
     renderForm();
-    expect(screen.getByRole("link", { name: "Accept invitation" })).toHaveAttribute(
-      "href",
-      "/en/invite"
-    );
+
+    expect(
+      screen.getByRole("link", { name: "Forgot password?" })
+    ).toHaveAttribute("href", "/en/recover");
+
+    expect(
+      screen.getByRole("link", { name: "Accept invitation" })
+    ).toHaveAttribute("href", "/en/invite");
+
+    expect(
+      screen.getByText(
+        "Invitation only · Contact your catalyst for access."
+      )
+    ).toBeInTheDocument();
   });
 });
