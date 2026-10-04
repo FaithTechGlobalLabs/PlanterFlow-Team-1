@@ -1,6 +1,16 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { NextIntlClientProvider } from "next-intl";
+import en from "../../messages/en.json";
 import { ExportReportButton } from "@/components/workspace/export-report-button";
+
+function renderWithIntl(ui: React.ReactNode) {
+  return render(
+    <NextIntlClientProvider locale="en" timeZone="America/Vancouver" messages={en}>
+      {ui}
+    </NextIntlClientProvider>
+  );
+}
 
 describe("ExportReportButton", () => {
   beforeEach(() => {
@@ -8,7 +18,7 @@ describe("ExportReportButton", () => {
   });
 
   it("renders export button", () => {
-    render(<ExportReportButton planterId="planter-1" />);
+    renderWithIntl(<ExportReportButton planterId="planter-1" />);
     expect(screen.getByRole("button", { name: /Export PDF report/i })).toBeInTheDocument();
   });
 
@@ -19,7 +29,7 @@ describe("ExportReportButton", () => {
     });
     vi.stubGlobal("fetch", fetchMock);
 
-    render(<ExportReportButton planterId="planter-1" />);
+    renderWithIntl(<ExportReportButton planterId="planter-1" />);
     const button = screen.getByRole("button", { name: /Export PDF report/i });
 
     fireEvent.click(button);

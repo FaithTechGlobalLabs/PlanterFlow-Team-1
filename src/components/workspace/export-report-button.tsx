@@ -3,22 +3,6 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
-function useExportReportTranslation() {
-  try {
-    return useTranslations("catalyst.exportReport");
-  } catch {
-    return (key: string) => {
-      const map: Record<string, string> = {
-        buttonLabel: "Export PDF Report",
-        generating: "Generating PDF...",
-        failedExport: "Failed to export report.",
-        unexpectedError: "An unexpected error occurred while exporting.",
-      };
-      return map[key] ?? key;
-    };
-  }
-}
-
 export function ExportReportButton({
   planterId,
   className = "",
@@ -27,7 +11,7 @@ export function ExportReportButton({
   planterName?: string;
   className?: string;
 }) {
-  const t = useExportReportTranslation();
+  const t = useTranslations("catalyst.exportReport");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

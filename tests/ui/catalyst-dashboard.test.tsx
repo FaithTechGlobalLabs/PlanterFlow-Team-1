@@ -1,6 +1,8 @@
 import { beforeEach, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render as rtlRender, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
+import { NextIntlClientProvider } from "next-intl";
+import en from "../../messages/en.json";
 import { sampleCatalyst, sampleWorkspace } from "@/lib/workspace/sample";
 
 const mocks = vi.hoisted(() => ({ save: vi.fn(), refresh: vi.fn() }));
@@ -11,6 +13,14 @@ vi.mock("@/app/[locale]/dashboard/category-actions", () => ({ saveCategory: mock
 vi.mock("@/app/[locale]/actions", () => ({ signOut: vi.fn() }));
 import { CatalystDashboard } from "@/components/workspace/catalyst-dashboard";
 import { Workspace } from "@/components/workspace/workspace";
+
+function render(ui: ReactNode) {
+  return rtlRender(
+    <NextIntlClientProvider locale="en" timeZone="America/Vancouver" messages={en}>
+      {ui}
+    </NextIntlClientProvider>
+  );
+}
 
 beforeEach(() => {
   mocks.save.mockReset();

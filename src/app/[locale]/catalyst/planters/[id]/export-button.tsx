@@ -4,22 +4,6 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 
-function useExportReportTranslation() {
-  try {
-    return useTranslations("catalyst.exportReport");
-  } catch {
-    return (key: string) => {
-      const map: Record<string, string> = {
-        buttonLabel: "Export PDF Report",
-        generating: "Generating PDF...",
-        failedExport: "Failed to export report.",
-        unexpectedError: "An unexpected error occurred while exporting.",
-      };
-      return map[key] ?? key;
-    };
-  }
-}
-
 interface ExportButtonProps {
   planterId: string;
   label?: string;
@@ -31,7 +15,7 @@ export function ExportButton({
   label,
   className = "",
 }: ExportButtonProps) {
-  const t = useExportReportTranslation();
+  const t = useTranslations("catalyst.exportReport");
   const displayLabel = label ?? t("buttonLabel");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
