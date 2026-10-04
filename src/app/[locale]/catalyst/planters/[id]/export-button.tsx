@@ -5,9 +5,14 @@ import { Button } from "@/components/ui/Button";
 interface ExportButtonProps {
   planterId: string;
   label?: string;
+  className?: string;
 }
 
-export function ExportButton({ planterId, label = "Export PDF Report" }: ExportButtonProps) {
+export function ExportButton({
+  planterId,
+  label = "Export PDF Report",
+  className = "",
+}: ExportButtonProps) {
   const handleExport = () => {
     const url = `/api/export/planter/${planterId}`;
     window.open(url, "_blank");
@@ -18,7 +23,7 @@ export function ExportButton({ planterId, label = "Export PDF Report" }: ExportB
       variant="secondary"
       onClick={handleExport}
       fullWidth={false}
-      className="min-w-[180px]"
+      className={`exportButton min-w-[180px] ${className}`.trim()}
     >
       📄 {label}
     </Button>

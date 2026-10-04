@@ -23,7 +23,7 @@ export function ReviewForm({ checkInId, objectives }: ReviewFormProps) {
   }
 
   return (
-    <form action={formAction} className="flex flex-col gap-3">
+    <form action={formAction} className="review-form flex flex-col gap-3">
       <input type="hidden" name="checkInId" value={checkInId} />
       <label htmlFor="review-note" className={labelClassName}>
         {t("review_label")}
@@ -35,7 +35,7 @@ export function ReviewForm({ checkInId, objectives }: ReviewFormProps) {
         maxLength={REPLY_MAX}
         defaultValue={state.ok ? "" : (state.body ?? "")}
         placeholder={t("review_placeholder")}
-        className="w-full min-h-[96px] p-4 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white text-[var(--color-ink)] placeholder-[var(--color-muted)] text-[13px]"
+        className="review-note-input w-full min-h-[96px] p-4 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white text-[var(--color-ink)] placeholder-[var(--color-muted)] text-[13px]"
       />
       {objectives.length > 1 && (
         <Select
@@ -53,11 +53,11 @@ export function ReviewForm({ checkInId, objectives }: ReviewFormProps) {
       {objectives.length === 1 && <input type="hidden" name="objectiveId" value={objectives[0].id} />}
       <FormError>{state.error && t(`errors.${state.error}`)}</FormError>
       {state.ok && (
-        <p role="status" className="text-[13px] text-[var(--color-green)]">
+        <p role="status" className="review-success-message text-[13px] text-[var(--color-green)]">
           {t("review_sent")}
         </p>
       )}
-      <Button variant="primary" type="submit" fullWidth={false} className="min-w-[222px]" disabled={isPending}>
+      <Button variant="primary" type="submit" fullWidth={false} className="review-submit-btn min-w-[222px]" disabled={isPending}>
         {isPending ? t("sending") : t("review_submit")}
       </Button>
     </form>
