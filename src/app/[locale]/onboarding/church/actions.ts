@@ -24,7 +24,7 @@ export async function saveChurch(
 
   const { user, profile } = await getSessionProfile();
 
-  if (!user || !profile) {
+  if (!user || !profile || profile.role !== "planter") {
     return { error: "onboarding.church.errors.generic" };
   }
 

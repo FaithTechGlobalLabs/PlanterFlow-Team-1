@@ -6,7 +6,7 @@ import { getSiteUrl } from "@/lib/auth/site-url";
 import { createAdminClient, hasAdminCredentials } from "@/lib/supabase/admin";
 import { getSessionProfile } from "@/lib/auth/session";
 import { deliverInvitation } from "@/lib/invitation-engine";
-import { validateInviteCatalyst } from "@/lib/validation/onboarding";
+import { validateInviteTeam } from "@/lib/validation/onboarding";
 
 interface ActionState {
   error?: string;
@@ -14,47 +14,55 @@ interface ActionState {
   email?: string;
 }
 
-export async function inviteCatalyst(
+export async function inviteTeamMember(
   prevState: ActionState | undefined,
   formData: FormData
 ): Promise<ActionState | never> {
-  const validation = validateInviteCatalyst(formData);
+  const validation = validateInviteTeam(formData);
   if ("error" in validation) {
     return { error: validation.error };
   }
-
-  const { email, welcomeNote, makeAdmin } = validation.values;
+  const { email, welcomeNote } = validation.values;
 
   const { user, profile } = await getSessionProfile();
-
-  if (!user || !profile || profile.role !== "catalyst" || !profile.is_admin) {
-    return { error: "inviteCatalyst.errors.generic" };
+  if (!user || !profile || profile.role !== "planter") {
+    return { error: "inviteTeam.errors.generic" };
   }
 
   if (!hasAdminCredentials()) return { error: "authSetup.description" };
   const admin = createAdminClient();
-  const origin = getSiteUrl();
+
+  // org, church, role and inviter are derived here, never read from the client.
+  const { data: church } = await admin
+    .from("churches")
+    .select("id, name, org_id")
+    .eq("pastor_id", user.id)
+    .maybeSingle();
+  if (!church) {
+    return { error: "inviteTeam.errors.no_church" };
+  }
 
   const { data: invitation, error: insertError } = await admin
     .from("invitations")
     .insert({
-      org_id: profile.org_id,
+      org_id: church.org_id,
+      church_id: church.id,
       email,
-      role: "catalyst",
-      is_admin: makeAdmin,
+      role: "peer",
       invited_by: user.id,
       invited_by_name: profile.display_name,
+      church_name: church.name,
       welcome_note: welcomeNote,
     })
     .select("id, token")
     .single();
-
   if (insertError) {
-    return { error: "inviteCatalyst.errors.generic" };
+    return { error: "inviteTeam.errors.generic" };
   }
 
   const locale = await getLocale();
-  const redirectTo = `${origin}/${locale}/invite/${invitation.token}`;
+  const origin = getSiteUrl();
+  const redirectTo = `${origin}/${locale}/team-invite/${invitation.token}`;
 
   const result = await deliverInvitation({
     admin,
@@ -64,14 +72,15 @@ export async function inviteCatalyst(
     data: {
       invitation_token: invitation.token,
       invited_by_name: profile.display_name,
+      church_name: church.name,
     },
-    appLink: `${origin}/${locale}/invite/${invitation.token}`,
-    errorNamespace: "inviteCatalyst",
-    logTag: "invite-catalyst",
+    appLink: `${origin}/${locale}/team-invite/${invitation.token}`,
+    errorNamespace: "inviteTeam",
+    logTag: "invite-team",
   });
   if ("error" in result) return result;
   if ("inviteLink" in result) return result;
 
-  redirect({ href: `/invite-catalyst/sent/${invitation.id}`, locale });
+  redirect({ href: `/invite-team/sent/${invitation.id}`, locale });
   return {};
 }

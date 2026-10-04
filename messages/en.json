@@ -74,6 +74,13 @@
       "subline": "Invitations arrive by email with your assigned role.",
       "card_title": "Check your inbox",
       "card_body": "The link in your invitation email signs you in and brings you to the right place."
+    },
+    "team": {
+      "title": "Join {church}.",
+      "subline": "Team member · {church} · Invited by Pastor {pastor}",
+      "card_title": "Accept your invitation",
+      "card_body": "{name} invited you to join the {church} team on First Fruits.",
+      "chip": "Role: Team member"
     }
   },
   "onboarding": {
@@ -206,7 +213,13 @@
         "sapling": "Sapling · year 1–2",
         "young": "Young tree · year 2–3",
         "established": "Established · year 3+"
-      }
+      },
+      "invite_team": "Invite a team member"
+    },
+    "team": {
+      "eyebrow": "YOUR TEAM",
+      "subline": "Your team workspace is coming next.",
+      "chip": "Role: Team member"
     }
   },
   "authSetup": {
@@ -243,5 +256,41 @@
     "field_label": "Invitation link",
     "copy": "Copy link",
     "copied": "Copied"
+  },
+  "inviteTeam": {
+    "eyebrow": "GROW YOUR TEAM",
+    "title": "Invite a team member.",
+    "subline": "They will join your church team and see only what you share.",
+    "card_title": "Team invitation",
+    "assigned": "Church: {church}",
+    "email_label": "Team member email",
+    "email_placeholder": "member@hopechurch.ca",
+    "welcome_label": "Personal welcome",
+    "welcome_placeholder": "We're glad you're joining us.",
+    "submit": "Send invitation",
+    "footnote": "Invitation expires in 7 days.",
+    "errors": {
+      "email": "Enter a valid email address",
+      "exists": "This email already has an account.",
+      "no_church": "Set up your church before inviting team members.",
+      "generic": "Something went wrong. Please try again.",
+      "rate_limit": "Too many invitation emails were sent recently. Wait an hour and try again."
+    },
+    "sent": {
+      "title": "An invitation is on its way.",
+      "subline": "Your team member will receive a link to join your church.",
+      "card_title": "Invitation sent",
+      "card_body": "{email} will receive a link to join your church team.",
+      "primary": "Back to my church",
+      "again": "Invite another team member"
+    }
+  },
+  "teamWelcome": {
+    "eyebrow": "WELCOME",
+    "title": "Welcome to {church}.",
+    "subline": "You're part of the team now.",
+    "card_title": "Glad you're here, {name}",
+    "card_body": "You've joined the {church} team. Your pastor will share more as you grow together.",
+    "continue": "Continue"
   }
 }

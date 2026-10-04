@@ -42,10 +42,10 @@ See [`docs/superpowers/specs/2026-10-02-first-fruits-design.md`](docs/superpower
 
 ## 📋 Requirements
 
-- Node.js 20+
+- Node.js 22+
 - pnpm 10+ (we use pnpm, not npm). Install with `corepack enable` or `npm i -g pnpm`.
 - A Supabase project (Postgres, Auth, Realtime) for anything beyond the landing page
-- A Vercel account for deploys
+- A Cloudflare account for deploys (OpenNext on Workers; see `wrangler.jsonc`)
 
 ## 🚀 Getting Started
 
@@ -55,7 +55,11 @@ cp .env.example .env.local   # fill in Supabase URL and keys
 pnpm dev                     # http://localhost:3000
 ```
 
-Other scripts: `pnpm lint`, `pnpm build`.
+Apply the SQL files in `supabase/migrations/` to your Supabase project, in order.
+
+Other scripts: `pnpm lint`, `pnpm build`, `pnpm exec vitest run` (unit tests), `pnpm test:e2e` (Playwright; needs `pnpm dev` and `.env.local`), `pnpm preview` / `pnpm deploy` (Cloudflare).
+
+Feature docs: [invitations](docs/features/invitations.md), [onboarding](docs/features/onboarding.md), [login](docs/features/login-page.md), [local testing](docs/local-testing.md).
 
 Project layout:
 

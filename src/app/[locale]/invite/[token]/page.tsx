@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { redirect as nextRedirect } from "next/navigation";
 import { redirect } from "@/i18n/routing";
 import { createAdminClient, hasAdminCredentials } from "@/lib/supabase/admin";
 import { AuthSetupPending } from "@/components/auth-setup-pending";
@@ -11,10 +12,12 @@ import { AcceptForm } from "./accept-form";
 
 interface PageProps {
   params: Promise<{ locale: string; token: string }>;
+  searchParams: Promise<{ s?: string }>;
 }
 
-export default async function InviteTokenPage({ params }: PageProps) {
+export default async function InviteTokenPage({ params, searchParams }: PageProps) {
   const { locale, token } = await params;
+  const { s } = await searchParams;
   if (!hasAdminCredentials()) return <AuthSetupPending />;
   const admin = createAdminClient();
   const t = await getTranslations();
@@ -29,7 +32,16 @@ export default async function InviteTokenPage({ params }: PageProps) {
     redirect({ href: "/invite/unavailable", locale });
   }
 
+  if (invitation.role === "peer") {
+    redirect({ href: `/team-invite/${token}`, locale });
+  }
+
   const { user, profile } = await getSessionProfile();
+
+  // Opened the shared app link without a session: sign the invitee in (once per visit).
+  if (!user && s !== "1") {
+    nextRedirect(`/api/invite-session/${token}?locale=${locale}`);
+  }
 
   if (profile) {
     redirect({ href: "/", locale });

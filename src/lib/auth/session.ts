@@ -4,7 +4,7 @@ import { redirect } from "@/i18n/routing";
 export type Profile = {
   id: string;
   org_id: string;
-  role: "catalyst" | "planter";
+  role: "catalyst" | "planter" | "peer";
   is_admin: boolean;
   display_name: string;
   locale: string;
@@ -29,7 +29,7 @@ export async function getSessionProfile() {
   return { user, profile: profile as Profile | null };
 }
 
-export async function requireRole(role: "catalyst" | "planter", locale: string) {
+export async function requireRole(role: Profile["role"], locale: string) {
   const { user, profile } = await getSessionProfile();
 
   if (!user || !profile || profile.role !== role) {

@@ -13,16 +13,23 @@ export async function generateInviteLink(
   redirectTo: string,
   data: Record<string, string | null>
 ): Promise<string | null> {
-  const { data: link, error } = await admin.auth.admin.generateLink({
-    type: "invite",
-    email,
-    options: { redirectTo, data },
-  });
+  const attempt = async (type: "invite" | "magiclink") => {
+    const { data: link, error } = await admin.auth.admin.generateLink({
+      type,
+      email,
+      options: { redirectTo, data },
+    });
+    return { url: link?.properties?.action_link ?? null, error };
+  };
 
-  if (error || !link?.properties?.action_link) {
-    console.error("[invite-link] generateLink failed:", error?.code, error?.message);
-    return null;
-  }
+  const invite = await attempt("invite");
+  if (invite.url) return invite.url;
 
-  return link.properties.action_link;
+  // An account that already confirmed (e.g. a first link was used before the form was
+  // submitted) can't be re-invited, but a magic link signs the same address back in.
+  const magic = await attempt("magiclink");
+  if (magic.url) return magic.url;
+
+  console.error("[invite-link] generateLink failed:", magic.error?.code, magic.error?.message);
+  return null;
 }

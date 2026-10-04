@@ -10,14 +10,15 @@ import { acceptInvitation } from "./actions";
 
 interface AcceptFormProps {
   token: string;
-  role: "catalyst" | "planter";
+  role: "catalyst" | "planter" | "peer";
   sessionReady: boolean;
+  action?: typeof acceptInvitation;
 }
 
-export function AcceptForm({ token, role, sessionReady }: AcceptFormProps) {
+export function AcceptForm({ token, role, sessionReady, action = acceptInvitation }: AcceptFormProps) {
   const t = useTranslations();
   const [state, formAction, isPending] = useActionState<{ error?: string }, FormData>(
-    acceptInvitation,
+    action,
     {}
   );
 
@@ -32,7 +33,7 @@ export function AcceptForm({ token, role, sessionReady }: AcceptFormProps) {
         required
       />
 
-      {role === "catalyst" && (
+      {(role === "catalyst" || role === "peer") && (
         <Select name="locale" label={t("invite.language_label")}>
           <option value="en">{t("common.language_english")}</option>
         </Select>

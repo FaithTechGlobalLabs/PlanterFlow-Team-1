@@ -9,6 +9,7 @@ export default async function DashboardPage({ params, searchParams }: { params: 
   const { locale } = await params;
   const { user, profile } = await getSessionProfile();
   if (!user || !profile) return redirect({ href: "/", locale });
+  if (profile.role === "peer") return redirect({ href: "/", locale });
   const { planter, view, objective } = await searchParams;
   if (profile.role === "catalyst" && !planter) return <CatalystDashboard data={await loadCatalystDashboard(profile)}/>;
   const data = await loadWorkspace(profile, planter);

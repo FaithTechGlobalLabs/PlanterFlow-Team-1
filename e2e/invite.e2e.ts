@@ -78,12 +78,20 @@ test("unknown token shows the unavailable page", async ({ page }) => {
   await expect(page).toHaveURL(`${BASE}/en/invite/unavailable`);
 });
 
-test("opening the link without the email session cannot create an account", async ({ page }) => {
-  const { email, token } = await createInvitation("catalyst");
-  await page.goto(`/en/invite/${token}`);
-  await expect(page.getByRole("button", { name: "Accept and continue" })).toBeDisabled();
-  await expect(page.getByText("Open the link from your invitation email to continue.")).toBeVisible();
-  expect(await userByEmail(email)).toBeNull();
+test("the shared app link can be opened repeatedly until the invitation is accepted", async ({ browser }) => {
+  const { email, token } = await createInvitation("planter");
+  for (let i = 0; i < 3; i++) {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto(`/en/invite/${token}`);
+    await expect(page).toHaveURL(`${BASE}/en/invite/${token}?s=1`.replace("?s=1", ""), { timeout: 15000 });
+    await expect(page.getByRole("button", { name: "Accept and continue" })).toBeEnabled();
+    await context.close();
+  }
+  // Signing in does not create an account or profile.
+  const user = await userByEmail(email);
+  const { data: profile } = await admin.from("profiles").select("id").eq("id", user!.id).maybeSingle();
+  expect(profile).toBeNull();
 });
 
 test("admin catalyst accepts via the email link and reaches onboarding", async ({ page }) => {
@@ -126,10 +134,13 @@ test("pastor accepts via the email link and reaches church onboarding", async ({
   await page.goto(await emailLink(email, token));
   await expect(page).toHaveURL(`${BASE}/en/invite/${token}`);
   await expect(page.getByText("E2E Church", { exact: false })).toBeVisible();
+  // Wait for the hash listener's session (and the remount it causes) before typing.
+  const submit = page.getByRole("button", { name: "Accept and continue" });
+  await expect(submit).toBeEnabled();
 
   await page.getByLabel("Your name").fill("E2E Pastor");
   await page.getByLabel("Create password").fill("e2e-password-123");
-  await page.getByRole("button", { name: "Accept and continue" }).click();
+  await submit.click();
 
   await expect(page).toHaveURL(`${BASE}/en/onboarding/church`);
 });

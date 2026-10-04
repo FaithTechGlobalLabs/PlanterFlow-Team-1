@@ -63,6 +63,7 @@ export async function proxy(request: NextRequest) {
     path === "/login" ||
     path === "/invite" ||
     path.startsWith("/invite/") ||
+    path.startsWith("/team-invite/") ||
     path === "/recover" || path === "/recover/update";
 
   if (!user && !isPublic) {

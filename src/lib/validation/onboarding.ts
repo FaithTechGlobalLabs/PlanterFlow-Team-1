@@ -49,6 +49,19 @@ export function validateInvitePastor(
   };
 }
 
+export function validateInviteTeam(
+  formData: FormData
+): ValidationResult<{ email: string; welcomeNote: string | null }> {
+  const email = formData.get("email")?.toString().trim().toLowerCase() || "";
+  const welcomeNote = formData.get("welcomeNote")?.toString().trim() || null;
+
+  if (!EMAIL_REGEX.test(email)) {
+    return { error: "inviteTeam.errors.email" };
+  }
+
+  return { values: { email, welcomeNote: welcomeNote || null } };
+}
+
 export function validateInviteCatalyst(
   formData: FormData
 ): ValidationResult<{ email: string; welcomeNote: string | null; makeAdmin: boolean }> {
