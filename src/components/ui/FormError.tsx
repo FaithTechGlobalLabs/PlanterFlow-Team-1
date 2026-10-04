@@ -7,5 +7,12 @@ interface FormErrorProps {
 export function FormError({ children }: FormErrorProps) {
   if (!children) return null;
 
-  return <p role="alert" className="text-[12px] text-red-600">{children}</p>;
+  return (
+    <p
+      role="alert"
+      className="ff-form-error text-sm text-[var(--color-danger)]"
+    >
+      {children}
+    </p>
+  );
 }

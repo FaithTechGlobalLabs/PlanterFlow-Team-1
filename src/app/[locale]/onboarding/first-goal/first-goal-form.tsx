@@ -20,17 +20,17 @@ interface FirstGoalFormProps {
 
 export function FirstGoalForm({ categories }: FirstGoalFormProps) {
   const t = useTranslations();
-  const [state, formAction, isPending] = useActionState<{ error?: string }, FormData>(
-    createFirstGoal,
-    {}
-  );
+  const [state, formAction, isPending] = useActionState<
+    { error?: string },
+    FormData
+  >(createFirstGoal, {});
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
-      <div>
-        <label className={labelClassName}>
+      <fieldset className="ff-category-choice">
+        <legend className={labelClassName}>
           {t("onboarding.firstGoal.category_label")}
-        </label>
+        </legend>
         <div className="flex flex-wrap gap-2">
           {categories.map((category, index) => (
             <label key={category.id}>
@@ -42,13 +42,13 @@ export function FirstGoalForm({ categories }: FirstGoalFormProps) {
                 defaultChecked={index === 0}
                 required
               />
-              <Status className="cursor-pointer min-w-0 opacity-60 peer-checked:opacity-100 peer-checked:ring-2 peer-checked:ring-[var(--color-green)]">
+              <Status className="cursor-pointer min-w-0 opacity-60 peer-checked:opacity-100 peer-checked:ring-2 peer-checked:ring-[var(--color-green)] peer-focus-visible:outline-3 peer-focus-visible:outline-[var(--color-green)] peer-focus-visible:outline-offset-4">
                 {category.title}
               </Status>
             </label>
           ))}
         </div>
-      </div>
+      </fieldset>
 
       <Input
         name="title"

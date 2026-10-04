@@ -1,10 +1,10 @@
 .planter-home,
 .ff-planter-app {
-  --ff-muted: #56675b;
-  --ff-ink: #253e32;
-  --ff-line: #d9dfcf;
+  --ff-muted: var(--color-muted);
+  --ff-ink: var(--color-ink);
+  --ff-line: var(--color-border);
   background: #f7f6ef;
-  color: #253e32;
+  color: var(--color-ink);
   font-size: 14px;
   min-height: 100vh;
 }
@@ -31,8 +31,8 @@
   justify-content: space-between;
   gap: 24px;
   padding: 14px 5%;
-  border-bottom: 1px solid #dce4d8;
-  background: #ffffff;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
 }
 .planter-brand {
   display: flex;
@@ -43,7 +43,7 @@
 .planter-brand > span {
   font-size: 10px;
   letter-spacing: 1px;
-  color: #596b5c;
+  color: var(--color-muted);
 }
 .planter-account {
   position: relative;
@@ -65,9 +65,9 @@
   top: 100%;
   z-index: 30;
   padding: 20px;
-  background: #fffef8;
+  background: var(--color-surface);
   box-shadow: 0 10px 30px #243e3220;
-  border: 1px solid #d9dfcf;
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   min-width: 220px;
 }
@@ -75,7 +75,7 @@
   background: none;
   border: 0;
   min-height: 44px;
-  color: #253e32;
+  color: var(--color-ink);
   text-decoration: underline;
 }
 .planter-home-main {
@@ -177,25 +177,25 @@
 }
 /* Stage colors describe planting age; they do not score church health. */
 .planter-stage--seed {
-  background: #fff0ed;
-  border-color: #d5968c;
-  color: #8a3028;
+  background: var(--color-sage);
+  border-color: var(--color-border);
+  color: var(--color-ink);
 }
 .planter-stage--sprout,
 .planter-stage--sapling {
-  background: #fff5d6;
-  border-color: #c4a34f;
-  color: #71520b;
+  background: var(--color-sage);
+  border-color: var(--color-border);
+  color: var(--color-green);
 }
 .planter-stage--young,
 .planter-stage--established {
   background: #e9f4e5;
-  border-color: #8aaf7a;
+  border-color: var(--color-muted);
   color: #31582c;
 }
 .planter-stage--unknown {
   background: #f0f1eb;
-  border-color: #c8cdbf;
+  border-color: var(--color-muted);
   color: #525e4c;
 }
 .planter-tree-summary {
@@ -272,11 +272,14 @@
 }
 .plant-branch {
   cursor: pointer;
-  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
 }
 .plant-branch:hover {
   background: #e7efdd;
-  border-color: #7c9767;
+  border-color: var(--color-muted);
   color: #203c25;
 }
 .plant-branch:focus-visible {
@@ -383,7 +386,7 @@
 .planter-members small,
 .planter-invitations small {
   display: block;
-  color: #576951;
+  color: var(--color-muted);
   font-size: 11px;
   margin-top: 5px;
 }
@@ -414,7 +417,7 @@
   line-height: 1.7;
 }
 .planter-footer {
-  border-top: 1px solid #d9dfcf;
+  border-top: 1px solid var(--color-border);
   padding: 24px 0 30px;
   margin-top: 24px;
   font-size: 11px;
@@ -429,7 +432,7 @@
   grid-template-columns: 140px 1fr;
   gap: 25px;
   padding: 22px 0;
-  border-bottom: 1px solid #d9dfcf;
+  border-bottom: 1px solid var(--color-border);
 }
 .planter-journey time {
   font-size: 12px;
@@ -445,7 +448,7 @@
   background: none;
   border: 0;
   text-align: left;
-  color: #253e32;
+  color: var(--color-ink);
   padding: 0;
   line-height: 1.7;
   overflow-wrap: anywhere;
@@ -455,9 +458,9 @@
   line-height: 1.7;
 }
 .ff-planter-app .ff-topbar {
-  background: #ffffff;
+  background: var(--color-surface);
   color: #263f33;
-  border-bottom: 1px solid #dce4d8;
+  border-bottom: 1px solid var(--color-border);
 }
 .ff-planter-app .ff-edition,
 .ff-planter-app .ff-connected {
@@ -465,7 +468,7 @@
 }
 .ff-planter-app .ff-sidebar {
   background: #efefe3;
-  border-color: #d7ddc9;
+  border-color: var(--color-muted);
 }
 .ff-planter-app .ff-main {
   padding-bottom: 30px;
@@ -482,7 +485,7 @@
 .ff-planter-app .ff-panel {
   background: #fcfbf5;
   box-shadow: none;
-  border-color: #d9dfcf;
+  border-color: var(--color-border);
   border-radius: 14px;
 }
 .ff-planter-app .ff-page-heading h1 {
@@ -521,7 +524,7 @@
 }
 .ff-planter-app .ff-objective-card {
   background: #fbfaf1;
-  border-color: #d4ddc5;
+  border-color: var(--color-muted);
   box-shadow: none;
   overflow-wrap: anywhere;
 }
@@ -600,7 +603,7 @@
   z-index: 100;
   background: white;
   padding: 12px;
-  color: #253e32;
+  color: var(--color-ink);
 }
 @media (max-width: 1000px) {
   .planter-landscape-copy {
@@ -823,7 +826,7 @@
 .planter-brand > .brand-lockup {
   font-size: 22px;
   letter-spacing: 0;
-  color: #253e32;
+  color: var(--color-ink);
 }
 @media (max-width: 700px) {
   .planter-brand > .brand-lockup {
@@ -895,7 +898,31 @@
 .ff-app.ff-planter-app .ff-panel .ff-conversation-thread {
   background: transparent;
   border: 0;
-  border-top: 1px solid #d9dfcf;
+  border-top: 1px solid var(--color-border);
   border-radius: 0;
   padding: 24px 0 0;
+}
+
+.planter-brand > span {
+  color: var(--color-muted);
+}
+
+.planter-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+.planter-topbar__partner-logo {
+  flex-shrink: 0;
+}
+
+@media (max-width: 520px) {
+  .planter-topbar {
+    flex-wrap: wrap;
+    row-gap: 12px;
+  }
+  .planter-topbar__actions {
+    margin-left: auto;
+  }
 }

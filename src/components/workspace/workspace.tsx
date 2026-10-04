@@ -21,7 +21,11 @@ import type {
 import "./workspace.css";
 import { AccountMenu } from "./account-menu";
 import { ObjectiveBoard, ObjectiveStatusControl } from "./objective-board";
-import { isOpenObjective, normalizeObjectiveStatus, OBJECTIVE_STATUS_LABELS } from "@/lib/workspace/objective-status";
+import {
+  isOpenObjective,
+  normalizeObjectiveStatus,
+  OBJECTIVE_STATUS_LABELS,
+} from "@/lib/workspace/objective-status";
 import { DashboardInsights } from "./dashboard-insights";
 import {
   PlanterGarden,
@@ -185,7 +189,7 @@ export function SaveForm({
       )}
       {saved && (
         <p role="status" className="ff-success">
-          Saved successfully.
+          Your update is saved.
         </p>
       )}
       {showSubmit && (
@@ -312,14 +316,21 @@ export function Workspace({
   const latest = isPeer ? undefined : data.checkIns[0];
   const [heroSlide, setHeroSlide] = useState(0);
   useEffect(() => {
-    if (view !== "overview" || isOwner) return;
+    if (
+      view !== "overview" ||
+      isOwner ||
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
     const timer = window.setInterval(() => {
       setHeroSlide((current) => (current + 1) % 2);
     }, 7000);
     return () => window.clearInterval(timer);
   }, [view, isOwner]);
   const active = data.objectives.filter((o) => isOpenObjective(o.status));
-  const completed = data.objectives.filter((o) => normalizeObjectiveStatus(o.status) === "complete");
+  const completed = data.objectives.filter(
+    (o) => o.has_completed || normalizeObjectiveStatus(o.status) === "complete",
+  );
   const ordinaryCategories = data.categories.filter(
     (c) => c.kind === "objective",
   );
@@ -392,7 +403,7 @@ export function Workspace({
           <Brand />
         </Link>
         <div className="ff-topbar-right">
-          <SendNetworkLogo className="h-5 w-auto" />
+          <SendNetworkLogo className="ff-topbar__partner-logo h-5 w-auto" />
           <span className="ff-connected">
             <i />
             {preview ? "Sample data preview" : "Your planting journey"}
@@ -414,8 +425,12 @@ export function Workspace({
             <Icon name="leaf" size={23} />
           </span>
           <div className="ff-church-info">
-            <strong className="ff-church-title">{data.church?.name ?? "First Fruits"}</strong>
-            <small className="ff-church-subtitle">{data.church?.city ?? "Your planting community"}</small>
+            <strong className="ff-church-title">
+              {data.church?.name ?? "First Fruits"}
+            </strong>
+            <small className="ff-church-subtitle">
+              {data.church?.city ?? "Your planting community"}
+            </small>
           </div>
         </div>
         <p className="ff-nav-label">YOUR WORKSPACE</p>
@@ -541,7 +556,13 @@ export function Workspace({
                     ? isPeer
                       ? "Progress"
                       : "Check-ins & progress"
-                    : view === "today" ? "Today" : view === "team" ? "Team" : view === "journey" || (isOwner && view === "updates") ? "Journey" : "Objectives"}
+                    : view === "today"
+                      ? "Today"
+                      : view === "team"
+                        ? "Team"
+                        : view === "journey" || (isOwner && view === "updates")
+                          ? "Journey"
+                          : "Objectives"}
           </span>
         </div>
         <div className="ff-page-heading">
@@ -562,19 +583,24 @@ export function Workspace({
             </p>
           </div>
           <div className="ff-page-heading-actions flex items-center gap-2">
-            {!preview && <ExportReportButton planterId={data.planter.id} planterName={data.planter.display_name} />}
-          {isOwner && !objective && ["overview", "today"].includes(view) && (
-            <button
-              className="ff-button ff-primary"
-              onClick={() => {
-                setEditObjective(null);
-                setModal("objective");
-              }}
-            >
-              <Icon name="plus" size={17} />
-              Create objective
-            </button>
-          )}
+            {!preview && (
+              <ExportReportButton
+                planterId={data.planter.id}
+                planterName={data.planter.display_name}
+              />
+            )}
+            {isOwner && !objective && ["overview", "today"].includes(view) && (
+              <button
+                className="ff-button ff-primary"
+                onClick={() => {
+                  setEditObjective(null);
+                  setModal("objective");
+                }}
+              >
+                <Icon name="plus" size={17} />
+                Create objective
+              </button>
+            )}
           </div>
         </div>
         {notice && (
@@ -774,7 +800,9 @@ export function Workspace({
                   Open objectives
                 </span>
                 <strong>{active.length.toString().padStart(2, "0")}</strong>
-                <small>{completed.length} completed · one step at a time</small>
+                <small>
+                  {completed.length} recorded outcomes · one step at a time
+                </small>
               </button>
               <button className="ff-stat" onClick={() => navigate("updates")}>
                 <span>
@@ -809,7 +837,9 @@ export function Workspace({
                 <div className="ff-section-heading">
                   <div className="ff-section-heading-text">
                     <p className="ff-eyebrow">KEEP GROWING</p>
-                    <h2 className="ff-section-title">Your next faithful steps</h2>
+                    <h2 className="ff-section-title">
+                      Your next faithful steps
+                    </h2>
                   </div>
                   <button
                     className="ff-text-button"
@@ -868,7 +898,9 @@ export function Workspace({
           <section className="ff-panel">
             <div className="ff-section-heading">
               <div className="ff-section-heading-text">
-                <h2 className="ff-section-title">{isPeer ? "Shared objectives" : "Your objectives"}</h2>
+                <h2 className="ff-section-title">
+                  {isPeer ? "Shared objectives" : "Your objectives"}
+                </h2>
                 <p>Turn your vision into small, meaningful actions.</p>
               </div>
               {isOwner && (
@@ -893,8 +925,12 @@ export function Workspace({
               />
             </label>
             <ObjectiveBoard
-              key={JSON.stringify(data.objectives.map(o => [o.id, o.status]))}
-              objectives={data.objectives.filter(o => `${o.title} ${categoryTitle(o.category_id)}`.toLowerCase().includes(query.toLowerCase()))}
+              key={JSON.stringify(data.objectives.map((o) => [o.id, o.status]))}
+              objectives={data.objectives.filter((o) =>
+                `${o.title} ${categoryTitle(o.category_id)}`
+                  .toLowerCase()
+                  .includes(query.toLowerCase()),
+              )}
               categoryTitle={categoryTitle}
               canManage={isOwner}
               perform={perform}
@@ -928,8 +964,14 @@ export function Workspace({
                 <section className="ff-panel">
                   <div className="ff-section-heading">
                     <h2 className="ff-section-title">The next small steps</h2>
-                    <span className={`ff-status status-${OBJECTIVE_STATUS_LABELS[normalizeObjectiveStatus(objective.status)]}`}>
-                      {OBJECTIVE_STATUS_LABELS[normalizeObjectiveStatus(objective.status)]}
+                    <span
+                      className={`ff-status status-${normalizeObjectiveStatus(objective.status)}`}
+                    >
+                      {
+                        OBJECTIVE_STATUS_LABELS[
+                          normalizeObjectiveStatus(objective.status)
+                        ]
+                      }
                     </span>
                   </div>
                   <p className="ff-muted">
@@ -1047,7 +1089,9 @@ export function Workspace({
                 </section>
                 <section className="ff-panel">
                   <div className="ff-section-heading">
-                    <h2 className="ff-section-title">Progress, in your words</h2>
+                    <h2 className="ff-section-title">
+                      Progress, in your words
+                    </h2>
                     <Icon name="leaf" />
                   </div>
                   {canContribute && (
@@ -1132,7 +1176,9 @@ export function Workspace({
                 {(objective.team_visible || teamReplies.length > 0) && (
                   <section className="ff-panel ff-dialogue">
                     <div className="ff-section-heading">
-                      <h2 className="ff-section-title">Church Team conversation</h2>
+                      <h2 className="ff-section-title">
+                        Church Team conversation
+                      </h2>
                       <Icon name="chat" />
                     </div>
                     <p className="ff-muted">
@@ -1207,7 +1253,9 @@ export function Workspace({
                 {!isPeer && (
                   <section className="ff-panel ff-dialogue">
                     <div className="ff-section-heading">
-                      <h2 className="ff-section-title">Catalyst conversation</h2>
+                      <h2 className="ff-section-title">
+                        Catalyst conversation
+                      </h2>
                       <Icon name="chat" />
                     </div>
                     <p className="ff-muted">
@@ -1292,7 +1340,11 @@ export function Workspace({
                       >
                         Edit objective
                       </button>
-                      <ObjectiveStatusControl key={`${objective.id}:${objective.status}`} objective={objective} perform={perform} />
+                      <ObjectiveStatusControl
+                        key={`${objective.id}:${objective.status}`}
+                        objective={objective}
+                        perform={perform}
+                      />
                     </>
                   )}
                 </section>
@@ -1556,7 +1608,10 @@ export function Workspace({
         )}
         <footer className="ff-main-footer">
           <Icon name="leaf" size={16} />
-          First Fruits<span className="ff-footer-tagline">Faithfulness in the everyday.</span>
+          First Fruits
+          <span className="ff-footer-tagline">
+            Faithfulness in the everyday.
+          </span>
         </footer>
       </main>
       {isOwner && modal === "objective" && (

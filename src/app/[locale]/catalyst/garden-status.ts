@@ -2,13 +2,19 @@
 // Statuses come from real check-ins, progress entries and acknowledgements;
 // only a message linked to the check-in (check_in_id) counts as reviewing it.
 
-import { isOpenObjective, normalizeObjectiveStatus } from "@/lib/workspace/objective-status";
-import { treeStageFromPlantingDate, type TreeStage } from "@/lib/tree-stage";
+import type { TreeStage } from "@/lib/tree-stage";
+import {
+  churchGrowth,
+  isGrowingObjective,
+  type ChurchGrowth,
+} from "@/lib/church-growth";
 
 export const CHECK_IN_DUE_AFTER_DAYS = 7;
 const DAY_MS = 86_400_000;
 
 export type GardenChurch = {
+  growth?: ChurchGrowth;
+  careCount?: number;
   completedObjectives?: number;
   currentObjective?: string;
   churchId: string;
@@ -39,12 +45,20 @@ type CheckInRow = {
   created_at: string;
 };
 type ObjectiveRow = {
+  has_completed?: boolean;
+  first_completed_at?: string | null;
   id: string;
   planter_id: string;
   title?: string;
   status?: string;
 };
-type ProgressRow = { objective_id: string; created_at: string };
+type ProgressRow = {
+  id?: string;
+  objective_id: string;
+  created_at: string;
+  note?: string | null;
+  value?: number | null;
+};
 
 export function buildGarden(
   input: {
@@ -79,28 +93,39 @@ export function buildGarden(
         .filter((p) => objectiveOwner.get(p.objective_id) === church.pastor_id)
         .map((p) => p.created_at);
       const reviewed = Boolean(lastCheckIn && acknowledged.has(lastCheckIn.id));
+      const growth = churchGrowth({
+        startDate: church.planting_start_date,
+        objectives: input.objectives.filter(
+          (o) => o.planter_id === church.pastor_id,
+        ),
+        progress: input.progress
+          .filter(
+            (p) =>
+              objectiveOwner.get(p.objective_id) === church.pastor_id && p.id,
+          )
+          .map((p) => ({ ...p, id: p.id! })),
+        now,
+      });
       const daysSinceCheckIn = lastCheckIn
         ? (now.getTime() - new Date(lastCheckIn.created_at).getTime()) / DAY_MS
         : Infinity;
 
       return {
-        completedObjectives: input.objectives.filter(
-          (o) => o.planter_id === church.pastor_id && (o.status !== undefined && normalizeObjectiveStatus(o.status) === "complete"),
-        ).length,
+        growth,
+        careCount: new Set(
+          checkIns.filter((c) => acknowledged.has(c.id)).map((c) => c.id),
+        ).size,
+        completedObjectives: growth.completed,
         currentObjective: input.objectives.find(
-          (o) => o.planter_id === church.pastor_id && (o.status !== undefined && isOpenObjective(o.status)),
+          (o) =>
+            o.planter_id === church.pastor_id && isGrowingObjective(o.status),
         )?.title,
         churchId: church.id,
         churchName: church.name,
         city: church.city,
         pastorId: church.pastor_id,
         pastorName: pastorName.get(church.pastor_id) ?? "",
-        stage: church.planting_start_date
-          ? treeStageFromPlantingDate(
-              new Date(`${church.planting_start_date}T00:00:00`),
-              now,
-            )
-          : null,
+        stage: growth.stage,
         lastActivityAt: latest([
           ...progressDates,
           ...checkIns.map((c) => c.created_at),

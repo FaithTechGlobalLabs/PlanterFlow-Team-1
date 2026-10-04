@@ -1,5 +1,8 @@
 "use client";
-import { normalizeObjectiveStatus, OBJECTIVE_STATUS_LABELS } from "@/lib/workspace/objective-status";
+import {
+  normalizeObjectiveStatus,
+  OBJECTIVE_STATUS_LABELS,
+} from "@/lib/workspace/objective-status";
 import type { Objective, WorkspaceData } from "@/lib/workspace/types";
 import {
   gardenDate,
@@ -8,6 +11,7 @@ import {
   stageLabels,
 } from "@/lib/workspace/garden";
 import { ChurchTree } from "@/components/garden/church-tree";
+import { TreeMeaning } from "@/components/garden/tree-meaning";
 import { Link } from "@/i18n/routing";
 import "@/components/garden/garden.css";
 import "./planter.css";
@@ -40,12 +44,18 @@ export function PlanterGarden({
           className={`planter-stage planter-stage--${summary.stage ?? "unknown"}`}
           title="Planting age stage"
         >
-          {summary.stage ? stageLabels[summary.stage] : "Your planting journey"}
+          {summary.stage
+            ? summary.growth.planned
+              ? "Planting is planned"
+              : stageLabels[summary.stage]
+            : "Planting date not recorded"}
         </span>
         <p className="planter-tree-summary">
-          {summary.active.length} open objective{summary.active.length === 1 ? "" : "s"} · {summary.shared} shared
-          with your Church Team · {summary.completed} completed objective{summary.completed === 1 ? "" : "s"} ·{" "}
-          {data.progress.length} progress updates
+          {summary.active.length} open objective
+          {summary.active.length === 1 ? "" : "s"} · {summary.shared} shared
+          with your Church Team · {summary.completed} recorded outcome
+          {summary.completed === 1 ? "" : "s"} · {summary.growth.progress}{" "}
+          recorded progress updates
         </p>
         <div className="planter-branches" aria-label="Objective branches">
           {data.objectives.slice(0, 4).map((o) =>
@@ -56,8 +66,14 @@ export function PlanterGarden({
                 onClick={() => openObjective(o)}
               >
                 <span className="plant-branch__title">{o.title}</span>
-                <span className={`plant-branch__status plant-branch__status--${normalizeObjectiveStatus(o.status)}`}>
-                  {normalizeObjectiveStatus(o.status) === "complete" ? "Completed · fruit" : OBJECTIVE_STATUS_LABELS[normalizeObjectiveStatus(o.status)]}
+                <span
+                  className={`plant-branch__status plant-branch__status--${normalizeObjectiveStatus(o.status)}`}
+                >
+                  {normalizeObjectiveStatus(o.status) === "complete"
+                    ? "Completed · fruit"
+                    : OBJECTIVE_STATUS_LABELS[
+                        normalizeObjectiveStatus(o.status)
+                      ]}
                 </span>
               </button>
             ) : (
@@ -67,8 +83,14 @@ export function PlanterGarden({
                 href={`${preview ? "/preview" : "/dashboard"}?view=objectives&objective=${o.id}`}
               >
                 <span className="plant-branch__title">{o.title}</span>
-                <span className={`plant-branch__status plant-branch__status--${normalizeObjectiveStatus(o.status)}`}>
-                  {normalizeObjectiveStatus(o.status) === "complete" ? "Completed · fruit" : OBJECTIVE_STATUS_LABELS[normalizeObjectiveStatus(o.status)]}
+                <span
+                  className={`plant-branch__status plant-branch__status--${normalizeObjectiveStatus(o.status)}`}
+                >
+                  {normalizeObjectiveStatus(o.status) === "complete"
+                    ? "Completed · fruit"
+                    : OBJECTIVE_STATUS_LABELS[
+                        normalizeObjectiveStatus(o.status)
+                      ]}
                 </span>
               </Link>
             ),
@@ -97,12 +119,15 @@ export function PlanterGarden({
             )}
           </div>
         )}
+        <TreeMeaning />
       </div>
       <div className={`planter-tree-plot stage-${summary.stage ?? "unknown"}`}>
         <div className="planter-sun" />
         <ChurchTree
           completed={summary.completed}
           stage={summary.stage ?? undefined}
+          progress={summary.growth.progress}
+          branches={summary.growth.branches}
         />
         <span className="planter-soil" />
         <p>Deep roots. A shared journey.</p>
@@ -160,7 +185,9 @@ export function RhythmIndicator({ data }: { data: WorkspaceData }) {
     <section className="planter-rhythm">
       <p className="planter-eyebrow">YOUR RHYTHM</p>
       <h2>
-        {days.filter(Boolean).length} {days.filter(Boolean).length === 1 ? "day" : "days"} with objective progress this week
+        {days.filter(Boolean).length}{" "}
+        {days.filter(Boolean).length === 1 ? "day" : "days"} with objective
+        progress this week
       </h2>
       <div className="planter-rhythm-days" aria-hidden="true">
         {["M", "T", "W", "T", "F", "S", "S"].map((label, i) => (
@@ -302,9 +329,9 @@ export function PlanterJourney({
       <p className="planter-eyebrow">A LIVING RECORD</p>
       <h2>Small steps, lasting roots.</h2>
       <p>
-        {data.objectives.filter((o) => normalizeObjectiveStatus(o.status) === "complete").length} completed
-        objectives. Fruit marks explicit completion; completion dates are not
-        recorded yet.
+        {gardenSummary(data).growth.completed} recorded outcomes. Fruit stays
+        when an objective is reopened. Older outcomes may have no recorded
+        completion date.
       </p>
       <ol>
         {moments.map((m) => (

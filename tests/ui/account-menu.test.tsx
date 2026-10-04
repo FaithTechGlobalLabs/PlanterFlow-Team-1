@@ -5,12 +5,17 @@ vi.mock("@/app/[locale]/actions", () => ({ signOut: vi.fn() }));
 vi.mock("@/i18n/routing", () => ({ Link: "a" }));
 
 describe("workspace account menu", () => {
-  it("offers switch account and sign out using the existing sign-out form", () => {
+  it("offers one purposeful sign-out action", () => {
     const { container } = render(<AccountMenu name="Daniel Park" />);
     const details = container.querySelector("details")!;
     details.open = true;
-    expect(screen.getByRole("button", { name: "Switch account" })).toHaveAttribute("type", "submit");
-    expect(screen.getByRole("button", { name: "Sign out" }).closest("form")).toBe(screen.getByRole("button", { name: "Switch account" }).closest("form"));
+    expect(
+      screen.queryByRole("button", { name: "Switch account" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Sign out" })).toHaveAttribute(
+      "type",
+      "submit",
+    );
   });
   it("closes on Escape and outside pointer presses", () => {
     const { container } = render(<AccountMenu name="Daniel Park" />);
@@ -26,7 +31,12 @@ describe("workspace account menu", () => {
   it("shows sign in instead of ending a real session in preview", () => {
     const { container } = render(<AccountMenu name="Sample" preview />);
     container.querySelector("details")!.open = true;
-    expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/login");
-    expect(screen.queryByRole("button", { name: "Sign out" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute(
+      "href",
+      "/login",
+    );
+    expect(
+      screen.queryByRole("button", { name: "Sign out" }),
+    ).not.toBeInTheDocument();
   });
 });

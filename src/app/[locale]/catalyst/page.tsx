@@ -1,3 +1,4 @@
+import { catalystCareThisMonth } from "@/lib/catalyst-care";
 import { getTranslations } from "next-intl/server";
 import { requireRole } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
@@ -68,7 +69,9 @@ export default async function CatalystGardenPage({ params }: PageProps) {
           .in("planter_id", pastorIds),
         supabase
           .from("objectives")
-          .select("id, planter_id, title, status")
+          .select(
+            "id, planter_id, title, status, has_completed, first_completed_at",
+          )
           .in("planter_id", pastorIds),
       ])
     : [
@@ -83,14 +86,14 @@ export default async function CatalystGardenPage({ params }: PageProps) {
     objectiveIds.length
       ? supabase
           .from("progress_entries")
-          .select("objective_id, created_at")
+          .select("id, objective_id, note, value, created_at")
           .in("objective_id", objectiveIds)
       : { data: [], error: null },
     // Only acknowledgements linked to a check-in count as a review; ordinary goal replies don't.
     checkInIds.length
       ? supabase
           .from("dialogue_messages")
-          .select("check_in_id")
+          .select("id, check_in_id, author_id, created_at")
           .in("check_in_id", checkInIds)
           .eq("author_id", user.id)
       : { data: [], error: null },
@@ -129,11 +132,27 @@ export default async function CatalystGardenPage({ params }: PageProps) {
           name: profile.display_name.split(" ")[0] || "",
         })}
         garden={garden}
+        careSummary={
+          loadFailed
+            ? undefined
+            : catalystCareThisMonth({
+                viewerId: user.id,
+                now,
+                objectives: objectives.data ?? [],
+                progress: progress.data ?? [],
+                responses: acknowledgements.data ?? [],
+              })
+        }
         loadFailed={loadFailed}
         isAdmin={profile.is_admin}
         invitations={
           invitations.error ? (
-            <p role="alert" className="catalyst-invites-error text-[15px] text-[var(--color-ink)]">{tInvites("load_error")}</p>
+            <p
+              role="alert"
+              className="catalyst-invites-error text-[15px] text-[var(--color-ink)]"
+            >
+              {tInvites("load_error")}
+            </p>
           ) : (
             <InviteList invites={invites} />
           )

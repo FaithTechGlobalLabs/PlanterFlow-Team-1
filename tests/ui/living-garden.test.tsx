@@ -1,5 +1,9 @@
 import { expect, it, vi, beforeEach } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import {
+  fireEvent,
+  render as testingRender,
+  screen,
+} from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import messages from "../../messages/en.json";
@@ -20,6 +24,13 @@ vi.mock("@/i18n/routing", () => ({
     </a>
   ),
 }));
+function render(ui: ReactNode) {
+  return testingRender(
+    <NextIntlClientProvider locale="en" messages={messages} timeZone="UTC">
+      {ui}
+    </NextIntlClientProvider>,
+  );
+}
 const church: GardenChurch = {
   churchId: "church-1",
   churchName: "A real church",
@@ -76,10 +87,9 @@ it("opens real church context with existing review and workspace routes, and clo
 });
 it("keeps search and no-church states honest", () => {
   home();
-  fireEvent.change(
-    screen.getByPlaceholderText(/Search church/i),
-    { target: { value: "missing" } },
-  );
+  fireEvent.change(screen.getByRole("searchbox", { name: "Find a church" }), {
+    target: { value: "missing" },
+  });
   expect(
     screen.getByText("No churches match your search."),
   ).toBeInTheDocument();
@@ -124,5 +134,5 @@ it("does not fabricate a church or earned fruit in an empty garden", () => {
   expect(
     screen.queryByRole("button", { name: /Explore/ }),
   ).not.toBeInTheDocument();
-  expect(container.querySelectorAll(".garden-fruit")).toHaveLength(0);
+  expect(container.querySelectorAll(".church-tree__fruit")).toHaveLength(0);
 });

@@ -10,13 +10,17 @@ describe("Input", () => {
 
   it("renders error message when provided", () => {
     render(<Input label="Email" error="Email is required" />);
-    expect(screen.getByText("Email is required")).toBeInTheDocument();
+    expect(screen.getByLabelText("Email")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+    expect(screen.getByLabelText("Email")).toHaveAccessibleDescription(
+      "Email is required",
+    );
   });
 
   it("renders with placeholder", () => {
-    const { container } = render(
-      <Input placeholder="name@example.com" />
-    );
+    const { container } = render(<Input placeholder="name@example.com" />);
     const input = container.querySelector("input");
     expect(input?.placeholder).toBe("name@example.com");
   });

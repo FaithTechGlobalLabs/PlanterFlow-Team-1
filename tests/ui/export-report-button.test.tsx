@@ -6,9 +6,13 @@ import { ExportReportButton } from "@/components/workspace/export-report-button"
 
 function renderWithIntl(ui: React.ReactNode) {
   return render(
-    <NextIntlClientProvider locale="en" timeZone="America/Vancouver" messages={en}>
+    <NextIntlClientProvider
+      locale="en"
+      timeZone="America/Vancouver"
+      messages={en}
+    >
       {ui}
-    </NextIntlClientProvider>
+    </NextIntlClientProvider>,
   );
 }
 
@@ -19,13 +23,18 @@ describe("ExportReportButton", () => {
 
   it("renders export button", () => {
     renderWithIntl(<ExportReportButton planterId="planter-1" />);
-    expect(screen.getByRole("button", { name: /Export PDF report/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Export PDF report/i }),
+    ).toBeInTheDocument();
   });
 
   it("displays loading state while exporting and handles error response", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: false,
-      json: async () => ({ error: "Forbidden: You are not authorized to export these records." }),
+      status: 403,
+      json: async () => ({
+        error: "Forbidden: You are not authorized to export these records.",
+      }),
     });
     vi.stubGlobal("fetch", fetchMock);
 
@@ -39,10 +48,12 @@ describe("ExportReportButton", () => {
 
     await waitFor(() => {
       expect(screen.getByRole("alert")).toHaveTextContent(
-        "Forbidden: You are not authorized to export these records."
+        "Forbidden: You are not authorized to export these records.",
       );
     });
 
-    expect(screen.getByRole("button", { name: /Export PDF report/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Export PDF report/i }),
+    ).toBeInTheDocument();
   });
 });

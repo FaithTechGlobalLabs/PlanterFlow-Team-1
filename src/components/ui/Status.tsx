@@ -8,7 +8,7 @@ interface StatusProps {
 export function Status({ children, className = "" }: StatusProps) {
   return (
     <span
-      className={`inline-flex items-center h-9 px-4 rounded-[var(--radius-card)] bg-[var(--color-sage)] text-[13px] font-bold text-[var(--color-green)] min-w-[240px] max-w-full ${className}`}
+      className={`ff-status-label inline-flex items-center min-h-9 px-4 py-1 rounded-[var(--radius-card)] bg-[var(--color-sage)] text-[13px] font-bold text-[var(--color-green)] max-w-full ${className}`}
     >
       {children}
     </span>

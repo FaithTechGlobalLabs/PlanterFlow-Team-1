@@ -26,7 +26,8 @@
       "rate_limit": "Too many attempts. Please wait a moment and try again."
     },
     "signing_in": "Signing in...",
-    "globe_label": "Church plants growing and flourishing around the world."
+    "globe_label": "Illustration of church planting across the world; this is not live church data.",
+    "illustration_note": "Illustration · not live church data"
   },
   "common": {
     "back_to_login": "Back to login",
@@ -76,13 +77,13 @@
       "card_title": "Check your inbox",
       "card_body": "The link in your invitation email signs you in and brings you to the right place."
     },
-      "team": {
-  "title": "Join {church}.",
-  "subline": "Team member · {church} · Invited by Pastor {pastor}",
-  "card_title": "Accept your invitation",
-  "card_body": "{name} invited you to join the {church} team on First Fruits.",
-  "chip": "Role: Team member"
-}
+    "team": {
+      "title": "Join {church}.",
+      "subline": "Team member · {church} · Invited by Pastor {pastor}",
+      "card_title": "Accept your invitation",
+      "card_body": "{name} invited you to join the {church} team on First Fruits.",
+      "chip": "Role: Team member"
+    }
   },
   "onboarding": {
     "catalyst": {
@@ -481,5 +482,28 @@
         "failedAuthors": "Failed to fetch message author profiles."
       }
     }
+  },
+  "tree": {
+    "meaning": "What your tree represents",
+    "missing_date": "Planting date not recorded",
+    "planned": "Planting is planned",
+    "counts": "{progress} recorded progress updates · {completed} recorded outcomes",
+    "age": "The tree’s structure and size reflect church age, from seed to established tree.",
+    "progress": "Branches represent objectives. Light leaves mark distinct saved progress notes or measurements.",
+    "outcomes": "Gold fruit marks distinct recorded outcomes, even when an objective is reopened or archived. Artwork shows up to 5 fruit and 18 progress leaves; counts show the full record.",
+    "quiet": "Time away never removes growth. Attention labels indicate where care may help, without changing the tree’s worth.",
+    "corrections": "Editing an update does not add another leaf. Corrected or deleted records change their representation. Completing the same objective again does not add another fruit.",
+    "stage": {
+      "seed": "Seed · first 3 months",
+      "sprout": "Sprout · 3–12 months",
+      "sapling": "Sapling · year 1–2",
+      "young": "Young tree · year 2–3",
+      "established": "Established · year 3+"
+    },
+    "roots": "Roots represent the church’s vision, foundation and community; they are not a completeness score.",
+    "history_title": "Care alongside the journey",
+    "responses_count": "You recorded {count, plural, one {# response} other {# responses}} in this church’s saved objective conversations. These actions sit alongside the church’s progress.",
+    "history_empty": "No dated progress or objective conversation history has been recorded here yet.",
+    "history_recent": "Showing the 12 most recent moments. Open the workspace Journey for the full record."
   }
 }

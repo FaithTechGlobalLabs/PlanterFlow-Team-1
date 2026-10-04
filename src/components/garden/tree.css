@@ -1,0 +1,47 @@
+.church-tree {
+  --tree-leaf-light: #64825b;
+  --tree-leaf: #385e40;
+  --tree-leaf-dark: #203e2d;
+  --tree-bark-light: #8c7653;
+  --tree-bark: #5b4832;
+  --tree-shadow: #203e2d;
+  --tree-progress-leaf: #b2c886;
+  --tree-fruit: #f3c263;
+  --tree-fruit-outline: #392b19;
+  --tree-fruit-light: #fff0cc;
+  display: block;
+  max-width: 100%;
+}
+.church-growth {
+  color: var(--color-ink);
+  min-width: 0;
+}
+.church-growth__summary {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 12px 0;
+}
+.church-growth__meaning {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.church-growth__toggle {
+  display: list-item;
+  padding: 12px 0;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-green);
+}
+.church-growth__explanation {
+  max-width: 65ch;
+  margin: 8px 0;
+}
+.church-growth__toggle:focus-visible {
+  outline: 3px solid var(--color-green);
+  outline-offset: 4px;
+}
+.church-tree__fruit,
+.church-tree__progress-leaf {
+  animation: none;
+}
+/* No perpetual growth animation or replay on mount. */

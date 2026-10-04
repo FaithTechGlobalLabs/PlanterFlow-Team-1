@@ -9,7 +9,6 @@ import { AuthHashListener } from "@/components/auth-hash-listener";
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
   subsets: ["latin"],
-  weight: ["400", "700"],
 });
 
 interface LayoutProps {
@@ -23,10 +22,7 @@ export const metadata: Metadata = {
     "Help church planters track their planting vision and stay connected with their Catalyst.",
 };
 
-export default async function Layout({
-  children,
-  params,
-}: LayoutProps) {
+export default async function Layout({ children, params }: LayoutProps) {
   const { locale } = await params;
   const messages = await getMessages();
 

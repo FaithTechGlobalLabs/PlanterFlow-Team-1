@@ -24,12 +24,16 @@ export type CategoryView = {
 };
 
 const textareaClassName =
-  "w-full min-h-[96px] p-4 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white text-[var(--color-ink)] placeholder-[var(--color-muted)] text-[13px]";
+  "w-full min-h-[96px] p-4 rounded-[var(--radius-card)] border border-[var(--color-control-border)] bg-[var(--color-surface)] text-[var(--color-ink)] placeholder-[var(--color-muted)] text-base";
 
 const smallButtonClassName =
   "h-11 px-4 rounded-[var(--radius-card)] bg-[var(--color-sage)] text-[13px] font-bold text-[var(--color-ink)] disabled:opacity-50";
 
-export function CategoryManager({ categories }: { categories: CategoryView[] }) {
+export function CategoryManager({
+  categories,
+}: {
+  categories: CategoryView[];
+}) {
   const t = useTranslations("catalyst.categories");
 
   return (
@@ -53,7 +57,13 @@ export function CategoryManager({ categories }: { categories: CategoryView[] }) 
   );
 }
 
-function CategoryFields({ idPrefix, values }: { idPrefix: string; values?: CategoryFormState["values"] }) {
+function CategoryFields({
+  idPrefix,
+  values,
+}: {
+  idPrefix: string;
+  values?: CategoryFormState["values"];
+}) {
   const t = useTranslations("catalyst.categories");
 
   return (
@@ -84,19 +94,36 @@ function CategoryFields({ idPrefix, values }: { idPrefix: string; values?: Categ
 
 function AddCategoryForm() {
   const t = useTranslations("catalyst.categories");
-  const [state, formAction, isPending] = useActionState<CategoryFormState, FormData>(addCategory, {});
+  const [state, formAction, isPending] = useActionState<
+    CategoryFormState,
+    FormData
+  >(addCategory, {});
 
   return (
-    <form action={formAction} className="bg-white rounded-[var(--radius-card)] p-6 flex flex-col gap-4">
-      <h2 className="text-[22px] font-bold text-[var(--color-ink)]">{t("add_title")}</h2>
-      <CategoryFields idPrefix="new-category" values={state.ok ? undefined : state.values} />
+    <form
+      action={formAction}
+      className="bg-white rounded-[var(--radius-card)] p-6 flex flex-col gap-4"
+    >
+      <h2 className="text-[22px] font-bold text-[var(--color-ink)]">
+        {t("add_title")}
+      </h2>
+      <CategoryFields
+        idPrefix="new-category"
+        values={state.ok ? undefined : state.values}
+      />
       <FormError>{state.error && t(`errors.${state.error}`)}</FormError>
       {state.ok && (
         <p role="status" className="text-[13px] text-[var(--color-green)]">
           {t("added")}
         </p>
       )}
-      <Button variant="primary" type="submit" fullWidth={false} className="min-w-[222px]" disabled={isPending}>
+      <Button
+        variant="primary"
+        type="submit"
+        fullWidth={false}
+        className="min-w-[222px]"
+        disabled={isPending}
+      >
         {isPending ? t("saving") : t("add")}
       </Button>
     </form>
@@ -115,34 +142,50 @@ function CategoryItem({
   const t = useTranslations("catalyst.categories");
   const [editing, setEditing] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
-  const [moveState, moveAction, isMoving] = useActionState<CategoryFormState, FormData>(moveCategory, {});
-  const [deleteState, deleteAction, isDeleting] = useActionState<CategoryFormState, FormData>(
-    deleteCategory,
-    {},
-  );
+  const [moveState, moveAction, isMoving] = useActionState<
+    CategoryFormState,
+    FormData
+  >(moveCategory, {});
+  const [deleteState, deleteAction, isDeleting] = useActionState<
+    CategoryFormState,
+    FormData
+  >(deleteCategory, {});
   const inUse = category.objectiveCount > 0;
   const canDelete = !inUse && !category.isPrayer;
 
   if (editing) {
     return (
       <li>
-        <EditCategoryForm category={category} onDone={() => setEditing(false)} />
+        <EditCategoryForm
+          category={category}
+          onDone={() => setEditing(false)}
+        />
       </li>
     );
   }
 
   return (
     <li className="bg-white rounded-[var(--radius-card)] p-6 flex flex-col gap-3">
-      <h2 className="text-[17px] font-bold text-[var(--color-ink)]">{category.title}</h2>
+      <h2 className="text-[17px] font-bold text-[var(--color-ink)]">
+        {category.title}
+      </h2>
       {category.description && (
-        <p className="text-[15px] text-[var(--color-muted)]">{category.description}</p>
+        <p className="text-[15px] text-[var(--color-muted)]">
+          {category.description}
+        </p>
       )}
       <p className="text-[13px] text-[var(--color-muted)]">
-        {category.isPrayer ? t("prayer_kind") : t("objective_count", { count: category.objectiveCount })}
+        {category.isPrayer
+          ? t("prayer_kind")
+          : t("objective_count", { count: category.objectiveCount })}
       </p>
 
       <div className="flex flex-wrap gap-2">
-        <button type="button" className={smallButtonClassName} onClick={() => setEditing(true)}>
+        <button
+          type="button"
+          className={smallButtonClassName}
+          onClick={() => setEditing(true)}
+        >
           {t("edit")}
         </button>
         <form action={moveAction}>
@@ -182,21 +225,38 @@ function CategoryItem({
       </div>
 
       {category.isPrayer ? (
-        <p className="text-[13px] text-[var(--color-muted)]">{t("delete_blocked_prayer")}</p>
+        <p className="text-[13px] text-[var(--color-muted)]">
+          {t("delete_blocked_prayer")}
+        </p>
       ) : (
-        inUse && <p className="text-[13px] text-[var(--color-muted)]">{t("delete_blocked")}</p>
+        inUse && (
+          <p className="text-[13px] text-[var(--color-muted)]">
+            {t("delete_blocked")}
+          </p>
+        )
       )}
 
       {confirmingDelete && (
-        <form action={deleteAction} className="flex flex-wrap items-center gap-2">
+        <form
+          action={deleteAction}
+          className="flex flex-wrap items-center gap-2"
+        >
           <input type="hidden" name="id" value={category.id} />
           <p className="text-[13px] text-[var(--color-ink)]">
             {t("delete_confirm", { title: category.title })}
           </p>
-          <button type="submit" className={smallButtonClassName} disabled={isDeleting}>
+          <button
+            type="submit"
+            className={smallButtonClassName}
+            disabled={isDeleting}
+          >
             {t("delete_yes")}
           </button>
-          <button type="button" className={smallButtonClassName} onClick={() => setConfirmingDelete(false)}>
+          <button
+            type="button"
+            className={smallButtonClassName}
+            onClick={() => setConfirmingDelete(false)}
+          >
             {t("cancel")}
           </button>
         </form>
@@ -210,28 +270,51 @@ function CategoryItem({
   );
 }
 
-function EditCategoryForm({ category, onDone }: { category: CategoryView; onDone: () => void }) {
+function EditCategoryForm({
+  category,
+  onDone,
+}: {
+  category: CategoryView;
+  onDone: () => void;
+}) {
   const t = useTranslations("catalyst.categories");
-  const [state, formAction, isPending] = useActionState<CategoryFormState, FormData>(
-    async (prev, formData) => {
-      const result = await updateCategory(prev, formData);
-      if (result.ok) onDone();
-      return result;
-    },
-    {},
-  );
-  const values = state.values ?? { title: category.title, description: category.description };
+  const [state, formAction, isPending] = useActionState<
+    CategoryFormState,
+    FormData
+  >(async (prev, formData) => {
+    const result = await updateCategory(prev, formData);
+    if (result.ok) onDone();
+    return result;
+  }, {});
+  const values = state.values ?? {
+    title: category.title,
+    description: category.description,
+  };
 
   return (
-    <form action={formAction} className="bg-white rounded-[var(--radius-card)] p-6 flex flex-col gap-4">
+    <form
+      action={formAction}
+      className="bg-white rounded-[var(--radius-card)] p-6 flex flex-col gap-4"
+    >
       <input type="hidden" name="id" value={category.id} />
       <CategoryFields idPrefix={`category-${category.id}`} values={values} />
       <FormError>{state.error && t(`errors.${state.error}`)}</FormError>
       <div className="flex flex-wrap gap-2">
-        <Button variant="primary" type="submit" fullWidth={false} className="min-w-[160px]" disabled={isPending}>
+        <Button
+          variant="primary"
+          type="submit"
+          fullWidth={false}
+          className="min-w-[160px]"
+          disabled={isPending}
+        >
           {isPending ? t("saving") : t("save")}
         </Button>
-        <Button variant="secondary" fullWidth={false} className="min-w-[160px]" onClick={onDone}>
+        <Button
+          variant="secondary"
+          fullWidth={false}
+          className="min-w-[160px]"
+          onClick={onDone}
+        >
           {t("cancel")}
         </Button>
       </div>

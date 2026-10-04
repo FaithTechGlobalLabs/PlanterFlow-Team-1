@@ -1,6 +1,9 @@
 "use client";
 import { useState } from "react";
 import { ChurchTree } from "./church-tree";
+import type { TreeStage } from "@/lib/tree-stage";
+import { TreeMeaning } from "./tree-meaning";
+import { useTranslations } from "next-intl";
 
 export type GardenPlot = {
   id: string;
@@ -10,14 +13,21 @@ export type GardenPlot = {
   statusClass?: string;
   attention?: boolean;
   completed?: number;
+  stage?: TreeStage | null;
+  planned?: boolean;
+  progress?: number;
+  branches?: number;
 };
 
 function getPlotStatusClass(plot: GardenPlot) {
   if (plot.statusClass) return plot.statusClass;
   const s = plot.status.toLowerCase();
-  if (plot.attention || s.includes("support")) return "status-badge-support garden-status-support";
+  if (plot.attention || s.includes("support"))
+    return "status-badge-support garden-status-support";
   if (s.includes("review") || s.includes("due")) {
-    return s.includes("review") ? "status-badge-review garden-status-review" : "status-badge-due garden-status-due";
+    return s.includes("review")
+      ? "status-badge-review garden-status-review"
+      : "status-badge-due garden-status-due";
   }
   return "status-badge-quiet garden-status-quiet";
 }
@@ -34,6 +44,7 @@ export function GardenScene({
   emptyTitle?: string;
   emptyBody?: string;
 }) {
+  const tTree = useTranslations("tree");
   const [page, setPage] = useState(0);
   const pageCount = Math.ceil(plots.length / 6);
   const currentPage = Math.min(page, Math.max(0, pageCount - 1));
@@ -64,18 +75,35 @@ export function GardenScene({
               <button
                 className={`garden-plot ${selectedId === plot.id ? "is-selected" : ""}`}
                 onClick={() => onSelect(plot.id)}
-                aria-label={`Explore ${plot.name}, ${plot.pastor}. ${plot.status}`}
+                aria-label={`Explore ${plot.name}, ${plot.pastor}. ${plot.status}. ${plot.planned ? tTree("planned") : plot.stage ? tTree(`stage.${plot.stage}`) : tTree("missing_date")}. ${tTree("counts", { progress: plot.progress ?? 0, completed: plot.completed ?? 0 })}`}
                 aria-pressed={selectedId === plot.id}
               >
-                <ChurchTree variant={i} completed={plot.completed} />
-                <span className={`garden-plot-label ${getPlotStatusClass(plot)}`}>
+                <ChurchTree
+                  variant={i}
+                  completed={plot.completed}
+                  stage={plot.stage ?? undefined}
+                  progress={plot.progress}
+                  branches={plot.branches}
+                />
+                <span className="garden-plot-label">
                   <strong>{plot.name}</strong>
                   <span className="garden-plot-pastor">{plot.pastor}</span>
-                  <small className={plot.attention ? "garden-attention" : ""}>
+                  <small className="garden-plot-stage">
+                    {plot.planned
+                      ? tTree("planned")
+                      : plot.stage
+                        ? tTree(`stage.${plot.stage}`)
+                        : tTree("missing_date")}
+                  </small>
+                  <small
+                    className={`garden-plot-attention ${getPlotStatusClass(plot)}`}
+                  >
                     {plot.status}
                   </small>
                   {Boolean(plot.completed) && (
-                    <small className="garden-plot-completed-badge">{plot.completed} objectives completed</small>
+                    <small className="garden-plot-completed-badge">
+                      {plot.completed} recorded outcomes
+                    </small>
                   )}
                 </span>
               </button>
@@ -114,6 +142,7 @@ export function GardenScene({
       <p className="garden-scene-note">
         Every church has its own story. Every act of care matters.
       </p>
+      <TreeMeaning />
     </section>
   );
 }

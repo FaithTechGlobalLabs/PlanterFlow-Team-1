@@ -6,22 +6,18 @@ interface PageHeaderProps {
   subline: string;
 }
 
-export function PageHeader({
-  eyebrow,
-  title,
-  subline,
-}: PageHeaderProps) {
+export function PageHeader({ eyebrow, title, subline }: PageHeaderProps) {
   return (
-    <div className="w-full">
+    <div className="ff-page-header w-full">
       {eyebrow && (
-        <p className="text-[13px] font-bold text-[var(--color-green)] mb-2 uppercase">
+        <p className="ff-page-header__eyebrow text-[13px] font-bold text-[var(--color-green)] mb-2 uppercase">
           {eyebrow}
         </p>
       )}
-      <h1 className="text-[36px] font-bold text-[var(--color-ink)] mb-4">
+      <h1 className="ff-page-header__title text-[clamp(28px,5vw,36px)] font-bold text-[var(--color-ink)] mb-4">
         {title}
       </h1>
-      <p className="text-[15px] text-[var(--color-muted)]">
+      <p className="ff-page-header__subline text-[15px] text-[var(--color-muted)]">
         {subline}
       </p>
     </div>
