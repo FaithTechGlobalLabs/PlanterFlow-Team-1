@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { getSessionProfile } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { hasAdminCredentials, createAdminClient } from "@/lib/supabase/admin";
 import enMessages from "../../../../../../messages/en.json";
 
 /**
@@ -338,21 +339,37 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const supabase = await createClient();
+  // Use service role admin client when available to bypass RLS policies for report generation
+  const supabase = hasAdminCredentials() ? createAdminClient() : await createClient();
 
-  // 1. Verify target planter exists
-  const { data: planter, error: planterError } = await supabase
-    .from("profiles")
-    .select("id, display_name, role, org_id")
-    .eq("id", planterId)
-    .maybeSingle();
+  // 1. Verify target planter profile
+  let planter: { id: string; display_name: string; role: string; org_id: string } | null = null;
 
-  if (planterError) {
-    console.error("[export-planter] Error fetching planter profile:", planterError);
-    return NextResponse.json({ error: "Failed to fetch database records." }, { status: 500 });
+  if (user.id === planterId && profile.role === "planter") {
+    planter = {
+      id: user.id,
+      display_name: profile.display_name || "Planter",
+      role: profile.role,
+      org_id: profile.org_id || "",
+    };
+  } else {
+    const { data: dbPlanter, error: planterError } = await supabase
+      .from("profiles")
+      .select("id, display_name, role, org_id")
+      .eq("id", planterId)
+      .maybeSingle();
+
+    if (planterError) {
+      console.error("[export-planter] Error fetching planter profile:", planterError);
+      return NextResponse.json({ error: "Failed to fetch database records." }, { status: 500 });
+    }
+
+    if (dbPlanter && dbPlanter.role === "planter") {
+      planter = dbPlanter;
+    }
   }
 
-  if (!planter || planter.role !== "planter") {
+  if (!planter) {
     return NextResponse.json({ error: "Planter not found" }, { status: 404 });
   }
 
