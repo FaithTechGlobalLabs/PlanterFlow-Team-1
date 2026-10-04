@@ -9,7 +9,7 @@ Two role-specific flows guide new users from invitation to dashboard.
 3. User clicks link → lands at `/invite/[token]`
 4. Accepts invitation (name, language, password) → creates auth user + profile
 5. `/onboarding/catalyst` → sets contact preference, marks onboarded
-6. Home dashboard (can now invite pastors)
+6. Catalyst garden at `/catalyst` (see [catalyst](catalyst.md))
 
 ## Pastor Flow
 
