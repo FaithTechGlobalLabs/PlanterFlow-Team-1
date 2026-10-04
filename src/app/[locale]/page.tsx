@@ -49,40 +49,8 @@ export default async function HomePage({ params }: PageProps) {
       redirect({ href: "/onboarding/catalyst", locale });
     }
 
-    const supabase = await createClient();
-    const { data: org } = await supabase
-      .from("organizations")
-      .select("name")
-      .eq("id", profile!.org_id)
-      .single();
-
-    return (
-      <OnboardingPage
-        eyebrow={t("home.catalyst.eyebrow")}
-        title={org?.name ?? ""}
-        subline={t("home.catalyst.subline")}
-      >
-        <FormCard title={profile!.display_name}>
-          <Button variant="primary" href="/dashboard" fullWidth={false}>Open workspace</Button>
-          <Status>
-            {profile!.is_admin ? t("home.catalyst.chip_admin") : t("invite.catalyst.chip")}
-          </Status>
-          <Button variant="primary" href="/invite-pastor" fullWidth={false} className="min-w-[222px]">
-            {t("home.catalyst.invite")}
-          </Button>
-          {profile!.is_admin && (
-            <Button variant="secondary" href="/invite-catalyst" fullWidth={false} className="min-w-[222px]">
-              {t("home.catalyst.invite_catalyst")}
-            </Button>
-          )}
-          <form action={signOut}>
-            <Button variant="secondary" type="submit" fullWidth={false} className="min-w-[222px]">
-              {t("common.sign_out")}
-            </Button>
-          </form>
-        </FormCard>
-      </OnboardingPage>
-    );
+    // /catalyst is the canonical Catalyst landing page; the #61 workspace stays at /dashboard.
+    redirect({ href: "/catalyst", locale });
   }
 
   if (profile!.role === "peer") {
