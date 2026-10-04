@@ -1,10 +1,10 @@
 import { useFormatter, useTranslations } from "next-intl";
 import type { InviteView } from "./invite-status";
 
-const badgeClass: Record<InviteView["status"], string> = {
-  pending: "bg-[var(--color-sage)] text-[var(--color-green)]",
-  accepted: "bg-[var(--color-canvas)] text-[var(--color-muted)]",
-  expired: "bg-[var(--color-canvas)] text-[var(--color-ink)]",
+const statusBadgeVariant: Record<InviteView["status"], string> = {
+  pending: "status-badge-pending bg-[var(--color-sage)] text-[var(--color-green)]",
+  accepted: "status-badge-accepted bg-[var(--color-canvas)] text-[var(--color-muted)]",
+  expired: "status-badge-expired bg-[var(--color-canvas)] text-[var(--color-ink)]",
 };
 
 export function InviteList({ invites }: { invites: InviteView[] }) {
@@ -33,7 +33,7 @@ export function InviteList({ invites }: { invites: InviteView[] }) {
                 : t("sent", { date: format.dateTime(new Date(invite.sentAt), { dateStyle: "medium" }) })}
             </p>
           </div>
-          <span className={`inline-flex items-center h-7 px-3 rounded-full text-[12px] font-bold ${badgeClass[invite.status]}`}>
+          <span className={`status-badge inline-flex items-center h-7 px-3 rounded-full text-[12px] font-bold ${statusBadgeVariant[invite.status]}`}>
             {t(`status.${invite.status}`)}
           </span>
         </li>

@@ -4,18 +4,18 @@ import { daysSince, type GardenChurch } from "./garden-status";
 
 export function StatusBadges({ church }: { church: GardenChurch }) {
   const t = useTranslations("catalyst.garden");
-  const badge = "inline-flex items-center h-7 px-3 rounded-full text-[12px] font-bold";
+  const statusBadge = "status-badge inline-flex items-center h-7 px-3 rounded-full text-[12px] font-bold";
 
   return (
-    <span className="flex flex-wrap gap-2">
+    <span className="status-badges flex flex-wrap gap-2">
       {church.supportRequested && (
-        <span className={`${badge} bg-[var(--color-blue)] text-white`}>{t("support_requested")}</span>
+        <span className={`${statusBadge} status-badge-support bg-[var(--color-blue)] text-white`}>{t("support_requested")}</span>
       )}
       {church.replyDue && !church.supportRequested && (
-        <span className={`${badge} bg-[var(--color-sage)] text-[var(--color-ink)]`}>{t("review_check_in")}</span>
+        <span className={`${statusBadge} status-badge-review bg-[var(--color-sage)] text-[var(--color-ink)]`}>{t("review_check_in")}</span>
       )}
       {church.checkInDue && (
-        <span className={`${badge} bg-[var(--color-sage)] text-[var(--color-green)]`}>{t("check_in_due")}</span>
+        <span className={`${statusBadge} status-badge-due bg-[var(--color-sage)] text-[var(--color-green)]`}>{t("check_in_due")}</span>
       )}
     </span>
   );
