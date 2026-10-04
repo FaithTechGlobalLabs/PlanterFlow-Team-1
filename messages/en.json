@@ -76,13 +76,13 @@
       "card_title": "Check your inbox",
       "card_body": "The link in your invitation email signs you in and brings you to the right place."
     },
-    "team": {
-      "title": "Join {church}.",
-      "subline": "Team member · {church} · Invited by Pastor {pastor}",
-      "card_title": "Accept your invitation",
-      "card_body": "{name} invited you to join the {church} team on First Fruits.",
-      "chip": "Role: Team member"
-    }
+      "team": {
+  "title": "Join {church}.",
+  "subline": "Team member · {church} · Invited by Pastor {pastor}",
+  "card_title": "Accept your invitation",
+  "card_body": "{name} invited you to join the {church} team on First Fruits.",
+  "chip": "Role: Team member"
+}
   },
   "onboarding": {
     "catalyst": {
@@ -220,7 +220,8 @@
     "team": {
       "eyebrow": "YOUR TEAM",
       "subline": "You’re part of this church’s journey. Stay connected with your pastor.",
-      "chip": "Role: Team member"
+      "chip": "Role: Team member",
+      "open_workspace": "Open workspace"
     }
   },
   "authSetup": {

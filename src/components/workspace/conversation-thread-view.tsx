@@ -66,14 +66,26 @@ export function ConversationThreadView({
           </span>
         </div>
         {allowStatusChange && thread && (
-          <SaveForm intent="conversation_status" perform={perform} submit="Update status" onSaved={onSaved}>
-            <input type="hidden" name="thread_id" value={thread.id} />
-            <select name="status" defaultValue={status} aria-label="Thread status">
-              <option value="active">Active</option>
-              <option value="resolved">Resolved</option>
-              <option value="archived">Archived</option>
-            </select>
-          </SaveForm>
+          <SaveForm
+  key={`${thread.id}-${status}`}
+  intent="conversation_status"
+  perform={perform}
+  showSubmit={false}
+  onSaved={onSaved}
+>
+  <input type="hidden" name="thread_id" value={thread.id} />
+
+  <select
+    name="status"
+    defaultValue={status}
+    aria-label="Thread status"
+    onChange={event => event.currentTarget.form?.requestSubmit()}
+  >
+    <option value="active">Active</option>
+    <option value="resolved">Resolved</option>
+    <option value="archived">Archived</option>
+  </select>
+</SaveForm>
         )}
       </div>
 
