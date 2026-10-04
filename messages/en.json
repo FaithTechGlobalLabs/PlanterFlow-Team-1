@@ -25,7 +25,8 @@
       "generic": "Something went wrong. Please try again.",
       "rate_limit": "Too many attempts. Please wait a moment and try again."
     },
-    "signing_in": "Signing in..."
+    "signing_in": "Signing in...",
+    "globe_label": "Church plants growing and flourishing around the world."
   },
   "common": {
     "back_to_login": "Back to login",
