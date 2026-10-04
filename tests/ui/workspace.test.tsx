@@ -156,3 +156,79 @@ describe("planter workspace", () => {
     expect(mocks.save).not.toHaveBeenCalled();
   });
 });
+
+describe("objective drafts", () => {
+  const titleLabel = "What are you working toward?";
+  function create() { fireEvent.click(screen.getByRole("button", { name: "Create objective" })); }
+  function dismiss() { fireEvent.click(screen.getByRole("dialog")); }
+  function edit(id: string) {
+    fireEvent.click(screen.getByRole("button", { name: /^Objectives/ }));
+    fireEvent.click(screen.getByRole("button", { name: `Open ${sampleWorkspace.objectives.find(o => o.id === id)!.title}` }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit objective" }));
+  }
+  it("restores every field after closing the new-objective modal", () => {
+    render(<Workspace data={sampleWorkspace} />);
+    create();
+    fireEvent.change(screen.getByLabelText("Category"), { target: { value: sampleWorkspace.categories[0].id } });
+    fireEvent.change(screen.getByLabelText(titleLabel), { target: { value: "My unfinished goal" } });
+    fireEvent.change(screen.getByLabelText("Why does it matter? (optional)"), { target: { value: "Important context" } });
+    fireEvent.change(screen.getByLabelText("Target date (optional)"), { target: { value: "2027-01-15" } });
+    fireEvent.change(screen.getByLabelText("Progress rhythm"), { target: { value: "monthly" } });
+    fireEvent.click(screen.getByLabelText("Share with Church Team"));
+    dismiss();
+    create();
+    expect(screen.getByLabelText(titleLabel)).toHaveValue("My unfinished goal");
+    expect(screen.getByLabelText("Category")).toHaveValue(sampleWorkspace.categories[0].id);
+    expect(screen.getByLabelText("Why does it matter? (optional)")).toHaveValue("Important context");
+    expect(screen.getByLabelText("Target date (optional)")).toHaveValue("2027-01-15");
+    expect(screen.getByLabelText("Progress rhythm")).toHaveValue("monthly");
+    expect(screen.getByLabelText("Share with Church Team")).toBeChecked();
+  });
+  it("keeps new and individual edit drafts separate, including empty values", () => {
+    render(<Workspace data={sampleWorkspace} />);
+    create();
+    fireEvent.change(screen.getByLabelText(titleLabel), { target: { value: "New draft" } });
+    dismiss();
+    edit(sampleWorkspace.objectives[0].id);
+    fireEvent.change(screen.getByLabelText(titleLabel), { target: { value: "" } });
+    dismiss();
+    edit(sampleWorkspace.objectives[1].id);
+    expect(screen.getByLabelText(titleLabel)).toHaveValue(sampleWorkspace.objectives[1].title);
+    dismiss();
+    edit(sampleWorkspace.objectives[0].id);
+    expect(screen.getByLabelText(titleLabel)).toHaveValue("");
+    dismiss();
+    fireEvent.click(screen.getByRole("button", { name: "Garden" }));
+    create();
+    expect(screen.getByLabelText(titleLabel)).toHaveValue("New draft");
+  });
+  it("clears a discarded draft", () => {
+    render(<Workspace data={sampleWorkspace} />);
+    create();
+    fireEvent.change(screen.getByLabelText(titleLabel), { target: { value: "Discard me" } });
+    fireEvent.click(screen.getByRole("button", { name: "Discard draft" }));
+    create();
+    expect(screen.getByLabelText(titleLabel)).toHaveValue("");
+  });
+  it("retains a failed-save draft after dismissing and reopening", async () => {
+    mocks.save.mockResolvedValue({ ok: false, error: "Save failed" });
+    render(<Workspace data={sampleWorkspace} />);
+    create();
+    fireEvent.change(screen.getByLabelText(titleLabel), { target: { value: "Keep me" } });
+    fireEvent.submit(screen.getByLabelText(titleLabel).closest("form")!);
+    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Save failed"));
+    dismiss();
+    create();
+    expect(screen.getByLabelText(titleLabel)).toHaveValue("Keep me");
+  });
+  it("clears the draft after a successful save", async () => {
+    mocks.save.mockResolvedValue({ ok: true });
+    render(<Workspace data={sampleWorkspace} />);
+    create();
+    fireEvent.change(screen.getByLabelText(titleLabel), { target: { value: "Saved goal" } });
+    fireEvent.submit(screen.getByLabelText(titleLabel).closest("form")!);
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    create();
+    expect(screen.getByLabelText(titleLabel)).toHaveValue("");
+  });
+});
