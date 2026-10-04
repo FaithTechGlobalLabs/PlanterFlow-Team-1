@@ -287,25 +287,20 @@ export async function GET(
   // Caller must be:
   // a) The planter themselves
   // b) The Catalyst assigned to this pastor's church
-  // c) An organization Admin in the same org
   let isAuthorized = false;
 
   if (user.id === planterId) {
     isAuthorized = true;
-  } else if (profile.role === "catalyst") {
-    if (profile.is_admin && profile.org_id === planter.org_id) {
-      isAuthorized = true;
-    } else {
-      const { data: church } = await supabase
-        .from("churches")
-        .select("id")
-        .eq("pastor_id", planterId)
-        .eq("catalyst_id", user.id)
-        .maybeSingle();
+  } else {
+    const { data: church } = await supabase
+      .from("churches")
+      .select("id")
+      .eq("pastor_id", planterId)
+      .eq("catalyst_id", user.id)
+      .maybeSingle();
 
-      if (church) {
-        isAuthorized = true;
-      }
+    if (church) {
+      isAuthorized = true;
     }
   }
 

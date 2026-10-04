@@ -107,6 +107,28 @@ describe("GET /api/export/planter/[id]", () => {
     expect(res.status).toBe(403);
   });
 
+  it("denies access to an unassigned admin user", async () => {
+    mocks.session = {
+      user: { id: "admin-1" },
+      profile: { role: "catalyst", is_admin: true, org_id: "org-1" },
+    };
+    mocks.assignedChurch = null;
+    const req = new Request("http://localhost/api/export/planter/planter-1");
+    const res = await GET(req, { params: Promise.resolve({ id: "planter-1" }) });
+    expect(res.status).toBe(403);
+  });
+
+  it("allows access to the planter themselves", async () => {
+    mocks.session = {
+      user: { id: "planter-1" },
+      profile: { role: "planter", org_id: "org-1" },
+    };
+    mocks.assignedChurch = null;
+    const req = new Request("http://localhost/api/export/planter/planter-1?format=json");
+    const res = await GET(req, { params: Promise.resolve({ id: "planter-1" }) });
+    expect(res.status).toBe(200);
+  });
+
   it("allows assigned Catalyst and returns JSON data format when requested", async () => {
     const req = new Request("http://localhost/api/export/planter/planter-1?format=json");
     const res = await GET(req, { params: Promise.resolve({ id: "planter-1" }) });
