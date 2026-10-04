@@ -66,7 +66,7 @@ export default async function HomePage({ params }: PageProps) {
         <FormCard title={profile!.display_name}>
           <Status>{t("home.team.chip")}</Status>
           <Button variant="primary" href="/dashboard" fullWidth={false}>
-            Open workspace
+            {t("home.team.open_workspace")} 
           </Button>
           <form action={signOut}>
             <Button variant="secondary" type="submit" fullWidth={false} className="min-w-[222px]">
