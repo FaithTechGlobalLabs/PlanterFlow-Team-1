@@ -6,3 +6,36 @@
 @media(prefers-reduced-motion:reduce){.ff-app *{transition:none!important}}
 .ff-insights-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(290px,1fr);gap:20px}.ff-progress-chart{display:flex;gap:24px;padding:20px 12px 10px;align-items:end}.ff-chart-column{flex:1;text-align:center}.ff-chart-column>strong{font-size:14px;font-weight:500;display:block;margin-bottom:9px}.ff-chart-track{height:125px;display:flex;align-items:end;justify-content:center;border-bottom:1px solid #dfe5d6}.ff-chart-track>span{width:65%;max-width:65px;border-radius:6px 6px 0 0;background:#e3e8dc}.ff-chart-track>span.has-progress{background:linear-gradient(#a9c78a,#6d965f)}.ff-chart-column>small{display:block;margin-top:10px;color:#718166;font-size:10px}.ff-chart-caption{font-size:11px;color:#76866b;border-top:1px solid #eef1e8;padding-top:18px;margin-top:18px}.ff-reply-preview{display:block;width:100%;background:none;border:0;border-bottom:1px solid #e8edde;text-align:left;padding:12px 0;color:inherit}.ff-reply-preview>small{font-size:10px;color:#718465}.ff-reply-preview>p{font-size:12px;line-height:1.8;margin:9px 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.ff-reply-preview>span,.ff-support-preview>span{font-size:10px;color:#52713e}.ff-support-preview{display:block;width:100%;padding:16px;background:#f2edf5;border:0;border-radius:9px;margin-top:18px;text-align:left;color:#796284}.ff-support-preview>strong{font-size:11px}.ff-support-preview>p{font-size:12px;line-height:1.7;margin:8px 0;white-space:pre-wrap}.ff-support-preview>span{color:#80688d}@media(max-width:850px){.ff-insights-grid{grid-template-columns:1fr}}
 .ff-home-link{display:block;font-size:11px;color:#567347;margin:20px 8px 0}.ff-table-controls{display:flex;gap:28px;align-items:center;justify-content:space-between}.ff-table-controls .ff-search{flex:1;max-width:400px}.ff-check-filter{display:flex;align-items:center;gap:8px;font-size:11px;color:#637858}.ff-check-filter input{accent-color:#426a46}.ff-table-scroll{overflow:auto}.ff-planter-table{width:100%;border-collapse:collapse;text-align:left;min-width:700px}.ff-planter-table th{padding:12px 16px;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#829376;background:#f4f7f0;font-weight:500}.ff-planter-table td{padding:20px 16px;font-size:12px;border-bottom:1px solid #e9eedf;vertical-align:middle}.ff-planter-table td>strong{display:block;font-size:13px}.ff-planter-table td>small{display:block;font-size:10px;color:#87977b;margin-top:6px}.ff-prayer-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.ff-prayer-summary{border:1px solid #e9dfed;background:#faf7fb;padding:22px;border-radius:12px}.ff-prayer-summary>svg{color:#a38bad;margin-bottom:14px}.ff-prayer-summary>small{font-size:10px;color:#8e7f96;display:block}.ff-prayer-summary>p{font-size:13px;line-height:1.8;margin:14px 0;white-space:pre-wrap}.ff-prayer-summary>.ff-text-button{display:block;margin-top:20px}.ff-category-row{display:flex;align-items:center;gap:16px;padding:23px 0;border-bottom:1px solid #e9eee2}.ff-category-row>div{flex:1}.ff-category-row h3{font-size:14px;margin:0 0 5px;font-weight:500}.ff-category-row p{font-size:12px;color:#7a8b6e;margin:0 0 5px;line-height:1.7}.ff-category-row small{font-size:10px;color:#8d9d82}.ff-catalyst-hero{min-height:280px}.ff-catalyst-hero .ff-hero-content{width:60%}.ff-catalyst-hero h2{font-size:39px}@media(max-width:1180px){.ff-prayer-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ff-table-controls{align-items:start;flex-direction:column;gap:0}}@media(max-width:850px){.ff-prayer-grid{grid-template-columns:1fr}.ff-catalyst-hero .ff-hero-content{width:85%}}
+.ff-hero-content {
+  overflow: hidden;
+}
+
+.ff-hero-slide {
+  animation: ff-slide-in 650ms ease-out both;
+}
+
+@keyframes ff-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(45px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ff-hero-slide {
+    animation: none;
+  }
+}
+
+.ff-hero-slide .ff-hero-actions {
+  margin-top: 24px;
+}
+
+.ff-overview-grid > .ff-panel:only-child {
+  grid-column: 1 / -1;
+}

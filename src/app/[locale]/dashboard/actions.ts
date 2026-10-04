@@ -23,8 +23,35 @@ export async function saveWorkspace(form: FormData): Promise<SaveResult> {
       const category_id = idField(form, "category_id");
       const { data: category } = await db.from("objective_categories").select("id").eq("id", category_id).eq("org_id", profile.org_id).eq("kind", "objective").maybeSingle();
       if (!category) throw new Error("Please choose an objective category in your organization.");
-      const values = { category_id, title: textField(form, "title", 160), description: textField(form, "description", 2000, false), cadence: choiceField(form, "cadence", ["weekly", "monthly"]) };
-      const res = form.get("id") ? await db.from("objectives").update({ ...values, updated_at: new Date().toISOString() }).eq("id", idField(form, "id")).eq("planter_id", user.id).select("id").single()
+      const dueDate = textField(form, "due_date", 10, false);
+
+      if (dueDate) {
+        const parsed = new Date(`${dueDate}T00:00:00Z`);
+
+        if (
+          !/^\d{4}-\d{2}-\d{2}$/.test(dueDate) ||
+          Number.isNaN(parsed.getTime()) ||
+          parsed.toISOString().slice(0, 10) !== dueDate
+        ) {
+          return { ok: false, error: "Please enter a valid target date." };
+        }
+      }
+
+      const values = {
+        category_id,
+        title: textField(form, "title", 160),
+        description: textField(form, "description", 2000, false),
+        cadence: choiceField(form, "cadence", ["weekly", "monthly"]),
+        due_date: dueDate || null,
+      };
+
+      const res = form.get("id")
+        ? await db.from("objectives")
+            .update({ ...values, updated_at: new Date().toISOString() })
+            .eq("id", idField(form, "id"))
+            .eq("planter_id", user.id)
+            .select("id")
+            .single()
         : await db.from("objectives").insert({ ...values, planter_id: user.id }).select("id").single();
       result = { ok: !res.error, id: res.data?.id, error: res.error?.message };
     } else if (["activity", "progress", "message", "objective_status"].includes(intent)) {
@@ -55,6 +82,7 @@ export async function saveWorkspace(form: FormData): Promise<SaveResult> {
         const res = await db.from("objectives").update({ status: choiceField(form, "status", ["active", "paused", "done"]), updated_at: new Date().toISOString() }).eq("id", objective_id).select("id").single();
         result = { ok: !res.error, id: res.data?.id, error: res.error?.message };
       }
+<<<<<<< HEAD
     } else if (intent === "conversation_message") {
       const entity_type = choiceField(form, "entity_type", ["prayer", "support"]) as ThreadEntityType;
       const entity_id = idField(form, "entity_id");
@@ -88,6 +116,8 @@ export async function saveWorkspace(form: FormData): Promise<SaveResult> {
         });
       }
       result = { ok: !res.error, id: res.data?.id, error: res.error?.message };
+=======
+>>>>>>> 763cc62 (Update planter dashboard and objective progress flow)
     } else if (intent === "prayer") {
       const body = textField(form, "body");
       const res = await db.from("prayer_requests").insert({ planter_id: user.id, org_id: profile.org_id, body, visibility: choiceField(form, "visibility", ["private", "organization"]) }).select("id").single();

@@ -1,7 +1,7 @@
 export type Category = { id: string; title: string; description: string | null; kind: "objective" | "prayer" };
-export type Objective = { id: string; planter_id: string; category_id: string; title: string; description: string | null; cadence: "weekly" | "monthly"; status: "active" | "paused" | "done"; created_at: string };
+export type Objective = { id: string; planter_id: string; category_id: string; title: string; description: string | null; cadence: "weekly" | "monthly"; status: "active" | "paused" | "done"; created_at: string; due_date: string | null};
 export type Activity = { id: string; objective_id: string; description: string; cadence: "weekly" | "monthly"; status: "active" | "done" };
-export type Progress = { id: string; objective_id: string; activity_id: string | null; note: string; value: number | null; created_at: string };
+export type Progress = { id: string; objective_id: string; activity_id: string | null; note: string; value: number | null; created_at: string; author_id: string };
 export type Message = { id: string; objective_id: string; author_id: string; body: string; created_at: string };
 export type CheckIn = { id: string; planter_id: string; note: string; feeling: string; momentum: string; support: string; created_at: string };
 export type Prayer = { id: string; planter_id: string; body: string; visibility: "private" | "organization"; resolved: boolean; created_at: string };
