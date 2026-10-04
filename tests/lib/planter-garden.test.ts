@@ -20,7 +20,7 @@ describe("truthful planter garden", () => {
       ...sampleWorkspace,
       objectives: sampleWorkspace.objectives.map((o, i) => ({
         ...o,
-        status: i === 0 ? ("done" as const) : o.status,
+        status: i === 0 ? ("complete" as const) : o.status,
       })),
     };
     expect(gardenSummary(data).completed).toBe(1);

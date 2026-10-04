@@ -1,4 +1,5 @@
 "use client";
+import { normalizeObjectiveStatus, OBJECTIVE_STATUS_LABELS } from "@/lib/workspace/objective-status";
 import type { Objective, WorkspaceData } from "@/lib/workspace/types";
 import {
   gardenDate,
@@ -42,7 +43,7 @@ export function PlanterGarden({
           {summary.stage ? stageLabels[summary.stage] : "Your planting journey"}
         </span>
         <p className="planter-tree-summary">
-          {summary.active.length} active objective{summary.active.length === 1 ? "" : "s"} · {summary.shared} shared
+          {summary.active.length} open objective{summary.active.length === 1 ? "" : "s"} · {summary.shared} shared
           with your Church Team · {summary.completed} completed objective{summary.completed === 1 ? "" : "s"} ·{" "}
           {data.progress.length} progress updates
         </p>
@@ -51,23 +52,23 @@ export function PlanterGarden({
             openObjective ? (
               <button
                 key={o.id}
-                className={`plant-branch plant-branch--${o.status}`}
+                className={`plant-branch plant-branch--${normalizeObjectiveStatus(o.status)}`}
                 onClick={() => openObjective(o)}
               >
                 <span className="plant-branch__title">{o.title}</span>
-                <span className={`plant-branch__status plant-branch__status--${o.status}`}>
-                  {o.status === "done" ? "Completed · fruit" : o.status}
+                <span className={`plant-branch__status plant-branch__status--${normalizeObjectiveStatus(o.status)}`}>
+                  {normalizeObjectiveStatus(o.status) === "complete" ? "Completed · fruit" : OBJECTIVE_STATUS_LABELS[normalizeObjectiveStatus(o.status)]}
                 </span>
               </button>
             ) : (
               <Link
                 key={o.id}
-                className={`plant-branch plant-branch--${o.status}`}
+                className={`plant-branch plant-branch--${normalizeObjectiveStatus(o.status)}`}
                 href={`${preview ? "/preview" : "/dashboard"}?view=objectives&objective=${o.id}`}
               >
                 <span className="plant-branch__title">{o.title}</span>
-                <span className={`plant-branch__status plant-branch__status--${o.status}`}>
-                  {o.status === "done" ? "Completed · fruit" : o.status}
+                <span className={`plant-branch__status plant-branch__status--${normalizeObjectiveStatus(o.status)}`}>
+                  {normalizeObjectiveStatus(o.status) === "complete" ? "Completed · fruit" : OBJECTIVE_STATUS_LABELS[normalizeObjectiveStatus(o.status)]}
                 </span>
               </Link>
             ),
@@ -301,7 +302,7 @@ export function PlanterJourney({
       <p className="planter-eyebrow">A LIVING RECORD</p>
       <h2>Small steps, lasting roots.</h2>
       <p>
-        {data.objectives.filter((o) => o.status === "done").length} completed
+        {data.objectives.filter((o) => normalizeObjectiveStatus(o.status) === "complete").length} completed
         objectives. Fruit marks explicit completion; completion dates are not
         recorded yet.
       </p>

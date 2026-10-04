@@ -39,3 +39,13 @@
 .ff-overview-grid > .ff-panel:only-child {
   grid-column: 1 / -1;
 }
+/* Objective board: each column stays readable, with horizontal scrolling on desktop. */
+.ff-board{display:grid;grid-template-columns:repeat(5,minmax(230px,1fr));gap:16px;overflow-x:auto;padding:4px 4px 18px;align-items:start}
+.ff-board-column{background:#f5f6f3;border:1px solid #e0e6da;border-top:4px solid #aab7a0;border-radius:10px;padding:12px;min-height:190px;color:var(--ff-ink)}
+.ff-board-column.status-in_progress{border-top-color:#65917b}.ff-board-column.status-at_risk{border-top-color:#c48c49}.ff-board-column.status-complete{border-top-color:#477c60}.ff-board-column.status-archived{border-top-color:#91999c}
+.ff-board-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}.ff-board-heading h3{font-size:14px;font-weight:600;margin:0}.ff-board-heading>span{background:#fff;border-radius:20px;padding:3px 8px;font-size:11px}
+.ff-board-card{background:white;border:1px solid #dfe6d9;border-radius:8px;margin-bottom:12px;overflow:hidden}.ff-board-open{display:block;width:100%;border:0;padding:15px;background:transparent;text-align:left;color:inherit}.ff-board-open:hover{background:#f8faf5}.ff-board-open h4{font-size:15px;line-height:1.5;margin:8px 0;overflow-wrap:anywhere}.ff-board-open p{font-size:12px;line-height:1.6;color:#697962;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.ff-board-open small{display:block;font-size:11px;color:#697962}.ff-board-shared{display:block;font-size:10px;color:#315a44;margin-top:10px}.ff-board-empty{font-size:12px;color:#74806d;padding:14px 0}
+.ff-status-control{padding:12px 15px;border-top:1px solid #e7ecdf}.ff-status-control label{display:block;font-size:11px;color:#52684a}.ff-status-control select{display:block;width:100%;margin-top:6px;padding:9px;border:1px solid #d5decd;border-radius:6px;background:#fafcf7;color:#30452b}.ff-status-control p{font-size:11px;line-height:1.5}.ff-status-control select:disabled{opacity:.65;cursor:wait}
+@media(max-width:680px){.ff-board{grid-template-columns:minmax(0,1fr);overflow-x:visible}.ff-board-column{min-height:100px}}
+
+.ff-board-drag-handle{display:flex;align-items:center;gap:6px;padding:8px 15px;background:#f0f4ec;color:#52684a;font-size:11px;cursor:grab;user-select:none}.ff-board-drag-handle:active{cursor:grabbing}.ff-board-drag-handle[draggable="false"]{cursor:wait;opacity:.6}.ff-board-column.is-drop-target{outline:2px solid #477c60;outline-offset:-2px;background:#e8f0e2}.ff-board-card.is-dragging{opacity:.55}

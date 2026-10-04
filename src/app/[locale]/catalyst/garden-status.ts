@@ -2,6 +2,7 @@
 // Statuses come from real check-ins, progress entries and acknowledgements;
 // only a message linked to the check-in (check_in_id) counts as reviewing it.
 
+import { isOpenObjective, normalizeObjectiveStatus } from "@/lib/workspace/objective-status";
 import { treeStageFromPlantingDate, type TreeStage } from "@/lib/tree-stage";
 
 export const CHECK_IN_DUE_AFTER_DAYS = 7;
@@ -84,10 +85,10 @@ export function buildGarden(
 
       return {
         completedObjectives: input.objectives.filter(
-          (o) => o.planter_id === church.pastor_id && o.status === "done",
+          (o) => o.planter_id === church.pastor_id && (o.status !== undefined && normalizeObjectiveStatus(o.status) === "complete"),
         ).length,
         currentObjective: input.objectives.find(
-          (o) => o.planter_id === church.pastor_id && o.status === "active",
+          (o) => o.planter_id === church.pastor_id && (o.status !== undefined && isOpenObjective(o.status)),
         )?.title,
         churchId: church.id,
         churchName: church.name,

@@ -52,7 +52,7 @@ describe("Planter living church", () => {
   it("keeps preview branch navigation inside the preview", () => {
     render(<PlanterHome data={sampleWorkspace} preview />);
     expect(
-      screen.getByRole("link", { name: /Build deeper roots.*active/ }),
+      screen.getByRole("link", { name: /Build deeper roots.*In Progress/ }),
     ).toHaveAttribute("href", "/preview?view=objectives&objective=neighbours");
     expect(
       screen.queryByRole("link", { name: "Invite team member" }),
@@ -104,7 +104,7 @@ describe("Planter living church", () => {
   it("opens objective controls from an accessible branch and offers owner-only views", () => {
     render(<Workspace data={sampleWorkspace} />);
     fireEvent.click(
-      screen.getByRole("button", { name: /Build deeper roots.*active/ }),
+      screen.getByRole("button", { name: /Build deeper roots.*In Progress/ }),
     );
     expect(
       screen.getByRole("button", { name: "Edit objective" }),

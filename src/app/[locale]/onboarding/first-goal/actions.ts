@@ -36,6 +36,7 @@ export async function createFirstGoal(
       description: checkpoint,
       due_date: dueDate,
       cadence: "monthly",
+      status: "planning",
     });
 
   if (objectiveError) {

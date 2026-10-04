@@ -33,13 +33,13 @@ describe("ObjectiveCard", () => {
   it("shows the objective with its category, cadence and description", () => {
     renderCard(dinners);
     expect(screen.getByRole("heading", { name: "Neighbourhood dinners" })).toBeInTheDocument();
-    expect(screen.getByText("Plan · Engage the City · Weekly")).toBeInTheDocument();
+    expect(screen.getByText("Plan · Engage the City · Weekly · In Progress")).toBeInTheDocument();
     expect(screen.getByText("Build relationships through shared meals.")).toBeInTheDocument();
   });
 
-  it("labels objectives that are not active", () => {
+  it("maps a legacy paused objective to Planning", () => {
     renderCard({ ...dinners, status: "paused", cadence: "monthly" });
-    expect(screen.getByText("Plan · Engage the City · Monthly · Paused")).toBeInTheDocument();
+    expect(screen.getByText("Plan · Engage the City · Monthly · Planning")).toBeInTheDocument();
   });
 
   it("shows the latest progress entry with its number", () => {

@@ -307,7 +307,12 @@
       },
       "status": {
         "paused": "Paused",
-        "done": "Done"
+        "done": "Done",
+        "planning": "Planning",
+        "in_progress": "In Progress",
+        "at_risk": "At Risk",
+        "complete": "Complete",
+        "archived": "Archived"
       },
       "empty": "This planter hasn't added any objectives yet.",
       "load_error": "We couldn't load this plan. Refresh the page to try again.",

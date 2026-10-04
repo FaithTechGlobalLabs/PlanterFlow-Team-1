@@ -1,3 +1,4 @@
+import { normalizeObjectiveStatus } from "@/lib/workspace/objective-status";
 import { notFound } from "next/navigation";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { requireRole } from "@/lib/auth/session";
@@ -211,7 +212,7 @@ export default async function CatalystPlanterPage({ params }: PageProps) {
         <div className="planter-sidebar-column flex flex-col gap-6 lg:max-w-[420px]">
           <section className="garden-surface planter-church-card flex flex-col gap-2">
             <ChurchTree
-              completed={views.filter((o) => o.status === "done").length}
+              completed={views.filter((o) => normalizeObjectiveStatus(o.status) === "complete").length}
             />
             <h2 className="planter-card-title text-[22px] font-bold text-[var(--color-ink)]">
               {t("church_title")}

@@ -1,3 +1,4 @@
+import { isOpenObjective, normalizeObjectiveStatus } from "./objective-status";
 import { treeStageFromPlantingDate, type TreeStage } from "@/lib/tree-stage";
 import type { WorkspaceData } from "./types";
 
@@ -17,7 +18,7 @@ export function gardenSummary(data: WorkspaceData) {
     start && Number.isFinite(start.getTime())
       ? treeStageFromPlantingDate(start, now)
       : null;
-  const active = data.objectives.filter((o) => o.status === "active");
+  const active = data.objectives.filter((o) => isOpenObjective(o.status));
   // A suggestion, not a deadline warning: earliest target, then oldest creation.
   const next = [...active].sort(
     (a, b) =>
@@ -41,7 +42,7 @@ export function gardenSummary(data: WorkspaceData) {
         new Date(p.created_at) <= now,
     );
   });
-  const completed = data.objectives.filter((o) => o.status === "done").length;
+  const completed = data.objectives.filter((o) => normalizeObjectiveStatus(o.status) === "complete").length;
   return {
     stage,
     active,

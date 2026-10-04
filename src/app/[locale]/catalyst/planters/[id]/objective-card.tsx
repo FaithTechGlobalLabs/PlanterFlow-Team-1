@@ -1,3 +1,4 @@
+import { normalizeObjectiveStatus, type ObjectiveStatus } from "@/lib/workspace/objective-status";
 import { useFormatter, useTranslations } from "next-intl";
 import { ReplyForm } from "./reply-form";
 
@@ -15,7 +16,7 @@ export type ObjectiveView = {
   description: string | null;
   categoryTitle: string;
   cadence: "weekly" | "monthly";
-  status: "active" | "paused" | "done";
+  status: ObjectiveStatus | "active" | "paused" | "done";
   latestProgress: { note: string; value: number | null; createdAt: string } | null;
   messages: MessageView[];
 };
@@ -35,7 +36,7 @@ export function ObjectiveCard({ objective }: { objective: ObjectiveView }) {
             category: objective.categoryTitle,
             cadence: t(`cadence.${objective.cadence}`),
           })}
-          {objective.status !== "active" && ` · ${t(`status.${objective.status}`)}`}
+          {` · ${t(`status.${normalizeObjectiveStatus(objective.status)}`)}`}
         </p>
         {objective.description && (
           <p className="objective-plan-description text-[15px] text-[var(--color-muted)]">{objective.description}</p>

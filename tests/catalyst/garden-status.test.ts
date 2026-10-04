@@ -166,12 +166,12 @@ it("keeps explicit completed outcomes visible even after a long time away", () =
     pastors: [{ id: "pastor", display_name: "Pastor" }],
     checkIns: [],
     objectives: [
-      { id: "done", planter_id: "pastor", title: "An outcome", status: "done" },
+      { id: "done", planter_id: "pastor", title: "An outcome", status: "complete" },
       {
         id: "active",
         planter_id: "pastor",
         title: "Next step",
-        status: "active",
+        status: "in_progress",
       },
     ],
     progress: [],

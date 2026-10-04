@@ -1,5 +1,6 @@
 "use server";
 
+import { OBJECTIVE_STATUSES } from "@/lib/workspace/objective-status";
 import { revalidatePath } from "next/cache";
 import { getSessionProfile } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
@@ -49,7 +50,7 @@ export async function saveWorkspace(form: FormData): Promise<SaveResult> {
       const res = form.get("id")
         ? await db.from("objectives").update({ ...values, updated_at: new Date().toISOString() })
             .eq("id", idField(form, "id")).eq("planter_id", user.id).select("id").single()
-        : await db.from("objectives").insert({ ...values, planter_id: user.id }).select("id").single();
+        : await db.from("objectives").insert({ ...values, planter_id: user.id, status: "planning" }).select("id").single();
       result = { ok: !res.error, id: res.data?.id, error: res.error?.message };
     } else if (["activity", "progress", "message", "team_message", "objective_status"].includes(intent)) {
       const objective_id = idField(form, "objective_id");
@@ -98,7 +99,7 @@ export async function saveWorkspace(form: FormData): Promise<SaveResult> {
         const res = await db.from(table).insert({ objective_id, author_id: user.id, body: textField(form, "body", 2000) }).select("id").single();
         result = { ok: !res.error, id: res.data?.id, error: res.error?.message };
       } else {
-        const res = await db.from("objectives").update({ status: choiceField(form, "status", ["active", "paused", "done"]), updated_at: new Date().toISOString() })
+        const res = await db.from("objectives").update({ status: choiceField(form, "status", OBJECTIVE_STATUSES), updated_at: new Date().toISOString() })
           .eq("id", objective_id).eq("planter_id", user.id).select("id").single();
         result = { ok: !res.error, id: res.data?.id, error: res.error?.message };
       }
@@ -127,6 +128,8 @@ export async function saveWorkspace(form: FormData): Promise<SaveResult> {
     }
     if (!result.ok) return { ok: false, error: result.error ?? "We couldn't save that change. Your text is still here; please try again." };
     revalidatePath("/[locale]/dashboard", "page");
+    revalidatePath("/[locale]/catalyst", "page");
+    revalidatePath("/[locale]/catalyst/planters/[id]", "page");
     return { ok: true, id: result.id };
   } catch (error) {
     return { ok: false, error: error instanceof Error ? error.message : "We couldn't save. Please try again." };
