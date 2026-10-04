@@ -59,7 +59,7 @@ Apply the SQL files in `supabase/migrations/` to your Supabase project, in order
 
 Other scripts: `pnpm lint`, `pnpm build`, `pnpm exec vitest run` (unit tests), `pnpm test:e2e` (Playwright; needs `pnpm dev` and `.env.local`), `pnpm preview` / `pnpm deploy` (Cloudflare).
 
-Feature docs: [invitations](docs/features/invitations.md), [onboarding](docs/features/onboarding.md), [login](docs/features/login-page.md), [local testing](docs/local-testing.md).
+Feature docs: [invitations](docs/features/invitations.md), [onboarding](docs/features/onboarding.md), [login](docs/features/login-page.md), [catalyst](docs/features/catalyst.md), [local testing](docs/local-testing.md).
 
 Project layout:
 

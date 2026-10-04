@@ -9,6 +9,8 @@ import { Link } from "@/i18n/routing";
 import { signOut } from "../actions";
 import { buildGarden, needsPresence } from "./garden-status";
 import { ChurchList, StatusBadges } from "./church-list";
+import { buildInviteStatuses } from "./invite-status";
+import { InviteList } from "./invite-list";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -29,17 +31,26 @@ export default async function CatalystGardenPage({ params }: PageProps) {
   const t = await getTranslations("catalyst.garden");
   const tHome = await getTranslations("home.catalyst");
   const tCommon = await getTranslations("common");
+  const tInvites = await getTranslations("catalyst.invites");
   const supabase = await createClient();
   const now = new Date();
 
-  // Only churches assigned to this Catalyst.
-  const [org, churches] = await Promise.all([
+  // Only churches assigned to this Catalyst, and only pastor invites this Catalyst sent.
+  const [org, churches, invitations] = await Promise.all([
     supabase.from("organizations").select("name").eq("id", profile.org_id).single(),
     supabase
       .from("churches")
       .select("id, name, city, planting_start_date, pastor_id")
       .eq("catalyst_id", user.id),
+    supabase
+      .from("invitations")
+      .select("id, email, church_name, accepted_at, expires_at, created_at")
+      .eq("invited_by", user.id)
+      .eq("role", "planter")
+      .order("created_at", { ascending: false })
+      .limit(50),
   ]);
+  const invites = invitations.error ? [] : buildInviteStatuses(invitations.data ?? [], now);
 
   const pastorIds = (churches.data ?? []).map((c) => c.pastor_id);
   const [pastors, checkIns, objectives] = pastorIds.length
@@ -143,6 +154,18 @@ export default async function CatalystGardenPage({ params }: PageProps) {
           </a>
         </section>
       </div>
+
+      <section>
+        <FormCard title={tInvites("title")}>
+          {invitations.error ? (
+            <p role="alert" className="text-[15px] text-[var(--color-ink)]">
+              {tInvites("load_error")}
+            </p>
+          ) : (
+            <InviteList invites={invites} />
+          )}
+        </FormCard>
+      </section>
 
       <section id="churches" className="scroll-mt-6">
         <FormCard title={t("list_title")}>
