@@ -124,14 +124,14 @@ export function CatalystDashboard({
               </span>
               <span>{data.viewer.display_name}</span>
             </summary>
-            <div>
-              <p>Catalyst · {data.organization}</p>
+            <div className="garden-account-dropdown">
+              <p className="garden-account-role">Catalyst · {data.organization}</p>
               {!preview && (
                 <form action={signOut}>
-                  <button type="submit">Sign out</button>
+                  <button type="submit" className="garden-signout-btn">Sign out</button>
                 </form>
               )}
-              {preview && <p>Sample records. Changes are not saved.</p>}
+              {preview && <p className="garden-account-preview-note">Sample records. Changes are not saved.</p>}
             </div>
           </details>
         </div>
@@ -151,9 +151,9 @@ export function CatalystDashboard({
           <span className="ff-church-icon">
             <Icon name="globe" size={23} />
           </span>
-          <div>
-            <strong>{data.organization}</strong>
-            <small>Catalyst workspace</small>
+          <div className="ff-church-info">
+            <strong className="ff-church-title">{data.organization}</strong>
+            <small className="ff-church-subtitle">Catalyst workspace</small>
           </div>
         </div>
         <p className="ff-nav-label">WALKING ALONGSIDE</p>
@@ -212,9 +212,9 @@ export function CatalystDashboard({
           <span>{nav.find((item) => item.id === view)?.label}</span>
         </div>
         <div className="ff-page-heading">
-          <div>
+          <div className="ff-page-heading-text">
             <p className="ff-eyebrow">{data.organization.toUpperCase()}</p>
-            <h1>
+            <h1 className="ff-page-title">
               {view === "community" || view === "churches"
                 ? "A garden of stories. Growing together."
                 : view === "support"
@@ -227,7 +227,7 @@ export function CatalystDashboard({
                         ? "Notice the steps along the way."
                         : "Give their vision room to grow."}
             </h1>
-            <p>
+            <p className="ff-page-description">
               {view === "categories"
                 ? "Shape the areas your planters use to organize their objectives."
                 : "Stay close to the growth, the challenges, and the people behind them."}
@@ -545,10 +545,10 @@ export function CatalystDashboard({
                       name={category.kind === "prayer" ? "heart" : "leaf"}
                     />
                   </span>
-                  <div>
-                    <h3>{category.title}</h3>
-                    <p>{category.description || "No description yet."}</p>
-                    <small>
+                  <div className="ff-category-content">
+                    <h3 className="ff-category-title">{category.title}</h3>
+                    <p className="ff-category-description">{category.description || "No description yet."}</p>
+                    <small className="ff-category-meta">
                       {category.kind === "prayer"
                         ? "Dedicated prayer workflow"
                         : `${used} objectives`}
@@ -607,14 +607,14 @@ export function CatalystDashboard({
                 .sort((a, b) => b.date.localeCompare(a.date))
                 .slice(0, 30)
                 .map((entry) => (
-                  <li key={entry.id}>
-                    <time dateTime={entry.date}>{formatDate(entry.date)}</time>
-                    <div>
-                      <small>
+                  <li key={entry.id} className="garden-journey-item">
+                    <time className="garden-journey-date" dateTime={entry.date}>{formatDate(entry.date)}</time>
+                    <div className="garden-journey-content">
+                      <small className="garden-journey-author">
                         {entry.planter ? personName(entry.planter) : ""}
                       </small>
-                      <h3>{entry.title}</h3>
-                      <p>{entry.note}</p>
+                      <h3 className="garden-journey-title">{entry.title}</h3>
+                      <p className="garden-journey-note">{entry.note}</p>
                       {entry.planter && (
                         <Link
                           className="ff-text-button"

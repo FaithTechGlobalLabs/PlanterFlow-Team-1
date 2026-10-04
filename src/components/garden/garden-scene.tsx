@@ -39,8 +39,8 @@ export function GardenScene({
         <div className="garden-path" />
       </div>
       <div className="garden-scene-caption">
-        <span>A GARDEN OF PEOPLE</span>
-        <span>
+        <span className="garden-scene-eyebrow">A GARDEN OF PEOPLE</span>
+        <span className="garden-scene-prompt">
           {plots.length
             ? "Select a church to walk alongside its journey"
             : "Room for a new beginning"}
@@ -49,7 +49,7 @@ export function GardenScene({
       {plots.length ? (
         <ul className="garden-plots">
           {visible.map((plot, i) => (
-            <li key={plot.id}>
+            <li key={plot.id} className="garden-plot-item">
               <button
                 className={`garden-plot ${selectedId === plot.id ? "is-selected" : ""}`}
                 onClick={() => onSelect(plot.id)}
@@ -59,12 +59,12 @@ export function GardenScene({
                 <ChurchTree variant={i} completed={plot.completed} />
                 <span className="garden-plot-label">
                   <strong>{plot.name}</strong>
-                  <span>{plot.pastor}</span>
+                  <span className="garden-plot-pastor">{plot.pastor}</span>
                   <small className={plot.attention ? "garden-attention" : ""}>
                     {plot.status}
                   </small>
                   {Boolean(plot.completed) && (
-                    <small>{plot.completed} objectives completed</small>
+                    <small className="garden-plot-completed-badge">{plot.completed} objectives completed</small>
                   )}
                 </span>
               </button>
@@ -74,23 +74,25 @@ export function GardenScene({
       ) : (
         <div className="garden-empty">
           <ChurchTree />
-          <h2>{emptyTitle}</h2>
-          <p>{emptyBody}</p>
+          <h2 className="garden-empty-title">{emptyTitle}</h2>
+          <p className="garden-empty-body">{emptyBody}</p>
         </div>
       )}
       {pageCount > 1 && (
         <nav className="garden-pagination" aria-label="Garden pages">
           <button
+            className="garden-pagination-btn garden-pagination-prev"
             disabled={currentPage === 0}
             onClick={() => setPage(currentPage - 1)}
           >
             ← Previous
           </button>
-          <span aria-live="polite">
+          <span className="garden-pagination-info" aria-live="polite">
             {currentPage * 6 + 1}–{Math.min(currentPage * 6 + 6, plots.length)}{" "}
             of {plots.length} churches
           </span>
           <button
+            className="garden-pagination-btn garden-pagination-next"
             disabled={currentPage === pageCount - 1}
             onClick={() => setPage(currentPage + 1)}
           >
