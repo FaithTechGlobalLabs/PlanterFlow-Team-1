@@ -104,7 +104,8 @@ export function Workspace({ data, preview = false, initialView, initialObjective
   const validObjective = data.objectives.some(objective => objective.id === initialObjective) ? initialObjective! : null;
   const [view, setView] = useState(validObjective ? "objectives" : ["overview", "objectives", "updates", "prayers"].includes(initialView ?? "") ? initialView! : "overview");
   const [selected, setSelected] = useState<string | null>(validObjective);
-  const [modal, setModal] = useState<"objective" | "prayer" | null>(null);  const [editObjective, setEditObjective] = useState<Objective | null>(null);
+  const [modal, setModal] = useState<"objective" | "prayer" | null>(null);
+  const [editObjective, setEditObjective] = useState<Objective | null>(null);
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const [activityForm, setActivityForm] = useState(false);
   const [query, setQuery] = useState("");
