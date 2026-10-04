@@ -28,6 +28,27 @@ create index if not exists conversation_threads_planter_idx on public.conversati
 create index if not exists conversation_threads_org_idx on public.conversation_threads(org_id, updated_at desc);
 create index if not exists conversation_messages_thread_idx on public.conversation_messages(thread_id, created_at asc);
 
+-- Helper function: is_assigned_catalyst for a given planter
+-- Head/Admin Catalyst has broad access; ordinary Catalyst requires explicit assignment (churches.catalyst_id = auth.uid())
+create or replace function public.is_assigned_catalyst(p_planter_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select public.is_catalyst() and (
+    public.is_admin()
+    or exists (
+      select 1
+      from public.churches c
+      where c.pastor_id = p_planter_id
+        and c.org_id = public.current_org()
+        and c.catalyst_id = auth.uid()
+    )
+  );
+$$;
+
 alter table public.conversation_threads enable row level security;
 alter table public.conversation_messages enable row level security;
 
@@ -40,7 +61,7 @@ drop policy if exists conversation_threads_read on public.conversation_threads;
 create policy conversation_threads_read on public.conversation_threads for select to authenticated using (
   org_id = public.current_org() and (
     planter_id = (select auth.uid())
-    or public.is_catalyst()
+    or public.is_assigned_catalyst(planter_id)
     or exists (
       select 1 from public.prayer_requests p
       where entity_type = 'prayer' and p.id = entity_id and p.visibility = 'organization'
@@ -52,7 +73,7 @@ drop policy if exists conversation_threads_insert on public.conversation_threads
 create policy conversation_threads_insert on public.conversation_threads for insert to authenticated with check (
   org_id = public.current_org() and (
     planter_id = (select auth.uid())
-    or public.is_catalyst()
+    or public.is_assigned_catalyst(planter_id)
   )
 );
 
@@ -60,12 +81,12 @@ drop policy if exists conversation_threads_update on public.conversation_threads
 create policy conversation_threads_update on public.conversation_threads for update to authenticated using (
   org_id = public.current_org() and (
     planter_id = (select auth.uid())
-    or public.is_catalyst()
+    or public.is_assigned_catalyst(planter_id)
   )
 ) with check (
   org_id = public.current_org() and (
     planter_id = (select auth.uid())
-    or public.is_catalyst()
+    or public.is_assigned_catalyst(planter_id)
   )
 );
 
@@ -77,7 +98,7 @@ create policy conversation_messages_read on public.conversation_messages for sel
     and t.org_id = public.current_org()
     and (
       t.planter_id = (select auth.uid())
-      or public.is_catalyst()
+      or public.is_assigned_catalyst(t.planter_id)
       or exists (
         select 1 from public.prayer_requests p
         where t.entity_type = 'prayer' and p.id = t.entity_id and p.visibility = 'organization'
@@ -95,7 +116,7 @@ create policy conversation_messages_insert on public.conversation_messages for i
     and t.org_id = public.current_org()
     and (
       t.planter_id = (select auth.uid())
-      or public.is_catalyst()
+      or public.is_assigned_catalyst(t.planter_id)
       or exists (
         select 1 from public.prayer_requests p
         where t.entity_type = 'prayer' and p.id = t.entity_id and p.visibility = 'organization'

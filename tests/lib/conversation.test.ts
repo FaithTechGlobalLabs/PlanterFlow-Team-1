@@ -52,7 +52,24 @@ describe("Conversation Backend Shared API Contract & Permissions", () => {
   describe("Permission & Access Control Verification", () => {
     const userPlanterAlpha = { id: "p1", org_id: "org-alpha", role: "planter" as const };
     const userPlanterAlphaPeer = { id: "p2", org_id: "org-alpha", role: "planter" as const };
-    const userCatalystAlpha = { id: "c1", org_id: "org-alpha", role: "catalyst" as const };
+    const userAssignedCatalystAlpha = {
+      id: "c1",
+      org_id: "org-alpha",
+      role: "catalyst" as const,
+      assignedPlanterIds: ["p1"],
+    };
+    const userUnassignedCatalystAlpha = {
+      id: "c2",
+      org_id: "org-alpha",
+      role: "catalyst" as const,
+      assignedPlanterIds: [],
+    };
+    const userAdminCatalystAlpha = {
+      id: "c3",
+      org_id: "org-alpha",
+      role: "catalyst" as const,
+      isAdmin: true,
+    };
     const userPlanterBeta = { id: "p3", org_id: "org-beta", role: "planter" as const };
 
     const privateSupportThread: Partial<ConversationThread> = {
@@ -77,12 +94,23 @@ describe("Conversation Backend Shared API Contract & Permissions", () => {
     };
 
     function canUserReadThread(
-      user: { id: string; org_id: string; role: "planter" | "catalyst" },
+      user: {
+        id: string;
+        org_id: string;
+        role: "planter" | "catalyst";
+        isAdmin?: boolean;
+        assignedPlanterIds?: string[];
+      },
       thread: Partial<ConversationThread>,
       prayerVisibility: "private" | "organization" = "private"
     ): boolean {
       if (user.org_id !== thread.org_id) return false;
-      if (user.role === "catalyst") return true;
+      if (user.role === "catalyst") {
+        if (user.isAdmin) return true;
+        if (user.assignedPlanterIds?.includes(thread.planter_id!)) return true;
+        if (thread.entity_type === "prayer" && prayerVisibility === "organization") return true;
+        return false;
+      }
       if (user.id === thread.planter_id) return true;
       if (thread.entity_type === "prayer" && prayerVisibility === "organization") return true;
       return false;
@@ -93,9 +121,19 @@ describe("Conversation Backend Shared API Contract & Permissions", () => {
       expect(canUserReadThread(userPlanterAlpha, privatePrayerThread)).toBe(true);
     });
 
-    it("allows same-organization catalyst to read planter threads", () => {
-      expect(canUserReadThread(userCatalystAlpha, privateSupportThread)).toBe(true);
-      expect(canUserReadThread(userCatalystAlpha, privatePrayerThread)).toBe(true);
+    it("allows explicitly assigned catalyst to read planter private threads", () => {
+      expect(canUserReadThread(userAssignedCatalystAlpha, privateSupportThread)).toBe(true);
+      expect(canUserReadThread(userAssignedCatalystAlpha, privatePrayerThread)).toBe(true);
+    });
+
+    it("prevents unassigned catalyst from reading planter private threads", () => {
+      expect(canUserReadThread(userUnassignedCatalystAlpha, privateSupportThread)).toBe(false);
+      expect(canUserReadThread(userUnassignedCatalystAlpha, privatePrayerThread)).toBe(false);
+    });
+
+    it("allows admin catalyst to read any planter threads in their organization", () => {
+      expect(canUserReadThread(userAdminCatalystAlpha, privateSupportThread)).toBe(true);
+      expect(canUserReadThread(userAdminCatalystAlpha, privatePrayerThread)).toBe(true);
     });
 
     it("prevents peer planter in same org from reading private support or private prayer threads", () => {
@@ -103,8 +141,9 @@ describe("Conversation Backend Shared API Contract & Permissions", () => {
       expect(canUserReadThread(userPlanterAlphaPeer, privatePrayerThread, "private")).toBe(false);
     });
 
-    it("allows peer planter in same org to read organization-shared prayer threads", () => {
+    it("allows peer planter or unassigned catalyst in same org to read organization-shared prayer threads", () => {
       expect(canUserReadThread(userPlanterAlphaPeer, sharedPrayerThread, "organization")).toBe(true);
+      expect(canUserReadThread(userUnassignedCatalystAlpha, sharedPrayerThread, "organization")).toBe(true);
     });
 
     it("strictly blocks foreign organization users from accessing any thread", () => {
