@@ -426,6 +426,8 @@
     "invites": {
       "title": "Pastor invitations",
       "empty": "You haven't invited a pastor yet.",
+      "search_placeholder": "Search invitations by email or church...",
+      "no_matches": "No invitations match your search.",
       "load_error": "We couldn't load your invitations. Refresh the page to try again.",
       "sent": "Sent {date}",
       "sent_with_church": "{church} · Sent {date}",

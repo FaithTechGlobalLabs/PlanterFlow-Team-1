@@ -94,6 +94,7 @@ export function CatalystHome({
               name: c.churchName,
               pastor: c.pastorName || "Pastor",
               status: status(c),
+              statusClass: statusClass(c),
               attention: needsPresence(c),
               completed: c.completedObjectives,
             }))}
@@ -152,7 +153,7 @@ export function CatalystHome({
               Find a church
               <input
                 type="search"
-                placeholder="Search church, pastor, or city…"
+                placeholder="Search church by;church name, pastor, or city…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />

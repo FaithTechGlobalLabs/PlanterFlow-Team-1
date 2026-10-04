@@ -7,9 +7,20 @@ export type GardenPlot = {
   name: string;
   pastor: string;
   status: string;
+  statusClass?: string;
   attention?: boolean;
   completed?: number;
 };
+
+function getPlotStatusClass(plot: GardenPlot) {
+  if (plot.statusClass) return plot.statusClass;
+  const s = plot.status.toLowerCase();
+  if (plot.attention || s.includes("support")) return "status-badge-support garden-status-support";
+  if (s.includes("review") || s.includes("due")) {
+    return s.includes("review") ? "status-badge-review garden-status-review" : "status-badge-due garden-status-due";
+  }
+  return "status-badge-quiet garden-status-quiet";
+}
 export function GardenScene({
   plots,
   onSelect,
@@ -57,7 +68,7 @@ export function GardenScene({
                 aria-pressed={selectedId === plot.id}
               >
                 <ChurchTree variant={i} completed={plot.completed} />
-                <span className="garden-plot-label">
+                <span className={`garden-plot-label ${getPlotStatusClass(plot)}`}>
                   <strong>{plot.name}</strong>
                   <span className="garden-plot-pastor">{plot.pastor}</span>
                   <small className={plot.attention ? "garden-attention" : ""}>
