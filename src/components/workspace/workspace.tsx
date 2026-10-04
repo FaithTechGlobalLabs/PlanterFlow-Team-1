@@ -126,6 +126,8 @@ export function SaveForm({
   submit = "Save",
   perform = saveWorkspace,
   showSubmit = true,
+  onDraftChange,
+  className,
 }: {
   intent: string;
   children: ReactNode;
@@ -133,6 +135,8 @@ export function SaveForm({
   submit?: string;
   perform?: (form: FormData) => Promise<SaveResult>;
   showSubmit?: boolean;
+  onDraftChange?: (form: FormData) => void;
+  className?: string;
 }) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState("");
@@ -163,7 +167,9 @@ export function SaveForm({
     });
   }
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="ff-form">
+    <form ref={formRef} onSubmit={handleSubmit}
+      onChange={event => onDraftChange?.(new FormData(event.currentTarget))}
+      className={["ff-form", className].filter(Boolean).join(" ")}>
       <input type="hidden" name="intent" value={intent} />
       <fieldset disabled={pending}>{children}</fieldset>
       {error && (
@@ -231,6 +237,15 @@ export function Modal({
     </dialog>
   );
 }
+type ObjectiveDraft = {
+  category_id: string;
+  title: string;
+  description: string;
+  due_date: string;
+  cadence: string;
+  team_visible: boolean;
+};
+
 export function Workspace({
   data,
   preview = false,
@@ -267,6 +282,16 @@ export function Workspace({
   const [selected, setSelected] = useState<string | null>(validObjective);
   const [modal, setModal] = useState<"objective" | "prayer" | null>(null);
   const [editObjective, setEditObjective] = useState<Objective | null>(null);
+  const [objectiveDrafts, setObjectiveDrafts] = useState<Record<string, ObjectiveDraft>>({});
+  const objectiveDraftKey = editObjective?.id ?? "new";
+  const objectiveDraft = objectiveDrafts[objectiveDraftKey];
+  function clearObjectiveDraft(key: string) {
+    setObjectiveDrafts(current => {
+      const next = { ...current };
+      delete next[key];
+      return next;
+    });
+  }
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const [activityForm, setActivityForm] = useState(false);
   const [query, setQuery] = useState("");
@@ -1540,23 +1565,36 @@ export function Workspace({
           }
           close={() => setModal(null)}
         >
-          <p className="ff-muted">
+          <p className="ff-muted ff-objective-draft-introduction">
             Start with something meaningful and achievable.
           </p>
           <SaveForm
             intent="objective"
+            className="ff-objective-draft-form"
             perform={perform}
             submit={editObjective ? "Save objective" : "Create objective"}
-            onSaved={saved}
+            onDraftChange={form => setObjectiveDrafts(current => ({
+              ...current,
+              [objectiveDraftKey]: {
+                category_id: String(form.get("category_id") ?? ""),
+                title: String(form.get("title") ?? ""),
+                description: String(form.get("description") ?? ""),
+                due_date: String(form.get("due_date") ?? ""),
+                cadence: String(form.get("cadence") ?? "weekly"),
+                team_visible: form.get("team_visible") === "on",
+              },
+            }))}
+            onSaved={() => { clearObjectiveDraft(objectiveDraftKey); saved(); }}
           >
             {editObjective && (
               <input type="hidden" name="id" value={editObjective.id} />
             )}
-            <label>
+            <label className="ff-objective-draft-field">
               Category
               <select
+                className="ff-objective-draft-category"
                 name="category_id"
-                defaultValue={editObjective?.category_id ?? ""}
+                defaultValue={objectiveDraft?.category_id ?? editObjective?.category_id ?? ""}
                 required
               >
                 <option value="" disabled>
@@ -1569,35 +1607,39 @@ export function Workspace({
                 ))}
               </select>
             </label>
-            <label>
+            <label className="ff-objective-draft-field">
               What are you working toward?
               <input
+                className="ff-objective-draft-title"
                 name="title"
                 required
                 maxLength={160}
-                defaultValue={editObjective?.title}
+                defaultValue={objectiveDraft?.title ?? editObjective?.title ?? ""}
                 placeholder="e.g. Build relationships in our neighbourhood"
               />
             </label>
-            <label>
+            <label className="ff-objective-draft-field">
               Why does it matter? (optional)
               <textarea
+                className="ff-objective-draft-description"
                 name="description"
                 maxLength={2000}
-                defaultValue={editObjective?.description ?? ""}
+                defaultValue={objectiveDraft?.description ?? editObjective?.description ?? ""}
                 placeholder="A little context for you and your Catalyst…"
               />
             </label>
-            <label>
+            <label className="ff-objective-draft-field">
               Target date (optional)
               <input
                 type="date"
+                className="ff-objective-draft-due-date"
                 name="due_date"
-                defaultValue={editObjective?.due_date ?? ""}
+                defaultValue={objectiveDraft?.due_date ?? editObjective?.due_date ?? ""}
               />
             </label>
             <input type="hidden" name="team_visible_present" value="1" />
             <label
+              className="ff-objective-draft-field ff-objective-draft-sharing-field"
               style={{
                 display: "flex",
                 flexDirection: "row",
@@ -1608,8 +1650,9 @@ export function Workspace({
             >
               <input
                 type="checkbox"
+                className="ff-objective-draft-sharing"
                 name="team_visible"
-                defaultChecked={editObjective?.team_visible ?? false}
+                defaultChecked={objectiveDraft?.team_visible ?? editObjective?.team_visible ?? false}
                 style={{
                   width: "16px",
                   height: "16px",
@@ -1620,21 +1663,27 @@ export function Workspace({
               />
               <span>Share with Church Team</span>
             </label>
-            <label>
+            <label className="ff-objective-draft-field">
               Progress rhythm
               <select
+                className="ff-objective-draft-cadence"
                 name="cadence"
-                defaultValue={editObjective?.cadence ?? "weekly"}
+                defaultValue={objectiveDraft?.cadence ?? editObjective?.cadence ?? "weekly"}
               >
                 <option value="weekly">Weekly</option>
                 <option value="monthly">Monthly</option>
               </select>
             </label>
-            <p className="ff-field-help">
+            <p className="ff-field-help ff-objective-draft-help">
               Your objective and updates are visible to your Catalyst. Select
               sharing to also include your Church Team. Private conversations
               stay private.
             </p>
+            <button type="button" className="ff-text-button ff-objective-draft-discard" onClick={() => {
+              clearObjectiveDraft(objectiveDraftKey);
+              setModal(null);
+              setEditObjective(null);
+            }}>Discard draft</button>
           </SaveForm>
         </Modal>
       )}{" "}
