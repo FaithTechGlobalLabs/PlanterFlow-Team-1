@@ -148,7 +148,7 @@ export default async function PreviewPage({
               ...o,
               team_visible: i === 0,
               status:
-                scenario === "rich" && i === 2 ? ("done" as const) : o.status,
+                scenario === "rich" && i === 2 ? ("complete" as const) : o.status,
             })),
       teamMessages: [
         {

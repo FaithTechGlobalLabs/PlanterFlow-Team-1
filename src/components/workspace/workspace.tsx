@@ -11,7 +11,6 @@ import { useRouter } from "next/navigation";
 import { Brand } from "@/components/ui/Brand";
 import { Link } from "@/i18n/routing";
 import { saveWorkspace } from "@/app/[locale]/dashboard/actions";
-import { signOut } from "@/app/[locale]/actions";
 import type {
   Activity,
   Objective,
@@ -19,6 +18,9 @@ import type {
   SaveResult,
 } from "@/lib/workspace/types";
 import "./workspace.css";
+import { AccountMenu } from "./account-menu";
+import { ObjectiveBoard, ObjectiveStatusControl } from "./objective-board";
+import { isOpenObjective, normalizeObjectiveStatus, OBJECTIVE_STATUS_LABELS } from "@/lib/workspace/objective-status";
 import { DashboardInsights } from "./dashboard-insights";
 import {
   PlanterGarden,
@@ -97,13 +99,7 @@ function date(value: string) {
     timeZone: "UTC",
   }).format(new Date(value));
 }
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join("");
-}
+
 function Empty({ children }: { children: ReactNode }) {
   return <p className="ff-empty">{children}</p>;
 }
@@ -296,8 +292,8 @@ export function Workspace({
     }, 7000);
     return () => window.clearInterval(timer);
   }, [view, isOwner]);
-  const active = data.objectives.filter((o) => o.status === "active");
-  const completed = data.objectives.filter((o) => o.status === "done");
+  const active = data.objectives.filter((o) => isOpenObjective(o.status));
+  const completed = data.objectives.filter((o) => normalizeObjectiveStatus(o.status) === "complete");
   const ordinaryCategories = data.categories.filter(
     (c) => c.kind === "objective",
   );
@@ -375,25 +371,7 @@ export function Workspace({
             <i />
             {preview ? "Sample data preview" : "Your planting journey"}
           </span>
-          <details className="planter-account">
-            <summary>
-              <span className="ff-avatar">
-                {initials(data.viewer.display_name)}
-              </span>
-              <span className="ff-account-name">{data.viewer.display_name}</span>
-            </summary>
-            <div>
-              <p>
-                {isOwner ? "Planter" : isPeer ? "Church Team" : "Catalyst"}{" "}
-                account
-              </p>
-              {!preview && (
-                <form action={signOut}>
-                  <button type="submit">Sign out</button>
-                </form>
-              )}
-            </div>
-          </details>
+          <AccountMenu name={data.viewer.display_name} preview={preview} />
         </div>
       </header>
       <aside className={`ff-sidebar ${navExpanded ? "is-expanded" : ""}`}>
@@ -767,7 +745,7 @@ export function Workspace({
               >
                 <span>
                   <Icon name="leaf" />
-                  Active objectives
+                  Open objectives
                 </span>
                 <strong>{active.length.toString().padStart(2, "0")}</strong>
                 <small>{completed.length} completed · one step at a time</small>
@@ -840,7 +818,7 @@ export function Workspace({
                 {!active.length && (
                   <Empty>
                     {isPeer
-                      ? "No active shared objectives yet."
+                      ? "No open shared objectives yet."
                       : "A small, specific goal is a good place to start. Add your first objective below."}
                   </Empty>
                 )}
@@ -888,57 +866,14 @@ export function Workspace({
                 onChange={(e) => setQuery(e.target.value)}
               />
             </label>
-            <div className="ff-objective-grid">
-              {data.objectives
-                .filter((o) =>
-                  `${o.title} ${categoryTitle(o.category_id)}`
-                    .toLowerCase()
-                    .includes(query.toLowerCase()),
-                )
-                .map((o, index) => (
-                  <button
-                    className="ff-objective-card"
-                    key={o.id}
-                    onClick={() => openObjective(o)}
-                  >
-                    <div>
-                      <span className={`ff-category-icon tone-${index % 3}`}>
-                        <Icon name="leaf" />
-                      </span>
-                      <span className={`ff-status status-${o.status}`}>
-                        {o.status === "done" ? "Completed" : o.status}
-                      </span>
-                    </div>
-                    <p className="ff-eyebrow">{categoryTitle(o.category_id)}</p>
-                    <h3>{o.title}</h3>
-                    <p>{o.description || "One faithful step at a time."}</p>
-                    <p className="ff-muted">
-                      {o.team_visible
-                        ? "Shared with Church Team"
-                        : "Planter + Catalyst"}
-                      {o.due_date ? ` · Target ${date(o.due_date)}` : ""}
-                    </p>
-                    <p className="ff-muted">
-                      {
-                        data.progress.filter((p) => p.objective_id === o.id)
-                          .length
-                      }{" "}
-                      progress updates
-                      {data.progress.find((p) => p.objective_id === o.id)
-                        ? ` · Latest ${date(data.progress.find((p) => p.objective_id === o.id)!.created_at)}`
-                        : ""}
-                    </p>
-                    <footer>
-                      {
-                        data.activities.filter((a) => a.objective_id === o.id)
-                          .length
-                      }{" "}
-                      activities · {o.cadence}
-                      <Icon name="arrow" size={17} />
-                    </footer>
-                  </button>
-                ))}
-            </div>
+            <ObjectiveBoard
+              key={JSON.stringify(data.objectives.map(o => [o.id, o.status]))}
+              objectives={data.objectives.filter(o => `${o.title} ${categoryTitle(o.category_id)}`.toLowerCase().includes(query.toLowerCase()))}
+              categoryTitle={categoryTitle}
+              canManage={isOwner}
+              perform={perform}
+              onOpen={openObjective}
+            />
             {!data.objectives.length && (
               <Empty>
                 {isPeer
@@ -967,8 +902,8 @@ export function Workspace({
                 <section className="ff-panel">
                   <div className="ff-section-heading">
                     <h2 className="ff-section-title">The next small steps</h2>
-                    <span className={`ff-status status-${objective.status}`}>
-                      {objective.status}
+                    <span className={`ff-status status-${OBJECTIVE_STATUS_LABELS[normalizeObjectiveStatus(objective.status)]}`}>
+                      {OBJECTIVE_STATUS_LABELS[normalizeObjectiveStatus(objective.status)]}
                     </span>
                   </div>
                   <p className="ff-muted">
@@ -1331,25 +1266,7 @@ export function Workspace({
                       >
                         Edit objective
                       </button>
-                      <SaveForm
-                        intent="objective_status"
-                        perform={perform}
-                        submit="Update status"
-                      >
-                        <input
-                          type="hidden"
-                          name="objective_id"
-                          value={objective.id}
-                        />
-                        <label>
-                          Status
-                          <select name="status" defaultValue={objective.status}>
-                            <option value="active">Active</option>
-                            <option value="paused">Paused</option>
-                            <option value="done">Completed</option>
-                          </select>
-                        </label>
-                      </SaveForm>
+                      <ObjectiveStatusControl key={`${objective.id}:${objective.status}`} objective={objective} perform={perform} />
                     </>
                   )}
                 </section>

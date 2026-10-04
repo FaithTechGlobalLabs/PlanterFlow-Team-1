@@ -290,13 +290,13 @@
   color: #1e3522;
   box-shadow: inset 0 0 0 1px #48693b;
 }
-.plant-branch__status--active {
+.plant-branch__status--in_progress {
   color: #31582c;
 }
-.plant-branch__status--paused {
+.plant-branch__status--planning {
   color: #71520b;
 }
-.plant-branch__status--done {
+.plant-branch__status--complete {
   color: #684117;
 }
 .planter-home-grid,

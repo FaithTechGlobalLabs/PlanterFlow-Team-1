@@ -15,9 +15,9 @@ export const sampleWorkspace: WorkspaceData = {
     { id: "prayer", title: "Prayer Requests", description: null, kind: "prayer" },
   ],
   objectives: [
-    { id: "neighbours", planter_id: "sample-planter", category_id: "city", title: "Build deeper roots in our neighbourhood", description: "Make space for genuine relationships with the people who call this neighbourhood home.", cadence: "weekly", status: "active", created_at: "2026-09-20T12:00:00Z", due_date: null, team_visible: false },
-    { id: "table", planter_id: "sample-planter", category_id: "disciples", title: "Make room around the table", description: "Start a small group where questions are welcome and people can explore faith together.", cadence: "weekly", status: "active", created_at: "2026-09-21T12:00:00Z", due_date: null, team_visible: false },
-    { id: "team", planter_id: "sample-planter", category_id: "church", title: "Grow a team that serves together", description: "Help our core team discover their gifts and find meaningful ways to serve.", cadence: "monthly", status: "active", created_at: "2026-09-22T12:00:00Z", due_date: null, team_visible: false },
+    { id: "neighbours", planter_id: "sample-planter", category_id: "city", title: "Build deeper roots in our neighbourhood", description: "Make space for genuine relationships with the people who call this neighbourhood home.", cadence: "weekly", status: "in_progress", created_at: "2026-09-20T12:00:00Z", due_date: null, team_visible: false },
+    { id: "table", planter_id: "sample-planter", category_id: "disciples", title: "Make room around the table", description: "Start a small group where questions are welcome and people can explore faith together.", cadence: "weekly", status: "in_progress", created_at: "2026-09-21T12:00:00Z", due_date: null, team_visible: false },
+    { id: "team", planter_id: "sample-planter", category_id: "church", title: "Grow a team that serves together", description: "Help our core team discover their gifts and find meaningful ways to serve.", cadence: "monthly", status: "in_progress", created_at: "2026-09-22T12:00:00Z", due_date: null, team_visible: false },
   ],
   activities: [
     { id: "coffee", objective_id: "neighbours", description: "Share coffee with two neighbours", cadence: "weekly", status: "active" },

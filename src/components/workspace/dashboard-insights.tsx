@@ -1,4 +1,5 @@
 "use client";
+import { isOpenObjective, normalizeObjectiveStatus } from "@/lib/workspace/objective-status";
 import type { Objective, WorkspaceData } from "@/lib/workspace/types";
 import { summarizeProgress } from "@/lib/workspace/progress-summary";
 
@@ -9,7 +10,7 @@ export function DashboardInsights({ data, openObjective, openSupport }: {
 }) {
   const weeks = summarizeProgress(data.progress, data.asOf);
   const max = Math.max(1, ...weeks.map(week => week.count));
-  const completed = data.objectives.filter(objective => objective.status === "done").length;
+  const completed = data.objectives.filter(objective => normalizeObjectiveStatus(objective.status) === "complete").length;
   const latestSupport = data.checkIns.find(checkIn => checkIn.support.trim());
   const latestReplies = data.messages.filter(message => message.author_id !== data.planter.id).slice(-3).reverse();
   return <div className="ff-insights-grid">
@@ -19,7 +20,7 @@ export function DashboardInsights({ data, openObjective, openSupport }: {
       <div className="ff-progress-chart" role="img" aria-label={weeks.map(week => `Week of ${week.label}: ${week.count} progress updates`).join(". ")}>
         {weeks.map(week => <div className="ff-chart-column" key={week.start}><strong>{week.count}</strong><div className="ff-chart-track"><span style={{ height: `${Math.max(3, week.count / max * 100)}%` }} className={week.count ? "has-progress" : ""}/></div><small>{week.label}</small></div>)}
       </div>
-      <p className="ff-chart-caption">{completed} completed objectives · {data.objectives.filter(objective => objective.status === "active").length} in progress</p>
+      <p className="ff-chart-caption">{completed} completed objectives · {data.objectives.filter(objective => isOpenObjective(objective.status)).length} open objectives</p>
     </section>
     <section className="ff-panel">
       <div className="ff-section-heading"><div className="ff-section-heading-text"><p className="ff-eyebrow">YOU’RE NOT WALKING ALONE</p><h2 className="ff-section-title">From your Catalyst</h2></div></div>

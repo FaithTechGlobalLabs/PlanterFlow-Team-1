@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { isOpenObjective, normalizeObjectiveStatus } from "@/lib/workspace/objective-status";
 import { Brand } from "@/components/ui/Brand";
 import { Link } from "@/i18n/routing";
 import { signOut } from "@/app/[locale]/actions";
@@ -47,7 +48,7 @@ export function CatalystDashboard({
     needsSupport(person.id),
   ).length;
   const activeObjectives = data.objectives.filter(
-    (objective) => objective.status === "active",
+    (objective) => isOpenObjective(objective.status),
   );
   const personName = (id: string) =>
     data.people.find((person) => person.id === id)?.display_name ?? "Planter";
@@ -265,7 +266,7 @@ export function CatalystDashboard({
                   attention: needsSupport(church.pastor_id),
                   completed: data.objectives.filter(
                     (o) =>
-                      o.planter_id === church.pastor_id && o.status === "done",
+                      o.planter_id === church.pastor_id && normalizeObjectiveStatus(o.status) === "complete",
                   ).length,
                 }))}
                 onSelect={setSelectedId}
@@ -284,7 +285,7 @@ export function CatalystDashboard({
               <div className="ff-stat">
                 <span>
                   <Icon name="leaf" />
-                  Active objectives
+                  Open objectives
                 </span>
                 <strong>{activeObjectives.length}</strong>
                 <small>Defined by your planters</small>
@@ -335,7 +336,7 @@ export function CatalystDashboard({
                   <thead>
                     <tr>
                       <th scope="col">Planter & church</th>
-                      <th scope="col">Active objectives</th>
+                      <th scope="col">Open objectives</th>
                       <th scope="col">Latest progress</th>
                       <th scope="col">Latest check-in</th>
                       <th scope="col">Workspace</th>
@@ -363,10 +364,10 @@ export function CatalystDashboard({
                                 : "Church setup in progress"}
                             </small>
                           </td>
-                          <td data-label="Active objectives">
+                          <td data-label="Open objectives">
                             {
                               objectives.filter(
-                                (objective) => objective.status === "active",
+                                (objective) => isOpenObjective(objective.status),
                               ).length
                             }
                           </td>
@@ -633,11 +634,11 @@ export function CatalystDashboard({
                 journey.
               </p>
             )}
-            {data.objectives.some((o) => o.status === "done") && (
+            {data.objectives.some((o) => normalizeObjectiveStatus(o.status) === "complete") && (
               <>
                 <h2>Objectives completed</h2>
                 {data.objectives
-                  .filter((o) => o.status === "done")
+                  .filter((o) => normalizeObjectiveStatus(o.status) === "complete")
                   .map((o) => (
                     <article className="ff-update" key={o.id}>
                       <small>{personName(o.planter_id)}</small>
@@ -694,15 +695,15 @@ export function CatalystDashboard({
             {data.objectives
               .filter(
                 (o) =>
-                  o.planter_id === selectedPerson.id && o.status === "active",
+                  o.planter_id === selectedPerson.id && isOpenObjective(o.status),
               )
               .map((o) => (
                 <h3 key={o.id}>{o.title}</h3>
               ))}
             {!data.objectives.some(
               (o) =>
-                o.planter_id === selectedPerson.id && o.status === "active",
-            ) && <p>No active objectives shared yet.</p>}
+                o.planter_id === selectedPerson.id && isOpenObjective(o.status),
+            ) && <p>No open objectives shared yet.</p>}
           </section>
           <div className="garden-panel-actions">
             <Link

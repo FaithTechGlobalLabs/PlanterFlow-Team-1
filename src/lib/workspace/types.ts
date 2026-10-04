@@ -1,3 +1,4 @@
+import type { ObjectiveStatus } from "./objective-status";
 export type Category = {
   id: string;
   title: string;
@@ -11,7 +12,7 @@ export type Objective = {
   title: string;
   description: string | null;
   cadence: "weekly" | "monthly";
-  status: "active" | "paused" | "done";
+  status: ObjectiveStatus;
   created_at: string;
   due_date: string | null;
   team_visible: boolean;
