@@ -8,6 +8,7 @@ import { ChurchTree } from "@/components/garden/church-tree";
 import { Button } from "@/components/ui/Button";
 import { CheckInList, type CheckInView } from "./check-in-list";
 import { ObjectiveCard, type ObjectiveView } from "./objective-card";
+import { ExportButton } from "./export-button";
 
 interface PageProps {
   params: Promise<{ locale: string; id: string }>;
@@ -170,10 +171,10 @@ export default async function CatalystPlanterPage({ params }: PageProps) {
           Open church workspace →
         </Button>
       </header>
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-        <div className="flex flex-col gap-6 w-full max-w-[720px]">
+      <div className="planter-content-layout flex flex-col gap-6 lg:flex-row lg:items-start">
+        <div className="planter-main-column flex flex-col gap-6 w-full max-w-[720px]">
           {loadFailed ? (
-            <p role="alert" className="text-[15px] text-[var(--color-ink)]">
+            <p role="alert" className="planter-error-message text-[15px] text-[var(--color-ink)]">
               {t("load_error")}
             </p>
           ) : (
@@ -184,7 +185,7 @@ export default async function CatalystPlanterPage({ params }: PageProps) {
                 objectives={objectiveOptions}
               />
               {views.length === 0 ? (
-                <p className="text-[15px] text-[var(--color-muted)]">
+                <p className="planter-empty-message text-[15px] text-[var(--color-muted)]">
                   {t("empty")}
                 </p>
               ) : (
@@ -194,34 +195,37 @@ export default async function CatalystPlanterPage({ params }: PageProps) {
               )}
             </>
           )}
-          <Button
-            variant="secondary"
-            href="/catalyst"
-            fullWidth={false}
-            className="min-w-[222px]"
-          >
-            {t("back")}
-          </Button>
+          <div className="planter-actions-row flex flex-wrap gap-4 items-center">
+            <Button
+              variant="secondary"
+              href="/catalyst"
+              fullWidth={false}
+              className="planter-back-btn min-w-[222px]"
+            >
+              {t("back")}
+            </Button>
+            <ExportButton planterId={id} label={t("export_pdf")} className="planter-export-btn" />
+          </div>
         </div>
 
-        <div className="flex flex-col gap-6 lg:max-w-[420px]">
-          <section className="garden-surface flex flex-col gap-2">
+        <div className="planter-sidebar-column flex flex-col gap-6 lg:max-w-[420px]">
+          <section className="garden-surface planter-church-card flex flex-col gap-2">
             <ChurchTree
               completed={views.filter((o) => o.status === "done").length}
             />
-            <h2 className="text-[22px] font-bold text-[var(--color-ink)]">
+            <h2 className="planter-card-title text-[22px] font-bold text-[var(--color-ink)]">
               {t("church_title")}
             </h2>
-            <p className="text-[15px] text-[var(--color-ink)]">{church.name}</p>
-            <p className="text-[15px] text-[var(--color-muted)]">
+            <p className="planter-church-name text-[15px] text-[var(--color-ink)]">{church.name}</p>
+            <p className="planter-pastor-name text-[15px] text-[var(--color-muted)]">
               {t("pastor", { name: planter.display_name })}
             </p>
             {church.city && (
-              <p className="text-[15px] text-[var(--color-muted)]">
+              <p className="planter-church-city text-[15px] text-[var(--color-muted)]">
                 {church.city}
               </p>
             )}
-            <p className="text-[15px] text-[var(--color-muted)]">
+            <p className="planter-start-date text-[15px] text-[var(--color-muted)]">
               {startDate
                 ? t("planting_start", {
                     date: format.dateTime(new Date(`${startDate}T00:00:00`), {
@@ -231,7 +235,7 @@ export default async function CatalystPlanterPage({ params }: PageProps) {
                 : t("planting_start_unknown")}
             </p>
             {startDate && (
-              <p className="text-[15px] font-bold text-[var(--color-green)]">
+              <p className="planter-stage-badge text-[15px] font-bold text-[var(--color-green)]">
                 {tStage(
                   treeStageFromPlantingDate(new Date(`${startDate}T00:00:00`)),
                 )}
@@ -239,20 +243,20 @@ export default async function CatalystPlanterPage({ params }: PageProps) {
             )}
           </section>
 
-          <section className="garden-surface flex flex-col gap-4">
-            <h2 className="text-[22px] font-bold text-[var(--color-ink)]">
+          <section className="garden-surface planter-care-card flex flex-col gap-4">
+            <h2 className="planter-care-title text-[22px] font-bold text-[var(--color-ink)]">
               {t("care_title")}
             </h2>
-            <p className="text-[15px] text-[var(--color-muted)]">
+            <p className="planter-care-item text-[15px] text-[var(--color-muted)]">
               {t("care_owner")}
             </p>
-            <p className="text-[15px] text-[var(--color-muted)]">
+            <p className="planter-care-item text-[15px] text-[var(--color-muted)]">
               {t("care_reply")}
             </p>
-            <p className="text-[15px] text-[var(--color-muted)]">
+            <p className="planter-care-item text-[15px] text-[var(--color-muted)]">
               {t("care_personal")}
             </p>
-            <p className="text-[15px] text-[var(--color-muted)]">
+            <p className="planter-care-item text-[15px] text-[var(--color-muted)]">
               {t("care_no_approval")}
             </p>
           </section>

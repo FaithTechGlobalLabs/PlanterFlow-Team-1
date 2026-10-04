@@ -133,7 +133,7 @@ export default async function CatalystGardenPage({ params }: PageProps) {
         isAdmin={profile.is_admin}
         invitations={
           invitations.error ? (
-            <p role="alert">{tInvites("load_error")}</p>
+            <p role="alert" className="catalyst-invites-error text-[15px] text-[var(--color-ink)]">{tInvites("load_error")}</p>
           ) : (
             <InviteList invites={invites} />
           )

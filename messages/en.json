@@ -354,6 +354,7 @@
       "review_objective_label": "Post under goal",
       "review_submit": "Acknowledge check-in",
       "review_sent": "Check-in acknowledged. Your note is in the goal conversation.",
+      "export_pdf": "Export PDF Report",
       "review_needs_goal": "Once the pastor adds a goal, you can acknowledge this check-in here."
     },
     "categories": {
