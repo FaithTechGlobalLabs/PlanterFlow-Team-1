@@ -665,7 +665,9 @@
 }
 /* Deeper Catalyst workspace: spacious navigation, botanical surfaces and readable text. */
 .ff-living-catalyst .ff-topbar {
-  background: #20372c;
+  background: #ffffff;
+  border-bottom: 1px solid #dce4d8;
+  color: #243b37;
 }
 .ff-living-catalyst .ff-sidebar {
   background: #f0f1e5;
