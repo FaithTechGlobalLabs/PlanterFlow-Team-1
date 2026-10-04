@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Brand } from "@/components/ui/Brand";
+import { SendNetworkLogo } from "@/components/ui/SendNetworkLogo";
 import { Link } from "@/i18n/routing";
 import { signOut } from "@/app/[locale]/actions";
 import { saveCategory } from "@/app/[locale]/dashboard/category-actions";
@@ -106,9 +107,9 @@ export function CatalystDashboard({
           className="ff-brand"
         >
           <Brand />
-          <span className="ff-edition">with SEND Network</span>
         </Link>
         <div className="ff-topbar-right">
+          <SendNetworkLogo className="h-5 w-auto" />
           <span className="ff-connected">
             <i />
             {preview ? "Sample data preview" : data.organization}

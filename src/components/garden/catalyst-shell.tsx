@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Brand } from "@/components/ui/Brand";
+import { SendNetworkLogo } from "@/components/ui/SendNetworkLogo";
 import { Link } from "@/i18n/routing";
 import { signOut } from "@/app/[locale]/actions";
 import "./garden.css";
@@ -23,27 +24,29 @@ export function CatalystShell({
       <header className="garden-topbar">
         <Link href="/catalyst" className="garden-brand">
           <Brand />
-          <span className="garden-brand-tagline">with SEND Network</span>
         </Link>
-        <details className="garden-account">
-          <summary>
-            <span className="garden-avatar">
-              {name
-                .trim()
-                .split(/\s+/)
-                .map((word) => word[0])
-                .slice(0, 2)
-                .join("") || "C"}
-            </span>
-            <span className="garden-account-name">{name || "Your account"}</span>
-          </summary>
-          <div className="garden-account-dropdown">
-            <p className="garden-account-role">Catalyst · {organization || "Your community"}</p>
-            <form action={signOut}>
-              <button type="submit" className="garden-signout-btn">Sign out</button>
-            </form>
-          </div>
-        </details>
+        <div className="flex items-center gap-4">
+          <SendNetworkLogo className="h-5 w-auto" />
+          <details className="garden-account">
+            <summary>
+              <span className="garden-avatar">
+                {name
+                  .trim()
+                  .split(/\s+/)
+                  .map((word) => word[0])
+                  .slice(0, 2)
+                  .join("") || "C"}
+              </span>
+              <span className="garden-account-name">{name || "Your account"}</span>
+            </summary>
+            <div className="garden-account-dropdown">
+              <p className="garden-account-role">Catalyst · {organization || "Your community"}</p>
+              <form action={signOut}>
+                <button type="submit" className="garden-signout-btn">Sign out</button>
+              </form>
+            </div>
+          </details>
+        </div>
       </header>
       <nav className="garden-nav" aria-label="Catalyst navigation">
         <span className="garden-nav-org">{organization || "Your community"}</span>

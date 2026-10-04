@@ -29,7 +29,7 @@ body {
   line-height: 1.4;
 }
 :where(a,button,input,select,textarea):focus-visible{outline:3px solid #50a790;outline-offset:4px}
-.brand-lockup{display:inline-flex;align-items:center;gap:10px;font-size:25px;font-weight:700;letter-spacing:-1px;white-space:nowrap}.brand-lockup img{flex-shrink:0}.brand-nav{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:74px;padding:16px 30px;background:var(--color-navy);color:white}.brand-nav>span{color:#c3d0c6;font-size:10px;letter-spacing:1.6px}
+.brand-lockup{display:inline-flex;align-items:center;gap:10px;font-size:25px;font-weight:700;letter-spacing:-1px;white-space:nowrap}.brand-lockup img{flex-shrink:0}.brand-nav{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:74px;padding:16px 30px;background:#ffffff;border-bottom:1px solid #dce4d8;color:var(--color-ink)}.brand-nav>span{color:var(--color-muted);font-size:10px;letter-spacing:1.6px}
 .onboarding-shell,.login-shell{min-height:100vh;background:var(--color-canvas)}.onboarding-content{display:flex;flex-direction:column;gap:24px;max-width:960px;margin:0 auto;padding:48px 28px 64px}.onboarding-content h1{font-weight:500;letter-spacing:-1px}
 
 @media (max-width: 760px) {

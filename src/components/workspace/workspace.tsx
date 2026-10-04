@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { Brand } from "@/components/ui/Brand";
+import { SendNetworkLogo } from "@/components/ui/SendNetworkLogo";
 import { Link } from "@/i18n/routing";
 import { saveWorkspace } from "@/app/[locale]/dashboard/actions";
 import { signOut } from "@/app/[locale]/actions";
@@ -368,9 +369,9 @@ export function Workspace({
       <header className="ff-topbar">
         <Link href="/dashboard" className="ff-brand">
           <Brand />
-          <span className="ff-edition">with SEND Network</span>
         </Link>
         <div className="ff-topbar-right">
+          <SendNetworkLogo className="h-5 w-auto" />
           <span className="ff-connected">
             <i />
             {preview ? "Sample data preview" : "Your planting journey"}
