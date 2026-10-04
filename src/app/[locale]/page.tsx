@@ -8,8 +8,9 @@ import { OnboardingPage } from "@/components/onboarding-page";
 import { FormCard } from "@/components/ui/FormCard";
 import { Status } from "@/components/ui/Status";
 import { Button } from "@/components/ui/Button";
-import { TreeSapling } from "@/components/ui/TreeSapling";
-import { treeStageFromPlantingDate } from "@/lib/tree-stage";
+import { PlanterHome } from "@/components/planter/planter-home";
+import { loadWorkspace } from "@/lib/workspace/data";
+
 import { getTeamChurch } from "@/lib/team";
 import { signOut } from "./actions";
 
@@ -39,7 +40,10 @@ export default async function HomePage({ params }: PageProps) {
       .maybeSingle();
 
     if (invitation) {
-      redirect({ href: `/${invitation.role === "peer" ? "team-invite" : "invite"}/${invitation.token}`, locale });
+      redirect({
+        href: `/${invitation.role === "peer" ? "team-invite" : "invite"}/${invitation.token}`,
+        locale,
+      });
     }
     redirect({ href: "/invite/unavailable", locale });
   }
@@ -62,14 +66,20 @@ export default async function HomePage({ params }: PageProps) {
       <OnboardingPage
         eyebrow={t("home.team.eyebrow")}
         title={teamChurch?.name ?? ""}
-        subline={t("home.team.subline")}>
+        subline={t("home.team.subline")}
+      >
         <FormCard title={profile!.display_name}>
           <Status>{t("home.team.chip")}</Status>
           <Button variant="primary" href="/dashboard" fullWidth={false}>
-            {t("home.team.open_workspace")} 
+            {t("home.team.open_workspace")}
           </Button>
           <form action={signOut}>
-            <Button variant="secondary" type="submit" fullWidth={false} className="min-w-[222px]">
+            <Button
+              variant="secondary"
+              type="submit"
+              fullWidth={false}
+              className="min-w-[222px]"
+            >
               {t("common.sign_out")}
             </Button>
           </form>
@@ -98,38 +108,8 @@ export default async function HomePage({ params }: PageProps) {
     redirect({ href: "/onboarding/first-goal", locale });
   }
 
-  const { data: firstObjective } = await supabase
-    .from("objectives")
-    .select("title")
-    .eq("planter_id", user!.id)
-    .order("created_at", { ascending: true })
-    .limit(1)
-    .single();
-
-  const stage = treeStageFromPlantingDate(new Date(church.planting_start_date));
-
-  return (
-    <OnboardingPage
-      eyebrow={t("home.planter.eyebrow")}
-      title={church.name}
-      subline={t("home.planter.subline")}
-    >
-      <FormCard title={church.city ?? church.name}>
-        <Button variant="primary" href="/dashboard" fullWidth={false}>
-          {t("home.team.open_workspace")}
-        </Button>
-        <Button variant="secondary" href="/invite-team" fullWidth={false} className="min-w-[222px]">
-          {t("home.planter.invite_team")}
-        </Button>
-        <TreeSapling />
-        <Status>{t(`home.planter.stage.${stage}`)}</Status>
-        <p className="text-[15px] text-[var(--color-muted)]">{firstObjective?.title}</p>
-        <form action={signOut}>
-          <Button variant="secondary" type="submit" fullWidth={false} className="min-w-[222px]">
-            {t("common.sign_out")}
-          </Button>
-        </form>
-      </FormCard>
-    </OnboardingPage>
-  );
+  const workspace = await loadWorkspace(profile!);
+  if (!workspace)
+    throw new Error("We couldn't load your church. Please try again.");
+  return <PlanterHome data={workspace} />;
 }
