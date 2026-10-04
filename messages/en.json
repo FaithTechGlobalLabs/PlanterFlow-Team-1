@@ -420,6 +420,18 @@
       "last_activity_none": "No activity yet",
       "empty": "No churches are assigned to you yet. Start with Invite a pastor.",
       "manage_categories": "Manage categories"
+    },
+    "invites": {
+      "title": "Pastor invitations",
+      "empty": "You haven't invited a pastor yet.",
+      "load_error": "We couldn't load your invitations. Refresh the page to try again.",
+      "sent": "Sent {date}",
+      "sent_with_church": "{church} · Sent {date}",
+      "status": {
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "expired": "Expired"
+      }
     }
   }
 }
