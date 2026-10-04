@@ -39,6 +39,14 @@ export function CatalystHome({
         : church.checkInDue
           ? t("check_in_due")
           : "No immediate action needed";
+  const statusClass = (church: GardenChurch) =>
+    church.supportRequested
+      ? "status-badge-support garden-status-support"
+      : church.replyDue
+        ? "status-badge-review garden-status-review"
+        : church.checkInDue
+          ? "status-badge-due garden-status-due"
+          : "status-badge-quiet garden-status-quiet";
   const filtered = garden.filter((church) =>
     `${church.churchName} ${church.pastorName} ${church.city ?? ""}`
       .toLowerCase()
@@ -99,7 +107,7 @@ export function CatalystHome({
               <ul className="garden-presence-list">
                 {presence.slice(0, 4).map((church) => (
                   <li key={church.churchId} className="garden-presence-item">
-                    <p className="garden-status">{status(church)}</p>
+                    <p className={`garden-status ${statusClass(church)}`}>{status(church)}</p>
                     <h3 className="garden-presence-church-name">{church.churchName}</h3>
                     <p className="garden-presence-pastor-name">{church.pastorName || "Pastor"}</p>
                     <Link
@@ -169,7 +177,7 @@ export function CatalystHome({
                           .join(" · ")}
                       </small>
                     </span>
-                    <span className="garden-status">{status(church)}</span>
+                    <span className={`garden-status ${statusClass(church)}`}>{status(church)}</span>
                     <span className="garden-church-arrow" aria-hidden="true">↗</span>
                   </button>
                 </li>

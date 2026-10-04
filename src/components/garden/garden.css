@@ -386,6 +386,26 @@
   border-radius: 20px;
   line-height: 1.5;
 }
+.garden-status-support,
+.status-badge-support {
+  background: var(--color-blue, #2563eb);
+  color: #ffffff;
+}
+.garden-status-review,
+.status-badge-review {
+  background: var(--color-sage, #edf0e6);
+  color: var(--color-ink, #1e293b);
+}
+.garden-status-due,
+.status-badge-due {
+  background: var(--color-sage, #edf0e6);
+  color: var(--color-green, #1b4332);
+}
+.garden-status-quiet,
+.status-badge-quiet {
+  background: #f1f5f9;
+  color: #64748b;
+}
 .garden-quiet {
   padding: 24px 0;
   line-height: 1.8;
