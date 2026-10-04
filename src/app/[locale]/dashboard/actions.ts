@@ -111,12 +111,6 @@ export async function saveWorkspace(form: FormData): Promise<SaveResult> {
       result = await postThreadMessage({ entityType: entity_type, entityId: entity_id, planterId: planter_id, orgId: profile.org_id, authorId: user.id, body, title });
     } else if (intent === "conversation_status") {
       result = await updateThreadStatus(idField(form, "thread_id"), choiceField(form, "status", ["active", "resolved", "archived"]) as LifecycleStatus);
-    } else if (intent === "check_in") {
-      const res = await db.from("check_ins").insert({ planter_id: user.id, note: textField(form, "note"), feeling: choiceField(form, "feeling", ["encouraged", "steady", "stretched", "struggling"]), momentum: choiceField(form, "momentum", ["moving", "steady", "stuck"]), support: textField(form, "support", 2000, false) }).select("id").single();
-      if (!res.error && res.data) {
-        await postThreadMessage({ entityType: "support", entityId: res.data.id, planterId: user.id, orgId: profile.org_id, authorId: user.id, body: textField(form, "note"), title: "Support Check-in" });
-      }
-      result = { ok: !res.error, id: res.data?.id, error: res.error?.message };
     } else if (intent === "prayer") {
       const body = textField(form, "body");
       const res = await db.from("prayer_requests").insert({ planter_id: user.id, org_id: profile.org_id, body, visibility: choiceField(form, "visibility", ["private", "organization"]) }).select("id").single();

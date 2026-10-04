@@ -26,40 +26,122 @@ describe("planter workspace", () => {
     fireEvent.click(screen.getByRole("button", { name: "← All objectives" }));
     expect(screen.getByPlaceholderText("Search by title or category…")).toBeInTheDocument();
   });
-  it("retains the check-in draft when persistence fails", async () => {
-    mocks.save.mockResolvedValue({ ok: false, error: "Connection failed. Try again." });
-    render(<Workspace data={sampleWorkspace}/>);
-    fireEvent.click(screen.getByRole("button", { name: "Quick check-in" }));
-    fireEvent.change(screen.getByLabelText("How are you feeling?"), { target: { value: "steady" } });
-    fireEvent.change(screen.getByLabelText("How is your planting work progressing?"), { target: { value: "moving" } });
-    fireEvent.change(screen.getByLabelText("A short update"), { target: { value: "A draft worth keeping" } });
-    fireEvent.submit(screen.getByRole("button", { name: "Save check-in" }).closest("form")!);
-    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Connection failed"));
-    expect(screen.getByLabelText("A short update")).toHaveValue("A draft worth keeping");
-    expect(mocks.refresh).not.toHaveBeenCalled();
+it("retains the progress draft when persistence fails", async () => {
+  mocks.save.mockResolvedValue({
+    ok: false,
+    error: "Connection failed. Try again.",
   });
-  it("moves from a successful check-in to the history workflow", async () => {
-    mocks.save.mockResolvedValue({ ok: true, id: "saved" });
-    render(<Workspace data={sampleWorkspace}/>);
-    fireEvent.click(screen.getByRole("button", { name: "Quick check-in" }));
-    fireEvent.submit(screen.getByRole("button", { name: "Save check-in" }).closest("form")!);
-    await waitFor(() => expect(screen.getByRole("heading", { name: "Your check-ins" })).toBeInTheDocument());
-    expect(mocks.refresh).toHaveBeenCalledOnce();
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+
+  render(<Workspace data={sampleWorkspace} />);
+
+  fireEvent.click(
+    screen.getByRole("button", {
+      name: /Engage the City Build deeper roots/,
+    })
+  );
+
+  const draft = screen.getByLabelText(
+    "How is this objective progressing?"
+  );
+
+  fireEvent.change(draft, {
+    target: { value: "A draft worth keeping" },
   });
-  it("lets Catalysts read and reply without presenting planter editing controls", () => {
-    render(<Workspace data={{ ...sampleWorkspace, viewer: sampleWorkspace.people[1] }}/>);
-    expect(screen.queryByRole("button", { name: "Quick check-in" })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /Engage the City Build deeper roots/ }));
-    expect(screen.getByRole("button", { name: "Send reply" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Edit objective" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Share progress" })).not.toBeInTheDocument();
-  });
-  it("never calls the live save action from the sample preview", async () => {
-    render(<Workspace data={sampleWorkspace} preview/>);
-    fireEvent.click(screen.getByRole("button", { name: "Quick check-in" }));
-    fireEvent.submit(screen.getByRole("button", { name: "Save check-in" }).closest("form")!);
-    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("visual preview"));
-    expect(mocks.save).not.toHaveBeenCalled();
-  });
+
+  fireEvent.submit(
+    screen
+      .getByRole("button", { name: "Share progress" })
+      .closest("form")!
+  );
+
+  await waitFor(() =>
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Connection failed"
+    )
+  );
+
+  expect(draft).toHaveValue("A draft worth keeping");
+  expect(mocks.refresh).not.toHaveBeenCalled();
+});
+
+it("refreshes after successfully sharing objective progress", async () => {
+  mocks.save.mockResolvedValue({ ok: true, id: "saved" });
+
+  render(<Workspace data={sampleWorkspace} />);
+
+  fireEvent.click(
+    screen.getByRole("button", {
+      name: /Engage the City Build deeper roots/,
+    })
+  );
+
+  fireEvent.change(
+    screen.getByLabelText("How is this objective progressing?"),
+    {
+      target: { value: "Made progress this week" },
+    }
+  );
+
+  fireEvent.submit(
+    screen
+      .getByRole("button", { name: "Share progress" })
+      .closest("form")!
+  );
+
+  await waitFor(() =>
+    expect(mocks.refresh).toHaveBeenCalledOnce()
+  );
+
+  expect(mocks.save).toHaveBeenCalledOnce();
+
+  const form = mocks.save.mock.calls[0][0] as FormData;
+
+  expect(form.get("intent")).toBe("progress");
+  expect(form.get("note")).toBe("Made progress this week");
+});
+
+it("lets Catalysts read and reply without presenting planter editing controls", () => {
+  render(<Workspace data={{ ...sampleWorkspace, viewer: sampleWorkspace.people[1] }}/>);
+
+  expect(screen.queryByRole("button", { name: "Quick check-in" })).not.toBeInTheDocument();
+
+  fireEvent.click(
+    screen.getByRole("button", { name: /Engage the City Build deeper roots/ })
+  );
+
+  expect(screen.getByRole("button", { name: "Send reply" })).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Edit objective" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Share progress" })).not.toBeInTheDocument();
+});
+
+it("never calls the live save action from the sample preview", async () => {
+  render(<Workspace data={sampleWorkspace} preview />);
+
+  fireEvent.click(
+    screen.getByRole("button", {
+      name: /Engage the City Build deeper roots/,
+    })
+  );
+
+  fireEvent.change(
+    screen.getByLabelText("How is this objective progressing?"),
+    {
+      target: { value: "Preview progress" },
+    }
+  );
+
+  fireEvent.submit(
+    screen
+      .getByRole("button", { name: "Share progress" })
+      .closest("form")!
+  );
+
+  await waitFor(() =>
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "visual preview"
+    )
+  );
+
+  expect(mocks.save).not.toHaveBeenCalled();
+});
 });

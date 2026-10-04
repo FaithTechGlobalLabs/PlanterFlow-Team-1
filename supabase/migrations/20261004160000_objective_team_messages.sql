@@ -39,7 +39,7 @@ USING (
     WHERE o.id = objective_team_messages.objective_id
       AND (
         o.planter_id = (SELECT auth.uid())
-        OR public.is_catalyst()
+        OR public.is_assigned_catalyst(o.planter_id)
         OR (
           o.team_visible
           AND public.is_church_team_member(o.planter_id)
@@ -61,7 +61,7 @@ WITH CHECK (
       AND o.team_visible
       AND (
         o.planter_id = (SELECT auth.uid())
-        OR public.is_catalyst()
+        OR public.is_assigned_catalyst(o.planter_id)
         OR public.is_church_team_member(o.planter_id)
       )
   )

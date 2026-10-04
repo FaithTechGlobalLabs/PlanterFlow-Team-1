@@ -12,7 +12,7 @@ export async function loadWorkspace(profile: Profile, requestedPlanter?: string)
   const { data: rawPeople, error: peopleError } = await db.from("profiles")
     .select("id,display_name,role").eq("org_id", profile.org_id).order("display_name");
   if (peopleError) throw new Error("We couldn't load your organization. Please try again.");
-  const people = (rawPeople ?? []) as Person[];
+let people = (rawPeople ?? []) as Person[];
   const planters = people.filter(p => p.role === "planter");
   let planter: Person | null = null;
 
@@ -28,24 +28,37 @@ export async function loadWorkspace(profile: Profile, requestedPlanter?: string)
     const { data: memberChurch, error: churchError } = await churchQuery
       .order("created_at").order("id").limit(1).maybeSingle();
     if (churchError) throw new Error("We couldn't load your church.");
-    console.log("Team church lookup", {
-  churchIds,
-  memberChurch,
-});
+    
     if (!memberChurch) return null;
-    planter = planters.find(p => p.id === memberChurch.pastor_id) ?? null;
-  } else {
+const { data: teamPlanters, error: planterError } = await db.rpc(
+  "get_team_planter_profile",
+  {
+    target_planter_id: memberChurch.pastor_id,
+  }
+);
+
+if (planterError) {
+  throw new Error("We couldn't load your planter.");
+}
+
+const teamPlanter = teamPlanters?.[0];
+
+if (!teamPlanter) return null;
+
+planter = {
+  id: teamPlanter.id,
+  display_name: teamPlanter.display_name,
+  role: "planter",
+};
+
+people = [
+  ...people.filter(person => person.id !== planter!.id),
+  planter,
+];  } else {
     planter = profile.role === "planter"
       ? { id: profile.id, display_name: profile.display_name, role: profile.role }
       : planters.find(p => p.id === requestedPlanter) ?? (requestedPlanter ? null : planters[0] ?? null);
   }
-  console.log("Workspace lookup", {
-  viewerId: profile.id,
-  viewerRole: profile.role,
-  requestedPlanter,
-  visiblePlanterIds: planters.map(p => p.id),
-  selectedPlanterId: planter?.id,
-});
   if (!planter) return null;
 
   let objectivesQuery = db.from("objectives").select("*").eq("planter_id", planter.id)

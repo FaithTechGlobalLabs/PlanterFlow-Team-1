@@ -62,7 +62,7 @@ export default async function HomePage({ params }: PageProps) {
       <OnboardingPage
         eyebrow={t("home.team.eyebrow")}
         title={teamChurch?.name ?? ""}
-        subline="View shared objectives and contribute with your Church Team."      >
+        subline={t("home.team.subline")}>
         <FormCard title={profile!.display_name}>
           <Status>{t("home.team.chip")}</Status>
           <Button variant="primary" href="/dashboard" fullWidth={false}>
@@ -115,7 +115,9 @@ export default async function HomePage({ params }: PageProps) {
       subline={t("home.planter.subline")}
     >
       <FormCard title={church.city ?? church.name}>
-        <Button variant="primary" href="/dashboard" fullWidth={false}>Open workspace</Button>
+        <Button variant="primary" href="/dashboard" fullWidth={false}>
+          {t("home.team.open_workspace")}
+        </Button>
         <Button variant="secondary" href="/invite-team" fullWidth={false} className="min-w-[222px]">
           {t("home.planter.invite_team")}
         </Button>
