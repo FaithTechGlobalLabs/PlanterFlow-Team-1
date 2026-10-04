@@ -15,22 +15,19 @@ export default function LoginPage() {
           <div className="login-copy">
             <p className="login-eyebrow">{t("login.welcome")}</p>
 
-            <h1 id="login-heading">
-              {t("login.headline_desktop")}
-            </h1>
+            <h1 id="login-heading">{t("login.headline_desktop")}</h1>
 
-            <p className="login-intro">
-              {t("login.subline_desktop")}
-            </p>
+            <p className="login-intro">{t("login.subline_desktop")}</p>
           </div>
 
           <div className="login-visual-stage">
             <LivingGlobe label={t("login.globe_label")} />
+            <p className="login-illustration-note">
+              {t("login.illustration_note")}
+            </p>
           </div>
 
-          <p className="login-story-note">
-            {t("login.subline_mobile")}
-          </p>
+          <p className="login-story-note">{t("login.subline_mobile")}</p>
         </section>
 
         <section

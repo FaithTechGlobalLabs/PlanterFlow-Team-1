@@ -1,6 +1,6 @@
 "use client";
 
-import { InputHTMLAttributes } from "react";
+import { useId, InputHTMLAttributes } from "react";
 import { fieldClassName, labelClassName } from "./field-styles";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -14,9 +14,14 @@ export function Input({
   id,
   name,
   placeholder,
+  className,
+  "aria-describedby": describedBy,
+  "aria-invalid": invalid,
   ...props
 }: InputProps) {
-  const inputId = id ?? name ?? label?.toLowerCase().replace(/\s+/g, "-");
+  const generatedId = useId();
+  const inputId = id ?? generatedId;
+  const errorId = `${inputId}-error`;
 
   return (
     <div className="w-full">
@@ -29,10 +34,23 @@ export function Input({
         id={inputId}
         name={name}
         placeholder={placeholder}
-        className={fieldClassName}
+        className={`${fieldClassName} ${className ?? ""}`}
+        aria-invalid={error ? true : invalid}
+        aria-describedby={
+          [describedBy, error ? errorId : null].filter(Boolean).join(" ") ||
+          undefined
+        }
         {...props}
       />
-      {error && <p className="text-[12px] text-red-600 mt-1">{error}</p>}
+      {error && (
+        <p
+          id={errorId}
+          role="alert"
+          className="ff-field__error text-sm text-[var(--color-danger)] mt-1"
+        >
+          {error}
+        </p>
+      )}
     </div>
   );
 }

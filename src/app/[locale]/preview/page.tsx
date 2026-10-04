@@ -25,13 +25,26 @@ export default async function PreviewPage({
 }) {
   const { role, surface, scenario, planter, view, objective } =
     await searchParams;
+  const stageDates: Record<string, string | null> = {
+    "fruitful-seed": "2026-09-01",
+    seed: "2026-09-01",
+    sprout: "2026-04-01",
+    sapling: "2025-04-01",
+    young: "2024-04-01",
+    established: "2020-04-01",
+    unknown: null,
+    planned: "2027-01-01",
+  };
   if (role === "catalyst" && surface === "garden") {
     const baseGarden = buildGarden(
       {
         churches: sampleCatalyst.churches.map((c, i) => ({
           ...c,
           id: `preview-church-${i}`,
-          planting_start_date: "2025-02-01",
+          planting_start_date:
+            scenario && scenario in stageDates
+              ? stageDates[scenario]
+              : "2025-02-01",
         })),
         pastors: sampleCatalyst.people,
         checkIns: sampleCatalyst.checkIns,
@@ -50,7 +63,6 @@ export default async function PreviewPage({
               churchId: `sample-${i}`,
               churchName: `Sample church ${i + 1}`,
               pastorName: `Sample pastor ${i + 1}`,
-              completedObjectives: i % 4,
             }))
           : scenario === "long"
             ? [
@@ -73,6 +85,7 @@ export default async function PreviewPage({
       <CatalystShell
         name={sampleCatalyst.viewer.display_name}
         organization="Design preview · Sample records"
+        preview
       >
         <p className="garden-quiet">
           Design preview · Fictional records. Sign in to use invitations and
@@ -101,7 +114,11 @@ export default async function PreviewPage({
         ? {
             ...data.church,
             planting_start_date:
-              scenario === "low" ? "2026-09-01" : "2024-02-01",
+              scenario && scenario in stageDates
+                ? stageDates[scenario]
+                : scenario === "low"
+                  ? "2026-09-01"
+                  : "2024-02-01",
           }
         : null,
       team: {
@@ -147,8 +164,13 @@ export default async function PreviewPage({
           : data.objectives.map((o, i) => ({
               ...o,
               team_visible: i === 0,
+              has_completed: scenario === "rich" && i === 2,
+              first_completed_at:
+                scenario === "rich" && i === 2 ? "2026-10-02T12:00:00Z" : null,
               status:
-                scenario === "rich" && i === 2 ? ("complete" as const) : o.status,
+                scenario === "rich" && i === 2
+                  ? ("complete" as const)
+                  : o.status,
             })),
       teamMessages: [
         {
@@ -184,6 +206,37 @@ export default async function PreviewPage({
         objectives: data.objectives.map((o) => ({
           ...o,
           title: `${o.title} with the people of our neighbourhood and surrounding communities`,
+        })),
+      };
+    if (scenario === "fruitful-seed") {
+      data = {
+        ...data,
+        objectives: Array.from({ length: 24 }, (_, i) => ({
+          ...data.objectives[0],
+          id: `sample-outcome-${i}`,
+          title: `Sample completed objective ${i + 1}`,
+          status: "complete" as const,
+          has_completed: true,
+          first_completed_at: "2026-10-02T12:00:00Z",
+        })),
+        progress: Array.from({ length: 30 }, (_, i) => ({
+          ...data.progress[0],
+          id: `sample-progress-${i}`,
+          objective_id: `sample-outcome-${i % 24}`,
+          note: "A sample recorded step",
+        })),
+      };
+    }
+    if (scenario === "quiet")
+      data = {
+        ...data,
+        progress: [],
+        messages: [],
+        objectives: data.objectives.map((o) => ({
+          ...o,
+          status: "planning" as const,
+          has_completed: false,
+          first_completed_at: null,
         })),
       };
     if (surface === "garden") return <PlanterHome data={data} preview />;

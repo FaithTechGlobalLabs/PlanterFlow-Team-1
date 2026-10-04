@@ -1,9 +1,17 @@
-import { normalizeObjectiveStatus } from "@/lib/workspace/objective-status";
+import {
+  ChurchJourney,
+  type ChurchMoment,
+} from "@/components/garden/church-journey";
 import { notFound } from "next/navigation";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { requireRole } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
-import { treeStageFromPlantingDate } from "@/lib/tree-stage";
+import {
+  churchGrowth,
+  plantingDate,
+  isMeaningfulProgress,
+} from "@/lib/church-growth";
+import { TreeMeaning } from "@/components/garden/tree-meaning";
 import { CatalystShell } from "@/components/garden/catalyst-shell";
 import { ChurchTree } from "@/components/garden/church-tree";
 import { Button } from "@/components/ui/Button";
@@ -19,13 +27,15 @@ export default async function CatalystPlanterPage({ params }: PageProps) {
   const { locale, id } = await params;
   const { user, profile } = await requireRole("catalyst", locale);
   const t = await getTranslations("catalyst.planter");
-  const tStage = await getTranslations("home.planter.stage");
   const format = await getFormatter();
   const supabase = await createClient();
 
   // Only the Catalyst assigned to this pastor's church may open it; anything
   // else (another Catalyst's church, another organization) is a 404.
-  const [{ data: church }, { data: planter }] = await Promise.all([
+  const [
+    { data: church, error: churchError },
+    { data: planter, error: planterError },
+  ] = await Promise.all([
     supabase
       .from("churches")
       .select("name, city, planting_start_date")
@@ -39,6 +49,8 @@ export default async function CatalystPlanterPage({ params }: PageProps) {
       .maybeSingle(),
   ]);
 
+  if (churchError || planterError) throw new Error(t("load_error"));
+
   if (!church || !planter || planter.role !== "planter") {
     notFound();
   }
@@ -47,7 +59,9 @@ export default async function CatalystPlanterPage({ params }: PageProps) {
     supabase.from("objective_categories").select("id, title, sort_order"),
     supabase
       .from("objectives")
-      .select("id, title, description, category_id, cadence, status")
+      .select(
+        "id, title, description, category_id, cadence, status, has_completed, first_completed_at, created_at",
+      )
       .eq("planter_id", id)
       .order("created_at"),
     supabase
@@ -63,7 +77,7 @@ export default async function CatalystPlanterPage({ params }: PageProps) {
     ? await Promise.all([
         supabase
           .from("progress_entries")
-          .select("objective_id, note, value, created_at")
+          .select("id, objective_id, author_id, note, value, created_at")
           .in("objective_id", objectiveIds)
           .order("created_at", { ascending: false }),
         supabase
@@ -77,24 +91,26 @@ export default async function CatalystPlanterPage({ params }: PageProps) {
         { data: [], error: null },
       ];
 
-  const authorIds = [...new Set((messages.data ?? []).map((m) => m.author_id))];
-  const { data: authors } = authorIds.length
+  const authorIds = [
+    ...new Set([
+      ...(messages.data ?? []).map((m) => m.author_id),
+      ...(progress.data ?? []).map((p) => p.author_id),
+    ]),
+  ];
+  const { data: authors, error: authorsError } = authorIds.length
     ? await supabase
         .from("profiles")
         .select("id, display_name")
         .in("id", authorIds)
-    : { data: [] };
+    : { data: [], error: null };
   const authorName = new Map(
     (authors ?? []).map((a) => [a.id, a.display_name]),
   );
 
-  const loadFailed = [
-    categories,
-    objectives,
-    checkIns,
-    progress,
-    messages,
-  ].some((r) => r.error);
+  const loadFailed =
+    [categories, objectives, checkIns, progress, messages].some(
+      (r) => r.error,
+    ) || Boolean(authorsError);
   const categoryById = new Map((categories.data ?? []).map((c) => [c.id, c]));
   const views: ObjectiveView[] = (objectives.data ?? [])
     .map((o) => {
@@ -150,6 +166,49 @@ export default async function CatalystPlanterPage({ params }: PageProps) {
   const objectiveOptions = views.map((o) => ({ id: o.id, title: o.title }));
 
   const startDate = church.planting_start_date;
+  const growth = loadFailed
+    ? undefined
+    : churchGrowth({
+        startDate,
+        objectives: objectives.data ?? [],
+        progress: progress.data ?? [],
+        now: new Date(),
+      });
+  const moments: ChurchMoment[] = [
+    ...(progress.data ?? [])
+      .filter((p) => isMeaningfulProgress(p))
+      .map((p) => ({
+        id: `progress-${p.id}`,
+        at: p.created_at,
+        actor:
+          p.author_id === user.id
+            ? "You"
+            : p.author_id === id
+              ? planter.display_name
+              : authorName.get(p.author_id) || "A contributor",
+        description: "Recorded progress",
+      })),
+    ...(messages.data ?? [])
+      .filter((m) => m.body.trim())
+      .map((m) => ({
+        id: `care-${m.id}`,
+        at: m.created_at,
+        actor:
+          m.author_id === user.id
+            ? "You"
+            : authorName.get(m.author_id) || "A contributor",
+        description: m.check_in_id
+          ? "Acknowledged a check-in"
+          : "Shared a conversation response",
+      })),
+    ...(objectives.data ?? [])
+      .filter((o) => o.has_completed && o.first_completed_at)
+      .map((o) => ({
+        id: `outcome-${o.id}`,
+        at: o.first_completed_at!,
+        description: `First completed: ${o.title}`,
+      })),
+  ];
   const title = t("title", { church: church.name, name: planter.display_name });
 
   return (
@@ -175,7 +234,10 @@ export default async function CatalystPlanterPage({ params }: PageProps) {
       <div className="planter-content-layout flex flex-col gap-6 lg:flex-row lg:items-start">
         <div className="planter-main-column flex flex-col gap-6 w-full max-w-[720px]">
           {loadFailed ? (
-            <p role="alert" className="planter-error-message text-[15px] text-[var(--color-ink)]">
+            <p
+              role="alert"
+              className="planter-error-message text-[15px] text-[var(--color-ink)]"
+            >
               {t("load_error")}
             </p>
           ) : (
@@ -196,6 +258,18 @@ export default async function CatalystPlanterPage({ params }: PageProps) {
               )}
             </>
           )}
+          {!loadFailed && (
+            <ChurchJourney
+              moments={moments}
+              ownResponses={
+                new Set(
+                  (messages.data ?? [])
+                    .filter((m) => m.author_id === user.id && m.body.trim())
+                    .map((m) => m.id),
+                ).size
+              }
+            />
+          )}
           <div className="planter-actions-row flex flex-wrap gap-4 items-center">
             <Button
               variant="secondary"
@@ -205,19 +279,31 @@ export default async function CatalystPlanterPage({ params }: PageProps) {
             >
               {t("back")}
             </Button>
-            <ExportButton planterId={id} label={t("export_pdf")} className="planter-export-btn" />
+            <ExportButton
+              planterId={id}
+              label={t("export_pdf")}
+              className="planter-export-btn"
+            />
           </div>
         </div>
 
         <div className="planter-sidebar-column flex flex-col gap-6 lg:max-w-[420px]">
           <section className="garden-surface planter-church-card flex flex-col gap-2">
-            <ChurchTree
-              completed={views.filter((o) => normalizeObjectiveStatus(o.status) === "complete").length}
-            />
+            {growth && (
+              <ChurchTree
+                completed={growth.completed}
+                progress={growth.progress}
+                branches={growth.branches}
+                stage={growth.stage ?? undefined}
+              />
+            )}
+            {growth && <TreeMeaning growth={growth} />}
             <h2 className="planter-card-title text-[22px] font-bold text-[var(--color-ink)]">
               {t("church_title")}
             </h2>
-            <p className="planter-church-name text-[15px] text-[var(--color-ink)]">{church.name}</p>
+            <p className="planter-church-name text-[15px] text-[var(--color-ink)]">
+              {church.name}
+            </p>
             <p className="planter-pastor-name text-[15px] text-[var(--color-muted)]">
               {t("pastor", { name: planter.display_name })}
             </p>
@@ -227,21 +313,15 @@ export default async function CatalystPlanterPage({ params }: PageProps) {
               </p>
             )}
             <p className="planter-start-date text-[15px] text-[var(--color-muted)]">
-              {startDate
+              {plantingDate(startDate)
                 ? t("planting_start", {
-                    date: format.dateTime(new Date(`${startDate}T00:00:00`), {
+                    date: format.dateTime(plantingDate(startDate)!, {
                       dateStyle: "medium",
+                      timeZone: "UTC",
                     }),
                   })
                 : t("planting_start_unknown")}
             </p>
-            {startDate && (
-              <p className="planter-stage-badge text-[15px] font-bold text-[var(--color-green)]">
-                {tStage(
-                  treeStageFromPlantingDate(new Date(`${startDate}T00:00:00`)),
-                )}
-              </p>
-            )}
           </section>
 
           <section className="garden-surface planter-care-card flex flex-col gap-4">

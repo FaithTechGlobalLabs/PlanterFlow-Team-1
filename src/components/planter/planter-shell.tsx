@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Brand } from "@/components/ui/Brand";
 import { SendNetworkLogo } from "@/components/ui/SendNetworkLogo";
 import { Link } from "@/i18n/routing";
-import { signOut } from "@/app/[locale]/actions";
+import { AccountMenu } from "@/components/workspace/account-menu";
 import "@/components/garden/garden.css";
 import "./planter.css";
 export function PlanterHomeShell({
@@ -25,18 +25,9 @@ export function PlanterHomeShell({
         <Link href="/" className="planter-brand" aria-label="First Fruits home">
           <Brand />
         </Link>
-        <div className="flex items-center gap-4">
-          <SendNetworkLogo className="h-5 w-auto" />
-          <details className="planter-account">
-            <summary>{name || "Your account"}</summary>
-            <div>
-              {!preview && (
-                <form action={signOut}>
-                  <button type="submit">Sign out</button>
-                </form>
-              )}
-            </div>
-          </details>
+<div className="planter-topbar__actions">
+          <SendNetworkLogo className="planter-topbar__partner-logo h-5 w-auto" />
+          <AccountMenu name={name} preview={preview} />
         </div>
       </header>
       <main id="planter-main" className="planter-home-main">

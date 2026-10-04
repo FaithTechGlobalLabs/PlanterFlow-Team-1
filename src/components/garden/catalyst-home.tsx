@@ -5,6 +5,7 @@ import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/Button";
 import { GardenScene } from "./garden-scene";
 import { ChurchPanel } from "./church-panel";
+import { TreeMeaning } from "./tree-meaning";
 import { ExportReportButton } from "@/components/workspace/export-report-button";
 import {
   needsPresence,
@@ -18,12 +19,18 @@ export function CatalystHome({
   loadFailed,
   invitations,
   isAdmin,
+  careSummary,
 }: {
   greeting: string;
   garden: GardenChurch[];
   loadFailed: boolean;
   invitations: ReactNode;
   isAdmin: boolean;
+  careSummary?: {
+    period: string;
+    churchesWithProgress: number;
+    ownResponses: number;
+  };
 }) {
   const t = useTranslations("catalyst.garden");
   const tStage = useTranslations("home.planter.stage");
@@ -59,7 +66,17 @@ export function CatalystHome({
         <div className="garden-header-text">
           <p className="garden-eyebrow">YOUR GARDEN</p>
           <h1 className="garden-title">{greeting}</h1>
-          <p className="garden-description">Your garden grows through the pastors and churches you support.</p>
+          {careSummary && !loadFailed && (
+            <p className="garden-care-summary">
+              {careSummary.period} · {careSummary.churchesWithProgress} churches
+              recorded progress. You saved {careSummary.ownResponses} check-in
+              acknowledgements this month (UTC).
+            </p>
+          )}
+          <p className="garden-description">
+            A living record of the churches you support and the care you have
+            shared.
+          </p>
           {!loadFailed && (
             <p className="garden-summary">
               {t("summary", {
@@ -98,20 +115,32 @@ export function CatalystHome({
               statusClass: statusClass(c),
               attention: needsPresence(c),
               completed: c.completedObjectives,
+              stage: c.stage,
+              planned: c.growth?.planned,
+              progress: c.growth?.progress,
+              branches: c.growth?.branches,
             }))}
             onSelect={select}
             selectedId={selectedId}
           />
           <section className="garden-presence" aria-labelledby="presence-title">
             <p className="garden-eyebrow">A LITTLE PRESENCE GOES A LONG WAY</p>
-            <h2 id="presence-title" className="garden-presence-title">Where your presence helps</h2>
+            <h2 id="presence-title" className="garden-presence-title">
+              Where your presence helps
+            </h2>
             {presence.length ? (
               <ul className="garden-presence-list">
                 {presence.slice(0, 4).map((church) => (
                   <li key={church.churchId} className="garden-presence-item">
-                    <p className={`garden-status ${statusClass(church)}`}>{status(church)}</p>
-                    <h3 className="garden-presence-church-name">{church.churchName}</h3>
-                    <p className="garden-presence-pastor-name">{church.pastorName || "Pastor"}</p>
+                    <p className={`garden-status ${statusClass(church)}`}>
+                      {status(church)}
+                    </p>
+                    <h3 className="garden-presence-church-name">
+                      {church.churchName}
+                    </h3>
+                    <p className="garden-presence-pastor-name">
+                      {church.pastorName || "Pastor"}
+                    </p>
                     <Link
                       href={`/catalyst/planters/${church.pastorId}`}
                       className="garden-text-link"
@@ -154,7 +183,7 @@ export function CatalystHome({
               Find a church
               <input
                 type="search"
-                placeholder="Search church;church name, pastor, or city"
+                placeholder="Church name, pastor, or city"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -172,15 +201,21 @@ export function CatalystHome({
                     aria-label={`Explore ${church.churchName}`}
                   >
                     <span className="garden-church-info">
-                      <strong className="garden-church-name">{church.churchName}</strong>
+                      <strong className="garden-church-name">
+                        {church.churchName}
+                      </strong>
                       <small className="garden-church-meta">
                         {[church.pastorName, church.city]
                           .filter(Boolean)
                           .join(" · ")}
                       </small>
                     </span>
-                    <span className={`garden-status ${statusClass(church)}`}>{status(church)}</span>
-                    <span className="garden-church-arrow" aria-hidden="true">↗</span>
+                    <span className={`garden-status ${statusClass(church)}`}>
+                      {status(church)}
+                    </span>
+                    <span className="garden-church-arrow" aria-hidden="true">
+                      ↗
+                    </span>
                   </button>
                 </li>
               ))}
@@ -198,7 +233,9 @@ export function CatalystHome({
           <div className="garden-invitations-header-text">
             <p className="garden-eyebrow">NEW BEGINNINGS</p>
             <h2 className="garden-invitations-title">Pastor invitations</h2>
-            <p className="garden-invitations-description">Keep track of the invitations you’ve sent.</p>
+            <p className="garden-invitations-description">
+              Keep track of the invitations you’ve sent.
+            </p>
           </div>
           <Link href="/invite-pastor" className="garden-text-link">
             Invite a pastor →
@@ -224,10 +261,19 @@ export function CatalystHome({
             <p className="garden-stage">{tStage(selected.stage)}</p>
           )}
           <StatusBadges church={selected} />
+          <TreeMeaning growth={selected.growth} />
+          {selected.careCount !== undefined && (
+            <p className="garden-panel-care-count">
+              You have acknowledged {selected.careCount} distinct check-in
+              {selected.careCount === 1 ? "" : "s"} from this church.
+            </p>
+          )}
           {selected.currentObjective && (
             <section className="garden-panel-objective-section">
               <p className="garden-eyebrow">CURRENT OBJECTIVE</p>
-              <h3 className="garden-panel-objective-title">{selected.currentObjective}</h3>
+              <h3 className="garden-panel-objective-title">
+                {selected.currentObjective}
+              </h3>
             </section>
           )}
           <section className="garden-panel-checkin-section">
@@ -242,8 +288,8 @@ export function CatalystHome({
           </section>
           {Boolean(selected.completedObjectives) && (
             <p className="garden-panel-completed-count">
-              {selected.completedObjectives} objectives completed. A moment
-              worth remembering.
+              {selected.completedObjectives} recorded outcomes. A moment worth
+              remembering.
             </p>
           )}
           <div className="garden-panel-actions flex flex-col gap-2">
@@ -261,7 +307,11 @@ export function CatalystHome({
             >
               Open church workspace
             </Button>
-            <ExportReportButton planterId={selected.pastorId} planterName={selected.pastorName} className="w-full" />
+            <ExportReportButton
+              planterId={selected.pastorId}
+              planterName={selected.pastorName}
+              className="w-full"
+            />
           </div>
         </ChurchPanel>
       )}

@@ -6,6 +6,8 @@ export type Category = {
   kind: "objective" | "prayer";
 };
 export type Objective = {
+  has_completed?: boolean;
+  first_completed_at?: string | null;
   id: string;
   planter_id: string;
   category_id: string;
@@ -104,7 +106,7 @@ export type WorkspaceData = {
     name: string;
     city: string | null;
     vision: string | null;
-    planting_start_date?: string;
+    planting_start_date?: string | null;
   } | null;
   team?: {
     members: (Person & { joined_at: string })[];
@@ -129,10 +131,16 @@ export type WorkspaceData = {
 };
 export type SaveResult = { ok: boolean; error?: string; id?: string };
 export type CatalystData = {
+  asOf?: string;
   viewer: Person;
   organization: string;
   people: Person[];
-  churches: { pastor_id: string; name: string; city: string | null }[];
+  churches: {
+    pastor_id: string;
+    name: string;
+    city: string | null;
+    planting_start_date?: string | null;
+  }[];
   categories: Category[];
   objectives: Objective[];
   checkIns: CheckIn[];

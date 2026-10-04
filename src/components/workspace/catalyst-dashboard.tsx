@@ -1,14 +1,21 @@
 "use client";
+import { ChurchJourney } from "@/components/garden/church-journey";
 import { useState } from "react";
-import { isOpenObjective, normalizeObjectiveStatus } from "@/lib/workspace/objective-status";
+import {
+  isOpenObjective,
+  normalizeObjectiveStatus,
+} from "@/lib/workspace/objective-status";
 import { Brand } from "@/components/ui/Brand";
 import { SendNetworkLogo } from "@/components/ui/SendNetworkLogo";
 import { Link } from "@/i18n/routing";
-import { signOut } from "@/app/[locale]/actions";
+import { AccountMenu } from "./account-menu";
 import { saveCategory } from "@/app/[locale]/dashboard/category-actions";
 import type { CatalystData, Category, SaveResult } from "@/lib/workspace/types";
 import { GardenScene } from "@/components/garden/garden-scene";
 import { ChurchPanel } from "@/components/garden/church-panel";
+import { TreeMeaning } from "@/components/garden/tree-meaning";
+import { catalystCareThisMonth } from "@/lib/catalyst-care";
+import { churchGrowth, isMeaningfulProgress } from "@/lib/church-growth";
 import "@/components/garden/garden.css";
 import { Icon, Modal, SaveForm } from "./workspace";
 import "./workspace.css";
@@ -48,13 +55,45 @@ export function CatalystDashboard({
   const supportCount = planters.filter((person) =>
     needsSupport(person.id),
   ).length;
-  const activeObjectives = data.objectives.filter(
-    (objective) => isOpenObjective(objective.status),
+  const activeObjectives = data.objectives.filter((objective) =>
+    isOpenObjective(objective.status),
   );
   const personName = (id: string) =>
     data.people.find((person) => person.id === id)?.display_name ?? "Planter";
   const churchFor = (id: string) =>
     data.churches.find((church) => church.pastor_id === id);
+  const care = catalystCareThisMonth({
+    viewerId: data.viewer.id,
+    now: new Date(data.asOf ?? "2026-10-04T12:00:00Z"),
+    objectives: data.objectives,
+    progress: data.progress,
+    responses: [
+      ...data.messages,
+      ...(data.threads ?? []).flatMap((t) => t.messages),
+    ],
+  });
+  const growthByPlanter = new Map(
+    data.churches.map((church) => {
+      const id = church.pastor_id;
+      const objectives = data.objectives.filter((o) => o.planter_id === id);
+      return [
+        id,
+        churchGrowth({
+          startDate: churchFor(id)?.planting_start_date,
+          objectives,
+          progress: data.progress,
+          now: new Date(data.asOf ?? "2026-10-04T12:00:00Z"),
+        }),
+      ] as const;
+    }),
+  );
+  const growthFor = (id: string) =>
+    growthByPlanter.get(id) ??
+    churchGrowth({
+      objectives: data.objectives.filter((o) => o.planter_id === id),
+      progress: data.progress,
+      now: new Date(data.asOf ?? "2026-10-04T12:00:00Z"),
+    });
   const detailHref = (id: string, section?: string, objective?: string) =>
     preview
       ? `/preview?role=catalyst&planter=${encodeURIComponent(id)}${section ? `&view=${section}` : ""}${objective ? `&objective=${encodeURIComponent(objective)}` : ""}`
@@ -115,27 +154,7 @@ export function CatalystDashboard({
             <i />
             {preview ? "Sample data preview" : data.organization}
           </span>
-          <details className="garden-account">
-            <summary>
-              <span className="ff-avatar">
-                {data.viewer.display_name
-                  .split(" ")
-                  .map((word) => word[0])
-                  .slice(0, 2)
-                  .join("")}
-              </span>
-              <span>{data.viewer.display_name}</span>
-            </summary>
-            <div className="garden-account-dropdown">
-              <p className="garden-account-role">Catalyst · {data.organization}</p>
-              {!preview && (
-                <form action={signOut}>
-                  <button type="submit" className="garden-signout-btn">Sign out</button>
-                </form>
-              )}
-              {preview && <p className="garden-account-preview-note">Sample records. Changes are not saved.</p>}
-            </div>
-          </details>
+          <AccountMenu name={data.viewer.display_name} preview={preview} />
         </div>
       </header>
       <aside className={`ff-sidebar ${navigationOpen ? "is-nav-open" : ""}`}>
@@ -188,6 +207,11 @@ export function CatalystDashboard({
         </nav>
         <div className="ff-sidebar-bottom">
           <div className="ff-care-note">
+            <p>
+              {care.period} · {care.churchesWithProgress} churches recorded
+              progress. You shared {care.ownResponses} saved conversation
+              responses this month (UTC).
+            </p>
             <Icon name="heart" />
             <strong>People before numbers.</strong>
             <p>
@@ -265,10 +289,11 @@ export function CatalystDashboard({
                     ? "Support mentioned"
                     : "Walk alongside this church",
                   attention: needsSupport(church.pastor_id),
-                  completed: data.objectives.filter(
-                    (o) =>
-                      o.planter_id === church.pastor_id && normalizeObjectiveStatus(o.status) === "complete",
-                  ).length,
+                  completed: growthFor(church.pastor_id).completed,
+                  stage: growthFor(church.pastor_id).stage,
+                  planned: growthFor(church.pastor_id).planned,
+                  progress: growthFor(church.pastor_id).progress,
+                  branches: growthFor(church.pastor_id).branches,
                 }))}
                 onSelect={setSelectedId}
                 selectedId={selectedId}
@@ -367,8 +392,8 @@ export function CatalystDashboard({
                           </td>
                           <td data-label="Open objectives">
                             {
-                              objectives.filter(
-                                (objective) => isOpenObjective(objective.status),
+                              objectives.filter((objective) =>
+                                isOpenObjective(objective.status),
                               ).length
                             }
                           </td>
@@ -549,7 +574,9 @@ export function CatalystDashboard({
                   </span>
                   <div className="ff-category-content">
                     <h3 className="ff-category-title">{category.title}</h3>
-                    <p className="ff-category-description">{category.description || "No description yet."}</p>
+                    <p className="ff-category-description">
+                      {category.description || "No description yet."}
+                    </p>
                     <small className="ff-category-meta">
                       {category.kind === "prayer"
                         ? "Dedicated prayer workflow"
@@ -610,7 +637,9 @@ export function CatalystDashboard({
                 .slice(0, 30)
                 .map((entry) => (
                   <li key={entry.id} className="garden-journey-item">
-                    <time className="garden-journey-date" dateTime={entry.date}>{formatDate(entry.date)}</time>
+                    <time className="garden-journey-date" dateTime={entry.date}>
+                      {formatDate(entry.date)}
+                    </time>
                     <div className="garden-journey-content">
                       <small className="garden-journey-author">
                         {entry.planter ? personName(entry.planter) : ""}
@@ -635,11 +664,15 @@ export function CatalystDashboard({
                 journey.
               </p>
             )}
-            {data.objectives.some((o) => normalizeObjectiveStatus(o.status) === "complete") && (
+            {data.objectives.some(
+              (o) => normalizeObjectiveStatus(o.status) === "complete",
+            ) && (
               <>
                 <h2>Objectives completed</h2>
                 {data.objectives
-                  .filter((o) => normalizeObjectiveStatus(o.status) === "complete")
+                  .filter(
+                    (o) => normalizeObjectiveStatus(o.status) === "complete",
+                  )
                   .map((o) => (
                     <article className="ff-update" key={o.id}>
                       <small>{personName(o.planter_id)}</small>
@@ -674,6 +707,76 @@ export function CatalystDashboard({
               ? ` · ${churchFor(selectedPerson.id)?.city}`
               : ""}
           </p>
+          <TreeMeaning growth={growthFor(selectedPerson.id)} />
+          <ChurchJourney
+            ownResponses={
+              new Set(
+                data.messages
+                  .filter(
+                    (m) =>
+                      m.author_id === data.viewer.id &&
+                      m.body.trim() &&
+                      data.objectives.some(
+                        (o) =>
+                          o.id === m.objective_id &&
+                          o.planter_id === selectedPerson.id,
+                      ),
+                  )
+                  .map((m) => m.id),
+              ).size
+            }
+            moments={[
+              ...data.progress
+                .filter(
+                  (p) =>
+                    data.objectives.some(
+                      (o) =>
+                        o.id === p.objective_id &&
+                        o.planter_id === selectedPerson.id,
+                    ) && isMeaningfulProgress(p),
+                )
+                .map((p) => ({
+                  id: `progress-${p.id}`,
+                  at: p.created_at,
+                  description: "Recorded progress",
+                  actor:
+                    data.people.find((person) => person.id === p.author_id)
+                      ?.display_name || "A contributor",
+                })),
+              ...data.messages
+                .filter(
+                  (m) =>
+                    m.body.trim() &&
+                    data.objectives.some(
+                      (o) =>
+                        o.id === m.objective_id &&
+                        o.planter_id === selectedPerson.id,
+                    ),
+                )
+                .map((m) => ({
+                  id: `care-${m.id}`,
+                  at: m.created_at,
+                  description: "Shared a conversation response",
+                  actor:
+                    m.author_id === data.viewer.id
+                      ? "You"
+                      : data.people.find((p) => p.id === m.author_id)
+                          ?.display_name || "A contributor",
+                })),
+              ...data.objectives
+                .filter(
+                  (o) =>
+                    o.planter_id === selectedPerson.id &&
+                    o.has_completed &&
+                    o.first_completed_at,
+                )
+                .map((o) => ({
+                  id: `outcome-${o.id}`,
+                  at: o.first_completed_at!,
+                  description: `First completed: ${o.title}`,
+                })),
+            ]}
+          />
           <p className="garden-status">
             {needsSupport(selectedPerson.id)
               ? "Support mentioned in the latest check-in"
@@ -696,7 +799,8 @@ export function CatalystDashboard({
             {data.objectives
               .filter(
                 (o) =>
-                  o.planter_id === selectedPerson.id && isOpenObjective(o.status),
+                  o.planter_id === selectedPerson.id &&
+                  isOpenObjective(o.status),
               )
               .map((o) => (
                 <h3 key={o.id}>{o.title}</h3>

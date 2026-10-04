@@ -1,6 +1,6 @@
 "use client";
 
-import { SelectHTMLAttributes, ReactNode } from "react";
+import { useId, SelectHTMLAttributes, ReactNode } from "react";
 import { fieldClassName, labelClassName } from "./field-styles";
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
@@ -15,9 +15,14 @@ export function Select({
   id,
   name,
   children,
+  className,
+  "aria-describedby": describedBy,
+  "aria-invalid": invalid,
   ...props
 }: SelectProps) {
-  const selectId = id ?? name ?? label?.toLowerCase().replace(/\s+/g, "-");
+  const generatedId = useId();
+  const selectId = id ?? generatedId;
+  const errorId = `${selectId}-error`;
 
   return (
     <div className="w-full">
@@ -29,12 +34,25 @@ export function Select({
       <select
         id={selectId}
         name={name}
-        className={fieldClassName}
+        className={`${fieldClassName} ${className ?? ""}`}
+        aria-invalid={error ? true : invalid}
+        aria-describedby={
+          [describedBy, error ? errorId : null].filter(Boolean).join(" ") ||
+          undefined
+        }
         {...props}
       >
         {children}
       </select>
-      {error && <p className="text-[12px] text-red-600 mt-1">{error}</p>}
+      {error && (
+        <p
+          id={errorId}
+          role="alert"
+          className="ff-field__error text-sm text-[var(--color-danger)] mt-1"
+        >
+          {error}
+        </p>
+      )}
     </div>
   );
 }

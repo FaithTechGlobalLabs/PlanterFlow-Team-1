@@ -62,7 +62,13 @@ describe("truthful planter garden", () => {
   it("records only dated creation, progress and membership moments", () => {
     const moments = journeyMoments(sampleWorkspace);
     expect(moments).toHaveLength(
-      sampleWorkspace.objectives.length + sampleWorkspace.progress.length,
+      sampleWorkspace.objectives.length +
+        sampleWorkspace.progress.length +
+        sampleWorkspace.messages.filter((m) => m.body.trim()).length +
+        (sampleWorkspace.threads ?? []).reduce(
+          (n, t) => n + t.messages.filter((m) => m.body.trim()).length,
+          0,
+        ),
     );
     expect(moments.some((m) => m.detail === "Objective completed")).toBe(false);
   });
