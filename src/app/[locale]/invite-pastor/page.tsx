@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { requireRole } from "@/lib/auth/session";
 import { OnboardingPage } from "@/components/onboarding-page";
 import { FormCard } from "@/components/ui/FormCard";
+import { Button } from "@/components/ui/Button";
 import { InvitePastorForm } from "./invite-pastor-form";
 
 interface PageProps {
@@ -25,6 +26,9 @@ export default async function InvitePastorPage({ params }: PageProps) {
       >
         <InvitePastorForm />
       </FormCard>
+      <Button variant="secondary" href="/catalyst" fullWidth={false} className="min-w-[222px]">
+        {t("catalyst.planter.back")}
+      </Button>
     </OnboardingPage>
   );
 }
