@@ -1,7 +1,7 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import type { Profile } from "@/lib/auth/session";
-import type { WorkspaceData, Person } from "./types";
+import type { WorkspaceData, Person, ConversationThread, ConversationMessage, ConversationAuthor, ThreadEntityType, LifecycleStatus } from "./types";
 
 export async function loadWorkspace(profile: Profile, requestedPlanter?: string): Promise<WorkspaceData | null> {
   const db = await createClient();
@@ -27,6 +27,38 @@ export async function loadWorkspace(profile: Profile, requestedPlanter?: string)
     db.from("dialogue_messages").select("*").in("objective_id", ids).order("created_at"),
   ]) : [];
   if (children.some(r => r.error)) throw new Error("We couldn't load your progress. Please try again.");
+
+  // Load conversation threads & messages for objective, prayer, and support
+  let threads: ConversationThread[] = [];
+  try {
+    const peopleMap = new Map((people as Person[]).map(p => [p.id, p]));
+    const { data: rawThreads } = await db.from("conversation_threads").select("*").eq("planter_id", planter.id).order("updated_at", { ascending: false });
+    if (rawThreads && rawThreads.length > 0) {
+      const threadIds = rawThreads.map(t => t.id);
+      const { data: rawMsgs } = await db.from("conversation_messages").select("*").in("thread_id", threadIds).order("created_at", { ascending: true });
+      const msgsByThread = new Map<string, ConversationMessage[]>();
+      for (const m of rawMsgs ?? []) {
+        const authorPerson = peopleMap.get(m.author_id);
+        const author: ConversationAuthor | undefined = authorPerson ? { id: authorPerson.id, display_name: authorPerson.display_name, role: authorPerson.role } : undefined;
+        const msg: ConversationMessage = { id: m.id, thread_id: m.thread_id, author_id: m.author_id, author, body: m.body, created_at: m.created_at, updated_at: m.updated_at };
+        if (!msgsByThread.has(m.thread_id)) msgsByThread.set(m.thread_id, []);
+        msgsByThread.get(m.thread_id)!.push(msg);
+      }
+      threads = rawThreads.map(t => {
+        const msgs = msgsByThread.get(t.id) ?? [];
+        const lastActivity = msgs.length > 0 ? msgs[msgs.length - 1].created_at : t.created_at;
+        return {
+          id: t.id, entity_type: t.entity_type as ThreadEntityType, entity_id: t.entity_id,
+          planter_id: t.planter_id, org_id: t.org_id, title: t.title, status: t.status as LifecycleStatus,
+          created_at: t.created_at, updated_at: t.updated_at, messages: msgs, last_activity_at: lastActivity
+        };
+      });
+    }
+  } catch {
+    // If conversation tables are not yet present, fallback gracefully
+    threads = [];
+  }
+
   return { asOf: new Date().toISOString(), viewer: { id: profile.id, role: profile.role, display_name: profile.display_name }, planter, people, church, categories, objectives, checkIns, prayers, sharedPrayers,
-    activities: children[0]?.data ?? [], progress: children[1]?.data ?? [], messages: children[2]?.data ?? [] } as WorkspaceData;
+    activities: children[0]?.data ?? [], progress: children[1]?.data ?? [], messages: children[2]?.data ?? [], threads } as WorkspaceData;
 }
