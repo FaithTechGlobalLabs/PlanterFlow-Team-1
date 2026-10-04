@@ -37,8 +37,9 @@
 }
 .garden-topbar {
   min-height: 76px;
-  background: #20372c;
-  color: #fff;
+  background: #ffffff;
+  border-bottom: 1px solid #dce4d8;
+  color: #243b37;
   padding: 18px 4%;
   display: flex;
   justify-content: space-between;
@@ -54,8 +55,8 @@
 }
 .garden-brand > span:last-child {
   font-size: 10px;
-  color: #c4d1bf;
-  border-left: 1px solid #778571;
+  color: #617268;
+  border-left: 1px solid #dce4d8;
   padding-left: 22px;
   letter-spacing: 1px;
 }
@@ -664,7 +665,9 @@
 }
 /* Deeper Catalyst workspace: spacious navigation, botanical surfaces and readable text. */
 .ff-living-catalyst .ff-topbar {
-  background: #20372c;
+  background: #ffffff;
+  border-bottom: 1px solid #dce4d8;
+  color: #243b37;
 }
 .ff-living-catalyst .ff-sidebar {
   background: #f0f1e5;
