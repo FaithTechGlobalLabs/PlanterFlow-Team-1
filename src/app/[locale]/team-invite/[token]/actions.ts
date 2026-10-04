@@ -11,7 +11,7 @@ interface ActionState {
   error?: string;
 }
 
-export async function acceptInvitation(
+export async function acceptTeamInvitation(
   prevState: ActionState | undefined,
   formData: FormData
 ): Promise<ActionState | never> {
@@ -37,7 +37,7 @@ export async function acceptInvitation(
     name,
     locale,
     password,
-    roles: ["catalyst", "planter"],
+    roles: ["peer"],
     setPassword: async (pw, displayName) => {
       const { error } = await supabase.auth.updateUser({ password: pw, data: { display_name: displayName } });
       return !error;
@@ -51,8 +51,6 @@ export async function acceptInvitation(
     return { error: result.error === "session" ? "invite.errors.session" : "invite.errors.generic" };
   }
 
-  const redirectPath =
-    result.invitation.role === "catalyst" ? "/onboarding/catalyst" : "/onboarding/church";
-  redirect({ href: redirectPath, locale });
+  redirect({ href: "/team-invite/welcome", locale });
   return {};
 }

@@ -5,7 +5,7 @@ import { getLocale } from "next-intl/server";
 import { getSiteUrl } from "@/lib/auth/site-url";
 import { createAdminClient, hasAdminCredentials } from "@/lib/supabase/admin";
 import { getSessionProfile } from "@/lib/auth/session";
-import { generateInviteLink } from "@/lib/invite-link";
+import { deliverInvitation } from "@/lib/invitation-engine";
 import { validateInvitePastor } from "@/lib/validation/onboarding";
 
 interface ActionState {
@@ -56,40 +56,22 @@ export async function invitePastor(
   const locale = await getLocale();
   const redirectTo = `${origin}/${locale}/invite/${invitation.token}`;
 
-  const { error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
+  const result = await deliverInvitation({
+    admin,
+    invitation,
+    email,
     redirectTo,
     data: {
       invitation_token: invitation.token,
       invited_by_name: profile.display_name,
       church_name: churchName,
     },
+    appLink: `${origin}/${locale}/invite/${invitation.token}`,
+    errorNamespace: "invitePastor",
+    logTag: "invite-pastor",
   });
-
-  if (inviteError) {
-    console.error("[invite-pastor] inviteUserByEmail failed:", inviteError.code, inviteError.message);
-
-    const errorMessage = inviteError.message || "";
-    if (/already been registered|already exists/i.test(errorMessage)) {
-      await admin.from("invitations").delete().eq("id", invitation.id);
-      return { error: "invitePastor.errors.exists" };
-    }
-
-    // The email couldn't be sent, so hand the inviter the link to share themselves.
-    const inviteLink = await generateInviteLink(admin, email, redirectTo, {
-      invitation_token: invitation.token,
-      invited_by_name: profile.display_name,
-      church_name: churchName,
-    });
-    if (inviteLink) {
-      return { inviteLink, email };
-    }
-
-    await admin.from("invitations").delete().eq("id", invitation.id);
-    if (inviteError.code === "over_email_send_rate_limit" || /rate limit/i.test(errorMessage)) {
-      return { error: "invitePastor.errors.rate_limit" };
-    }
-    return { error: "invitePastor.errors.generic" };
-  }
+  if ("error" in result) return result;
+  if ("inviteLink" in result) return result;
 
   redirect({ href: `/invite-pastor/sent/${invitation.id}`, locale });
   return {};

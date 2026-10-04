@@ -32,3 +32,16 @@ describe("generateInviteLink", () => {
     expect(await generateInviteLink(admin, "a@b.co", "http://app", {})).toBeNull();
   });
 });
+
+describe("generateInviteLink fallback", () => {
+  it("falls back to a magic link when the account already confirmed", async () => {
+    const generateLink = vi
+      .fn()
+      .mockResolvedValueOnce({ data: null, error: { code: "email_exists", message: "exists" } })
+      .mockResolvedValueOnce({ data: { properties: { action_link: "https://x/magic" } }, error: null });
+    const admin = { auth: { admin: { generateLink } } } as never;
+
+    expect(await generateInviteLink(admin, "a@b.co", "http://app", {})).toBe("https://x/magic");
+    expect(generateLink.mock.calls.map((c) => c[0].type)).toEqual(["invite", "magiclink"]);
+  });
+});

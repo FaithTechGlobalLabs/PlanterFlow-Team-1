@@ -10,6 +10,7 @@ import { Status } from "@/components/ui/Status";
 import { Button } from "@/components/ui/Button";
 import { TreeSapling } from "@/components/ui/TreeSapling";
 import { treeStageFromPlantingDate } from "@/lib/tree-stage";
+import { getTeamChurch } from "@/lib/team";
 import { signOut } from "./actions";
 
 interface PageProps {
@@ -30,7 +31,7 @@ export default async function HomePage({ params }: PageProps) {
     const admin = createAdminClient();
     const { data: invitation } = await admin
       .from("invitations")
-      .select("token")
+      .select("token, role")
       .ilike("email", user!.email!)
       .is("accepted_at", null)
       .order("created_at", { ascending: false })
@@ -38,7 +39,7 @@ export default async function HomePage({ params }: PageProps) {
       .maybeSingle();
 
     if (invitation) {
-      redirect({ href: `/invite/${invitation.token}`, locale });
+      redirect({ href: `/${invitation.role === "peer" ? "team-invite" : "invite"}/${invitation.token}`, locale });
     }
     redirect({ href: "/invite/unavailable", locale });
   }
@@ -74,6 +75,29 @@ export default async function HomePage({ params }: PageProps) {
               {t("home.catalyst.invite_catalyst")}
             </Button>
           )}
+          <form action={signOut}>
+            <Button variant="secondary" type="submit" fullWidth={false} className="min-w-[222px]">
+              {t("common.sign_out")}
+            </Button>
+          </form>
+        </FormCard>
+      </OnboardingPage>
+    );
+  }
+
+  if (profile!.role === "peer") {
+    if (!profile!.onboarded_at) {
+      redirect({ href: "/team-invite/welcome", locale });
+    }
+    const teamChurch = await getTeamChurch(user!.id);
+    return (
+      <OnboardingPage
+        eyebrow={t("home.team.eyebrow")}
+        title={teamChurch?.name ?? ""}
+        subline={t("home.team.subline")}
+      >
+        <FormCard title={profile!.display_name}>
+          <Status>{t("home.team.chip")}</Status>
           <form action={signOut}>
             <Button variant="secondary" type="submit" fullWidth={false} className="min-w-[222px]">
               {t("common.sign_out")}
@@ -122,6 +146,9 @@ export default async function HomePage({ params }: PageProps) {
     >
       <FormCard title={church.city ?? church.name}>
         <Button variant="primary" href="/dashboard" fullWidth={false}>Open workspace</Button>
+        <Button variant="secondary" href="/invite-team" fullWidth={false} className="min-w-[222px]">
+          {t("home.planter.invite_team")}
+        </Button>
         <TreeSapling />
         <Status>{t(`home.planter.stage.${stage}`)}</Status>
         <p className="text-[15px] text-[var(--color-muted)]">{firstObjective?.title}</p>
