@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/routing";
 import { requireRole } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
-import { OnboardingPage } from "@/components/onboarding-page";
+import { PlanterHomeShell } from "@/components/planter/planter-shell";
 import { FormCard } from "@/components/ui/FormCard";
 import { InviteTeamForm } from "./invite-team-form";
 
@@ -12,7 +12,7 @@ interface PageProps {
 
 export default async function InviteTeamPage({ params }: PageProps) {
   const { locale } = await params;
-  const { user } = await requireRole("planter", locale);
+  const { user, profile } = await requireRole("planter", locale);
   const t = await getTranslations();
 
   const supabase = await createClient();
@@ -26,14 +26,15 @@ export default async function InviteTeamPage({ params }: PageProps) {
   }
 
   return (
-    <OnboardingPage
-      eyebrow={t("inviteTeam.eyebrow")}
-      title={t("inviteTeam.title")}
-      subline={t("inviteTeam.subline")}
-    >
-      <FormCard title={t("inviteTeam.card_title")} description={t("inviteTeam.assigned", { church: church!.name })}>
+    <PlanterHomeShell name={profile.display_name}>
+      <h1 className="text-3xl mb-4">{t("inviteTeam.title")}</h1>
+      <p className="mb-6">{t("inviteTeam.subline")}</p>
+      <FormCard
+        title={t("inviteTeam.card_title")}
+        description={t("inviteTeam.assigned", { church: church!.name })}
+      >
         <InviteTeamForm />
       </FormCard>
-    </OnboardingPage>
+    </PlanterHomeShell>
   );
 }

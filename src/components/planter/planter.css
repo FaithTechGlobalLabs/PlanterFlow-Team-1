@@ -1,0 +1,901 @@
+.planter-home,
+.ff-planter-app {
+  --ff-muted: #56675b;
+  --ff-ink: #253e32;
+  --ff-line: #d9dfcf;
+  background: #f7f6ef;
+  color: #253e32;
+  font-size: 14px;
+  min-height: 100vh;
+}
+.planter-home *,
+.ff-planter-app * {
+  box-sizing: border-box;
+}
+.planter-home a,
+.planter-home button,
+.ff-planter-app button {
+  cursor: pointer;
+}
+.planter-home a:focus-visible,
+.planter-home button:focus-visible,
+.planter-home summary:focus-visible,
+.ff-planter-app summary:focus-visible {
+  outline: 3px solid #476d4b;
+  outline-offset: 4px;
+}
+.planter-topbar {
+  min-height: 78px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 14px 5%;
+  border-bottom: 1px solid #dce0d1;
+  background: #fbfaf4;
+}
+.planter-brand {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  text-decoration: none;
+}
+.planter-brand > span {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #596b5c;
+}
+.planter-account {
+  position: relative;
+  font-size: 13px;
+}
+.planter-account summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.planter-account summary:after {
+  content: "⌄";
+}
+.planter-account > div {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 30;
+  padding: 20px;
+  background: #fffef8;
+  box-shadow: 0 10px 30px #243e3220;
+  border: 1px solid #d9dfcf;
+  border-radius: 12px;
+  min-width: 220px;
+}
+.planter-account button {
+  background: none;
+  border: 0;
+  min-height: 44px;
+  color: #253e32;
+  text-decoration: underline;
+}
+.planter-home-main {
+  max-width: 1360px;
+  margin: auto;
+  padding: 36px 5% 0;
+}
+.planter-home-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 30px;
+}
+.planter-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin: 0 0 12px;
+  color: #506b45;
+}
+.planter-home h1 {
+  font:
+    400 42px/1.15 Georgia,
+    serif;
+  letter-spacing: -1px;
+  margin: 0 0 12px;
+}
+.planter-home p {
+  line-height: 1.7;
+}
+.planter-home-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.planter-link {
+  color: #345633;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+}
+.planter-landscape {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 24px;
+  min-height: 450px;
+  background: radial-gradient(
+    ellipse at 73% 35%,
+    #faf5dc 0,
+    #e8eddb 48%,
+    #e1e5cd 100%
+  );
+  border: 1px solid #d5dcc6;
+  margin-bottom: 26px;
+}
+.planter-landscape:after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: auto -10% -70px;
+  height: 180px;
+  background: #bac59d55;
+  border-radius: 50% 40% 0 0;
+  transform: rotate(-3deg);
+}
+.planter-landscape-copy {
+  padding: 38px;
+  z-index: 2;
+}
+.planter-landscape h2 {
+  font:
+    400 38px/1.13 Georgia,
+    serif;
+  letter-spacing: -1px;
+  margin: 0 0 16px;
+  overflow-wrap: anywhere;
+}
+.planter-landscape-copy > p:not(.planter-eyebrow) {
+  max-width: 480px;
+  color: #475a41;
+  line-height: 1.7;
+}
+.planter-stage {
+  display: inline-flex;
+  padding: 7px 12px;
+  background: #f8f8e9b3;
+  border: 1px solid #c8d2b6;
+  border-radius: 30px;
+  font-size: 12px;
+  margin-top: 6px;
+}
+/* Stage colors describe planting age; they do not score church health. */
+.planter-stage--seed {
+  background: #fff0ed;
+  border-color: #d5968c;
+  color: #8a3028;
+}
+.planter-stage--sprout,
+.planter-stage--sapling {
+  background: #fff5d6;
+  border-color: #c4a34f;
+  color: #71520b;
+}
+.planter-stage--young,
+.planter-stage--established {
+  background: #e9f4e5;
+  border-color: #8aaf7a;
+  color: #31582c;
+}
+.planter-stage--unknown {
+  background: #f0f1eb;
+  border-color: #c8cdbf;
+  color: #525e4c;
+}
+.planter-tree-summary {
+  font-size: 12px;
+}
+.planter-tree-plot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-direction: column;
+  min-width: 0;
+  padding: 20px 20px 30px;
+}
+.planter-tree-plot .garden-tree {
+  width: min(100%, 370px);
+  height: auto;
+  z-index: 1;
+  filter: drop-shadow(8px 12px 8px #536a3820);
+}
+.planter-tree-plot > p {
+  font:
+    italic 15px Georgia,
+    serif;
+  color: #4b6243;
+  margin: 12px 0 0;
+  z-index: 1;
+}
+.planter-sun {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  top: 20px;
+  right: 20px;
+  border-radius: 50%;
+  background: radial-gradient(#fff9d5a0, transparent 70%);
+}
+.planter-soil {
+  position: absolute;
+  bottom: 40px;
+  width: 80%;
+  height: 45px;
+  border-radius: 50%;
+  background: #7c925a20;
+}
+.planter-branches {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin-top: 20px;
+}
+.plant-branch {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  text-align: left;
+  gap: 6px;
+  border: 1px solid #c4ceb5;
+  background: #f9faf080;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #304a32;
+  font-size: 12px;
+  min-height: 60px;
+  overflow-wrap: anywhere;
+}
+.plant-branch__status {
+  font-size: 10px;
+  text-transform: capitalize;
+  color: #4b623e;
+}
+.plant-branch__title {
+  font-weight: 600;
+}
+.plant-branch {
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.plant-branch:hover {
+  background: #e7efdd;
+  border-color: #7c9767;
+  color: #203c25;
+}
+.plant-branch:focus-visible {
+  outline: 3px solid #476d4b;
+  outline-offset: 3px;
+}
+/* Pressed state lasts while activating; objective navigation opens the detail. */
+.plant-branch:active {
+  background: #d4e3c6;
+  border-color: #48693b;
+  color: #1e3522;
+  box-shadow: inset 0 0 0 1px #48693b;
+}
+.plant-branch__status--active {
+  color: #31582c;
+}
+.plant-branch__status--paused {
+  color: #71520b;
+}
+.plant-branch__status--done {
+  color: #684117;
+}
+.planter-home-grid,
+.planter-work-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 28px;
+  margin-bottom: 26px;
+}
+.planter-next,
+.planter-rhythm,
+.planter-team,
+.planter-support,
+.planter-journey,
+.planter-today {
+  padding: 26px 0;
+  border-top: 1px solid #d4ddca;
+  min-width: 0;
+}
+.planter-next h2,
+.planter-team h2,
+.planter-support h2,
+.planter-journey h2,
+.planter-today h2 {
+  font:
+    400 27px/1.2 Georgia,
+    serif;
+  margin: 0 0 12px;
+  overflow-wrap: anywhere;
+}
+.planter-rhythm h2 {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0 0 18px;
+}
+.planter-next p,
+.planter-team p,
+.planter-support p,
+.planter-rhythm p,
+.planter-journey > p {
+  color: #53664b;
+  line-height: 1.7;
+}
+.planter-rhythm-days {
+  display: flex;
+  gap: 10px;
+}
+.planter-rhythm-days span {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #c2cbb4;
+  font-size: 10px;
+  color: #526649;
+}
+.planter-rhythm-days .is-tended {
+  background: #486a40;
+  color: white;
+  border-color: #486a40;
+}
+.planter-members {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+  margin: 20px 0;
+}
+.planter-members li {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.planter-members li > span {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e3e9d3;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.planter-members small,
+.planter-invitations small {
+  display: block;
+  color: #576951;
+  font-size: 11px;
+  margin-top: 5px;
+}
+.planter-sharing,
+.planter-invitations {
+  padding: 0;
+  list-style: none;
+}
+.planter-sharing li,
+.planter-invitations li {
+  padding: 14px 0;
+  border-bottom: 1px solid #d8dfcf;
+  overflow-wrap: anywhere;
+}
+.planter-sharing li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+.planter-sharing span {
+  font-size: 12px;
+  color: #506048;
+}
+.planter-preview-note,
+.planter-small {
+  font-size: 12px;
+  color: #53664b;
+  line-height: 1.7;
+}
+.planter-footer {
+  border-top: 1px solid #d9dfcf;
+  padding: 24px 0 30px;
+  margin-top: 24px;
+  font-size: 11px;
+  color: #53664b;
+}
+.planter-journey ol {
+  list-style: none;
+  padding: 0;
+}
+.planter-journey li {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 25px;
+  padding: 22px 0;
+  border-bottom: 1px solid #d9dfcf;
+}
+.planter-journey time {
+  font-size: 12px;
+  color: #53664b;
+}
+.planter-journey small {
+  display: block;
+  font-size: 11px;
+  color: #53664b;
+  margin-bottom: 7px;
+}
+.planter-journey button {
+  background: none;
+  border: 0;
+  text-align: left;
+  color: #253e32;
+  padding: 0;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.planter-journey p {
+  margin: 0;
+  line-height: 1.7;
+}
+.ff-planter-app .ff-topbar {
+  background: #faf9f3;
+  color: #263f33;
+  border-bottom: 1px solid #d9dfcf;
+}
+.ff-planter-app .ff-edition,
+.ff-planter-app .ff-connected {
+  color: #52654b;
+}
+.ff-planter-app .ff-sidebar {
+  background: #efefe3;
+  border-color: #d7ddc9;
+}
+.ff-planter-app .ff-main {
+  padding-bottom: 30px;
+}
+.ff-planter-app .ff-nav-item {
+  color: #4d6147;
+  min-height: 44px;
+}
+.ff-planter-app .ff-nav-item.is-active {
+  background: #dee6cb;
+  color: #294d33;
+  box-shadow: none;
+}
+.ff-planter-app .ff-panel {
+  background: #fcfbf5;
+  box-shadow: none;
+  border-color: #d9dfcf;
+  border-radius: 14px;
+}
+.ff-planter-app .ff-page-heading h1 {
+  font:
+    400 35px/1.15 Georgia,
+    serif;
+}
+.ff-planter-app .ff-eyebrow,
+.ff-planter-app .ff-page-heading > div > p:last-child,
+.ff-planter-app .ff-muted,
+.ff-planter-app .ff-section-heading p:not(.ff-eyebrow),
+.ff-planter-app .ff-objective-card > p:not(.ff-eyebrow),
+.ff-planter-app .ff-objective-card footer,
+.ff-planter-app .ff-breadcrumb,
+.ff-planter-app .ff-nav-label,
+.ff-planter-app .ff-church small,
+.ff-planter-app .ff-footer-brand {
+  color: #53664b;
+}
+.ff-planter-app .ff-button {
+  min-height: 44px;
+  font-size: 12px !important;
+}
+.ff-planter-app .ff-text-button {
+  min-height: 44px;
+  color: #345633;
+  font-size: 12px !important;
+}
+.ff-planter-app .ff-care-note {
+  background: none;
+  border: none;
+  padding: 12px;
+}
+.ff-planter-app .ff-care-note p {
+  color: #53664b;
+}
+.ff-planter-app .ff-objective-card {
+  background: #fbfaf1;
+  border-color: #d4ddc5;
+  box-shadow: none;
+  overflow-wrap: anywhere;
+}
+.ff-planter-app .ff-objective-card h3 {
+  font:
+    400 24px/1.25 Georgia,
+    serif;
+}
+.ff-planter-app .ff-detail-grid {
+  grid-template-columns: minmax(0, 1.65fr) minmax(260px, 1fr);
+}
+.ff-planter-app .ff-detail-grid > div {
+  min-width: 0;
+}
+.ff-planter-app .ff-page-heading {
+  align-items: flex-start;
+}
+.ff-planter-app .ff-update p,
+.ff-planter-app .ff-prayer p,
+.ff-planter-app .ff-messages p,
+.ff-planter-app .ff-page-heading h1 {
+  overflow-wrap: anywhere;
+}
+.ff-planter-app .ff-notice {
+  background: #e4ead7;
+  color: #2b4e34;
+}
+.ff-planter-app .ff-status {
+  color: #345533;
+}
+.ff-planter-app .ff-home-link {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.planter-today-actions {
+  display: grid;
+  gap: 14px;
+}
+.planter-today-actions > button {
+  padding: 18px;
+  background: #ebefdf;
+  border: 1px solid #cfd9c1;
+  border-radius: 12px;
+  text-align: left;
+  color: #2a4931;
+  min-height: 44px;
+}
+.planter-today-actions small {
+  display: block;
+  margin-top: 8px;
+  color: #53664b;
+}
+.planter-work-nav-toggle {
+  display: none;
+}
+.ff-planter-app .ff-overview-grid {
+  grid-template-columns: 1fr;
+}
+.ff-planter-app .ff-objective-row em {
+  color: #53664b;
+}
+.ff-planter-app .ff-topbar-right {
+  max-width: 50%;
+}
+.ff-planter-app .planter-account summary {
+  overflow-wrap: anywhere;
+}
+.ff-planter-app .ff-skip {
+  position: absolute;
+  top: -80px;
+}
+.ff-planter-app .ff-skip:focus {
+  top: 10px;
+  left: 10px;
+  z-index: 100;
+  background: white;
+  padding: 12px;
+  color: #253e32;
+}
+@media (max-width: 1000px) {
+  .planter-landscape-copy {
+    padding: 26px;
+  }
+  .planter-landscape h2 {
+    font-size: 30px;
+  }
+  .planter-landscape {
+    min-height: 390px;
+  }
+  .planter-branches {
+    grid-template-columns: 1fr;
+  }
+  .planter-tree-plot {
+    padding: 10px;
+  }
+  .planter-home-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .planter-home-grid {
+    gap: 20px;
+  }
+  .ff-planter-app .ff-main {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+@media (max-width: 700px) {
+  .planter-topbar {
+    padding: 12px 20px;
+    gap: 12px;
+  }
+  .planter-brand > span {
+    display: none;
+  }
+  .planter-account {
+    max-width: 45%;
+    overflow-wrap: anywhere;
+  }
+  .planter-home-main {
+    padding: 26px 20px 0;
+  }
+  .planter-home h1 {
+    font-size: 32px;
+  }
+  .planter-home-heading {
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .planter-home-actions {
+    gap: 10px;
+  }
+  .planter-landscape {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    border-radius: 16px;
+  }
+  .planter-landscape-copy {
+    padding: 24px;
+  }
+  .planter-landscape h2 {
+    font-size: 28px;
+  }
+  .planter-tree-plot {
+    max-height: 220px;
+    padding: 0 10px 20px;
+  }
+  .planter-tree-plot .garden-tree {
+    width: 180px;
+  }
+  .planter-tree-plot > p {
+    font-size: 12px;
+    margin: 0;
+  }
+  .planter-branches {
+    grid-template-columns: 1fr 1fr;
+  }
+  .planter-home-grid,
+  .planter-work-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+    margin-bottom: 0;
+  }
+  .planter-next,
+  .planter-rhythm,
+  .planter-team,
+  .planter-support {
+    padding: 24px 0;
+  }
+  .planter-home .planter-landscape {
+    margin-bottom: 20px;
+  }
+  .planter-journey li {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .planter-sharing li {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ff-planter-app .ff-main {
+    margin-left: 0;
+    padding: 20px;
+  }
+  .ff-planter-app .ff-topbar {
+    padding: 12px 20px;
+    min-height: 74px;
+    height: auto;
+  }
+  .ff-planter-app .ff-connected,
+  .ff-planter-app .ff-edition {
+    display: none;
+  }
+  .ff-planter-app .ff-sidebar {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    padding: 10px 20px;
+    border-bottom: 1px solid #d5dcc8;
+    display: block;
+  }
+  .ff-planter-app .ff-church,
+  .ff-planter-app .ff-sidebar-bottom,
+  .ff-planter-app .ff-nav-label {
+    display: none;
+  }
+  .planter-work-nav-toggle {
+    display: block;
+    padding: 12px 0;
+    min-height: 44px;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 0;
+    color: #2a4931;
+  }
+  .ff-planter-app .ff-sidebar nav {
+    display: none;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+  }
+  .ff-planter-app .ff-sidebar.is-expanded nav {
+    display: grid;
+  }
+  .ff-planter-app .ff-nav-item {
+    padding: 10px;
+    font-size: 11px !important;
+    gap: 7px;
+  }
+  .ff-planter-app .ff-nav-item > span {
+    display: none;
+  }
+  .ff-planter-app .ff-page-heading {
+    gap: 12px;
+    flex-direction: column;
+  }
+  .ff-planter-app .ff-page-heading h1 {
+    font-size: 29px;
+  }
+  .ff-planter-app .ff-detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .ff-planter-app .ff-panel {
+    padding: 20px;
+  }
+  .ff-planter-app .ff-section-heading {
+    flex-wrap: wrap;
+  }
+  .ff-planter-app .ff-objective-grid {
+    grid-template-columns: 1fr;
+  }
+  .ff-planter-app .ff-topbar-right {
+    max-width: 48%;
+  }
+  .ff-planter-app .planter-account {
+    max-width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .planter-home *,
+  .ff-planter-app * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .ff-planter-app button:hover {
+    transform: none !important;
+  }
+}
+/* Scoped corrections keep legacy peer and Catalyst workspace styles intact. */
+.ff-app.ff-planter-app {
+  background: #f7f6ef;
+}
+.ff-app.ff-planter-app .ff-preview-banner {
+  color: #665326;
+}
+.ff-app.ff-planter-app .ff-objective-row small,
+.ff-app.ff-planter-app .ff-activity small,
+.ff-app.ff-planter-app .ff-update small,
+.ff-app.ff-planter-app .ff-update time,
+.ff-app.ff-planter-app .ff-messages time,
+.ff-app.ff-planter-app .ff-prayer small,
+.ff-app.ff-planter-app .ff-empty,
+.ff-app.ff-planter-app .ff-search,
+.ff-app.ff-planter-app .ff-search input,
+.ff-app.ff-planter-app .ff-checkin-card p,
+.ff-app.ff-planter-app .ff-support p,
+.ff-app.ff-planter-app .ff-support strong,
+.ff-app.ff-planter-app .ff-add-row,
+.ff-app.ff-planter-app .ff-pill,
+.ff-app.ff-planter-app .ff-main > footer,
+.ff-app.ff-planter-app .ff-main > footer span {
+  color: #4d6245;
+}
+.ff-app.ff-planter-app .ff-add-row {
+  min-height: 44px;
+}
+.planter-brand > .brand-lockup {
+  font-size: 22px;
+  letter-spacing: 0;
+  color: #253e32;
+}
+@media (max-width: 700px) {
+  .planter-brand > .brand-lockup {
+    display: flex;
+  }
+  .planter-home-main {
+    display: flex;
+    flex-direction: column;
+  }
+  .planter-home-main > * {
+    order: 4;
+  }
+  .planter-home-main > .planter-preview-note {
+    order: 0;
+  }
+  .planter-home-main > .planter-home-heading {
+    order: 1;
+  }
+  .planter-home-main > .planter-landscape {
+    order: 3;
+  }
+  .planter-home-main > .planter-landscape + .planter-home-grid {
+    order: 2;
+  }
+}
+.ff-app.ff-planter-app .ff-timeline small,
+.ff-app.ff-planter-app .ff-timeline time {
+  color: #4d6245;
+}
+
+@media (max-width: 700px) {
+  .planter-home-main > .planter-home-rhythm {
+    display: contents;
+  }
+  .planter-home-rhythm > .planter-next {
+    order: 2;
+  }
+  .planter-home-main > .planter-landscape {
+    order: 3;
+  }
+  .planter-home-rhythm > .planter-rhythm {
+    order: 4;
+  }
+  .planter-home-main > .planter-home-grid:not(.planter-home-rhythm) {
+    order: 5;
+  }
+  .planter-home-main > .planter-footer {
+    order: 6;
+  }
+}
+@keyframes planter-saved {
+  from {
+    opacity: 0.4;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.ff-app.ff-planter-app .ff-success {
+  animation: planter-saved 0.3s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ff-app.ff-planter-app .ff-success {
+    animation: none;
+  }
+}
+.ff-app.ff-planter-app .ff-panel .ff-conversation-thread {
+  background: transparent;
+  border: 0;
+  border-top: 1px solid #d9dfcf;
+  border-radius: 0;
+  padding: 24px 0 0;
+}

@@ -1,3 +1,4 @@
+import { PlanterHome } from "@/components/planter/planter-home";
 import { CatalystShell } from "@/components/garden/catalyst-shell";
 import { CatalystHome } from "@/components/garden/catalyst-home";
 import { buildGarden } from "../catalyst/garden-status";
@@ -89,10 +90,104 @@ export default async function PreviewPage({
   }
   if (role === "catalyst" && !planter)
     return <CatalystDashboard data={sampleCatalyst} preview />;
-  const data =
+  let data =
     role === "catalyst"
       ? { ...sampleWorkspace, viewer: sampleCatalyst.viewer }
       : sampleWorkspace;
+  if (role !== "catalyst") {
+    data = {
+      ...data,
+      church: data.church
+        ? {
+            ...data.church,
+            planting_start_date:
+              scenario === "low" ? "2026-09-01" : "2024-02-01",
+          }
+        : null,
+      team: {
+        unavailable: false,
+        members:
+          scenario === "empty"
+            ? []
+            : [
+                {
+                  id: "sample-member",
+                  display_name: "Sample team member",
+                  role: "peer",
+                  joined_at: "2026-09-25T12:00:00Z",
+                },
+                {
+                  id: "sample-member-2",
+                  display_name: "Sample member with a longer display name",
+                  role: "peer",
+                  joined_at: "2026-09-27T12:00:00Z",
+                },
+                {
+                  id: "sample-member-3",
+                  display_name: "Sample member three",
+                  role: "peer",
+                  joined_at: "2026-10-01T12:00:00Z",
+                },
+              ],
+        invitations:
+          scenario === "pending"
+            ? [
+                {
+                  id: "sample-invite",
+                  email: "sample@example.invalid",
+                  created_at: "2026-10-01T12:00:00Z",
+                  expires_at: "2026-10-08T12:00:00Z",
+                },
+              ]
+            : [],
+      },
+      objectives:
+        scenario === "empty"
+          ? []
+          : data.objectives.map((o, i) => ({
+              ...o,
+              team_visible: i === 0,
+              status:
+                scenario === "rich" && i === 2 ? ("done" as const) : o.status,
+            })),
+      teamMessages: [
+        {
+          id: "sample-team-reply",
+          objective_id: "neighbours",
+          author_id: "sample-member",
+          body: "Sample team conversation: we can plan the next meal together.",
+          created_at: "2026-10-02T18:00:00Z",
+        },
+      ],
+    };
+    data.people = [...data.people, ...(data.team?.members ?? [])];
+    if (scenario === "empty")
+      data = {
+        ...data,
+        progress: [],
+        messages: [],
+        teamMessages: [],
+        checkIns: [],
+        prayers: [],
+        threads: [],
+        activities: [],
+      };
+    if (scenario === "long")
+      data = {
+        ...data,
+        church: data.church
+          ? {
+              ...data.church,
+              name: "A sample church with a very long name serving several communities together",
+            }
+          : null,
+        objectives: data.objectives.map((o) => ({
+          ...o,
+          title: `${o.title} with the people of our neighbourhood and surrounding communities`,
+        })),
+      };
+    if (surface === "garden") return <PlanterHome data={data} preview />;
+  }
   return (
     <Workspace
       key={`${role}:${view}:${objective}`}
