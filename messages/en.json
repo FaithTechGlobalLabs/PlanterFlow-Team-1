@@ -354,6 +354,7 @@
       "review_objective_label": "Post under goal",
       "review_submit": "Acknowledge check-in",
       "review_sent": "Check-in acknowledged. Your note is in the goal conversation.",
+      "export_pdf": "Export PDF Report",
       "review_needs_goal": "Once the pastor adds a goal, you can acknowledge this check-in here."
     },
     "categories": {
@@ -425,6 +426,8 @@
     "invites": {
       "title": "Pastor invitations",
       "empty": "You haven't invited a pastor yet.",
+      "search_placeholder": "Search invitations by email or church",
+      "no_matches": "No invitations match your search.",
       "load_error": "We couldn't load your invitations. Refresh the page to try again.",
       "sent": "Sent {date}",
       "sent_with_church": "{church} · Sent {date}",
@@ -432,6 +435,45 @@
         "pending": "Pending",
         "accepted": "Accepted",
         "expired": "Expired"
+      }
+    },
+    "exportReport": {
+      "header": "FIRST FRUITS · AUTHORIZED PLANTER REPORT",
+      "churchMeta": "Church: {church}",
+      "exportDateMeta": "Export Date: {date}",
+      "checkInHistory": "Check-in History",
+      "noCheckIns": "No check-ins recorded yet.",
+      "checkInTitle": "Check-in · {date}",
+      "feeling": "Feeling",
+      "momentum": "Momentum",
+      "notes": "Notes",
+      "supportNeeded": "Support Needed",
+      "objectivesAndDialogue": "Objectives & Dialogue",
+      "noObjectives": "No objectives added yet.",
+      "progressUpdates": "Progress Updates:",
+      "dialogue": "Dialogue:",
+      "notAvailable": "N/A",
+      "generalCategory": "General",
+      "categoryHeader": "Category: {category}",
+      "recorded": "Recorded",
+      "fallbackAuthor": "Author",
+      "fallbackPlanterName": "Planter",
+      "buttonLabel": "Export PDF Report",
+      "generating": "Generating PDF...",
+      "failedExport": "Failed to export report.",
+      "unexpectedError": "An unexpected error occurred while exporting.",
+      "errors": {
+        "unauthorized": "Unauthorized",
+        "forbidden": "Forbidden: You are not authorized to export these records.",
+        "planterNotFound": "Planter not found",
+        "failedDb": "Failed to fetch database records.",
+        "failedChurch": "Failed to fetch church details.",
+        "failedCategories": "Failed to fetch categories.",
+        "failedObjectives": "Failed to fetch objectives.",
+        "failedCheckIns": "Failed to fetch check-ins.",
+        "failedProgress": "Failed to fetch progress entries.",
+        "failedDialogue": "Failed to fetch dialogue messages.",
+        "failedAuthors": "Failed to fetch message author profiles."
       }
     }
   }

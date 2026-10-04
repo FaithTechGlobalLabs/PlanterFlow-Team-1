@@ -38,17 +38,18 @@ export function ChurchPanel({
       }}
     >
       <div className="garden-drawer-content">
-        <header>
+        <header className="garden-drawer-header">
           <p className="garden-eyebrow">WALK ALONGSIDE</p>
           <button
             type="button"
+            className="garden-drawer-close-btn"
             onClick={close}
             aria-label="Close church details"
           >
             ×
           </button>
         </header>
-        <h2 id="garden-panel-title">{title}</h2>
+        <h2 id="garden-panel-title" className="garden-drawer-title">{title}</h2>
         {children}
       </div>
     </dialog>

@@ -77,7 +77,7 @@ it("opens real church context with existing review and workspace routes, and clo
 it("keeps search and no-church states honest", () => {
   home();
   fireEvent.change(
-    screen.getByPlaceholderText("Search church, pastor, or city…"),
+    screen.getByPlaceholderText(/Search church/i),
     { target: { value: "missing" } },
   );
   expect(

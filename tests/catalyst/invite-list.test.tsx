@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { NextIntlClientProvider } from "next-intl";
 import en from "../../messages/en.json";
@@ -26,8 +26,22 @@ describe("InviteList", () => {
     expect(screen.getByText("Accepted")).toBeInTheDocument();
   });
 
-  it("shows an empty state", () => {
+  it("shows an empty state when no invites exist", () => {
     renderList([]);
     expect(screen.getByText("You haven't invited a pastor yet.")).toBeInTheDocument();
+  });
+
+  it("filters invitations when user types in the search input", () => {
+    renderList([
+      { id: "a", email: "pastor@hope.ca", churchName: "Hope Church", status: "pending", sentAt: "2026-10-03T18:00:00Z" },
+      { id: "b", email: "amy@river.ca", churchName: "River Fellowship", status: "accepted", sentAt: "2026-10-01T18:00:00Z" },
+    ]);
+
+    const input = screen.getByPlaceholderText(/Search invitations by email or church/i);
+    expect(input).toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: "River" } });
+    expect(screen.queryByText("pastor@hope.ca")).not.toBeInTheDocument();
+    expect(screen.getByText("amy@river.ca")).toBeInTheDocument();
   });
 });

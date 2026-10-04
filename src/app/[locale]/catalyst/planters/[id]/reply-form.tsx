@@ -14,7 +14,7 @@ export function ReplyForm({ objectiveId }: { objectiveId: string }) {
   const fieldId = `reply-${objectiveId}`;
 
   return (
-    <form action={formAction} className="flex flex-col gap-3">
+    <form action={formAction} className="reply-form flex flex-col gap-3">
       <input type="hidden" name="objectiveId" value={objectiveId} />
       <label htmlFor={fieldId} className={labelClassName}>
         {t("reply_label")}
@@ -26,15 +26,15 @@ export function ReplyForm({ objectiveId }: { objectiveId: string }) {
         maxLength={REPLY_MAX}
         defaultValue={state.ok ? "" : (state.body ?? "")}
         placeholder={t("reply_placeholder")}
-        className="w-full min-h-[96px] p-4 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white text-[var(--color-ink)] placeholder-[var(--color-muted)] text-[13px]"
+        className="reply-body-input w-full min-h-[96px] p-4 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white text-[var(--color-ink)] placeholder-[var(--color-muted)] text-[13px]"
       />
       <FormError>{state.error && t(`errors.${state.error}`)}</FormError>
       {state.ok && (
-        <p role="status" className="text-[13px] text-[var(--color-green)]">
+        <p role="status" className="reply-success-message text-[13px] text-[var(--color-green)]">
           {t("reply_sent")}
         </p>
       )}
-      <Button variant="primary" type="submit" fullWidth={false} className="min-w-[222px]" disabled={isPending}>
+      <Button variant="primary" type="submit" fullWidth={false} className="reply-submit-btn min-w-[222px]" disabled={isPending}>
         {isPending ? t("sending") : t("send")}
       </Button>
     </form>

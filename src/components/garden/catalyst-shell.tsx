@@ -23,7 +23,7 @@ export function CatalystShell({
       <header className="garden-topbar">
         <Link href="/catalyst" className="garden-brand">
           <Brand />
-          <span>with SEND Network</span>
+          <span className="garden-brand-tagline">with SEND Network</span>
         </Link>
         <details className="garden-account">
           <summary>
@@ -35,18 +35,18 @@ export function CatalystShell({
                 .slice(0, 2)
                 .join("") || "C"}
             </span>
-            <span>{name || "Your account"}</span>
+            <span className="garden-account-name">{name || "Your account"}</span>
           </summary>
-          <div>
-            <p>Catalyst · {organization || "Your community"}</p>
+          <div className="garden-account-dropdown">
+            <p className="garden-account-role">Catalyst · {organization || "Your community"}</p>
             <form action={signOut}>
-              <button type="submit">Sign out</button>
+              <button type="submit" className="garden-signout-btn">Sign out</button>
             </form>
           </div>
         </details>
       </header>
       <nav className="garden-nav" aria-label="Catalyst navigation">
-        <span>{organization || "Your community"}</span>
+        <span className="garden-nav-org">{organization || "Your community"}</span>
         <Link
           href="/catalyst"
           aria-current={active === "garden" ? "page" : undefined}
@@ -66,7 +66,7 @@ export function CatalystShell({
         {children}
       </main>
       <footer className="garden-footer">
-        First Fruits <span>Care for the people. Notice the growth.</span>
+        First Fruits <span className="garden-footer-tagline">Care for the people. Notice the growth.</span>
       </footer>
     </div>
   );

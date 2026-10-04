@@ -318,6 +318,59 @@
 .garden-plot-label small.garden-attention {
   color: #765820;
 }
+.garden-plot-label.status-badge-support,
+.garden-plot-label.garden-status-support {
+  background: #fee2e2f0;
+  border-color: #fecaca;
+}
+.garden-plot-label.status-badge-support strong,
+.garden-plot-label.garden-status-support strong {
+  color: #991b1b;
+}
+.garden-plot-label.status-badge-support > span,
+.garden-plot-label.status-badge-support small,
+.garden-plot-label.garden-status-support > span,
+.garden-plot-label.garden-status-support small {
+  color: #b91c1c;
+}
+.garden-plot-label.status-badge-review,
+.garden-plot-label.status-badge-due,
+.garden-plot-label.garden-status-review,
+.garden-plot-label.garden-status-due {
+  background: #fef3c7f0;
+  border-color: #fde68a;
+}
+.garden-plot-label.status-badge-review strong,
+.garden-plot-label.status-badge-due strong,
+.garden-plot-label.garden-status-review strong,
+.garden-plot-label.garden-status-due strong {
+  color: #92400e;
+}
+.garden-plot-label.status-badge-review > span,
+.garden-plot-label.status-badge-review small,
+.garden-plot-label.status-badge-due > span,
+.garden-plot-label.status-badge-due small,
+.garden-plot-label.garden-status-review > span,
+.garden-plot-label.garden-status-review small,
+.garden-plot-label.garden-status-due > span,
+.garden-plot-label.garden-status-due small {
+  color: #b45309;
+}
+.garden-plot-label.status-badge-quiet,
+.garden-plot-label.garden-status-quiet {
+  background: #dcfce7f0;
+  border-color: #bbf7d0;
+}
+.garden-plot-label.status-badge-quiet strong,
+.garden-plot-label.garden-status-quiet strong {
+  color: #166534;
+}
+.garden-plot-label.status-badge-quiet > span,
+.garden-plot-label.status-badge-quiet small,
+.garden-plot-label.garden-status-quiet > span,
+.garden-plot-label.garden-status-quiet small {
+  color: #15803d;
+}
 .garden-scene-note {
   font-size: 11px;
   color: #56694b;
@@ -385,6 +438,30 @@
   padding: 6px 10px;
   border-radius: 20px;
   line-height: 1.5;
+}
+.garden-status-support,
+.status-badge-support {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+.garden-status-review,
+.status-badge-review {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+.garden-status-due,
+.status-badge-due {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+.garden-status-quiet,
+.status-badge-quiet {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
 }
 .garden-quiet {
   padding: 24px 0;
