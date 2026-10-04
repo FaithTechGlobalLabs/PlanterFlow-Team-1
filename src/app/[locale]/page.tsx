@@ -62,10 +62,12 @@ export default async function HomePage({ params }: PageProps) {
       <OnboardingPage
         eyebrow={t("home.team.eyebrow")}
         title={teamChurch?.name ?? ""}
-        subline={t("home.team.subline")}
-      >
+        subline="View shared objectives and contribute with your Church Team."      >
         <FormCard title={profile!.display_name}>
           <Status>{t("home.team.chip")}</Status>
+          <Button variant="primary" href="/dashboard" fullWidth={false}>
+            Open workspace
+          </Button>
           <form action={signOut}>
             <Button variant="secondary" type="submit" fullWidth={false} className="min-w-[222px]">
               {t("common.sign_out")}

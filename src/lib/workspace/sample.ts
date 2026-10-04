@@ -15,9 +15,9 @@ export const sampleWorkspace: WorkspaceData = {
     { id: "prayer", title: "Prayer Requests", description: null, kind: "prayer" },
   ],
   objectives: [
-    { id: "neighbours", planter_id: "sample-planter", category_id: "city", title: "Build deeper roots in our neighbourhood", description: "Make space for genuine relationships with the people who call this neighbourhood home.", cadence: "weekly", status: "active", created_at: "2026-09-20T12:00:00Z" },
-    { id: "table", planter_id: "sample-planter", category_id: "disciples", title: "Make room around the table", description: "Start a small group where questions are welcome and people can explore faith together.", cadence: "weekly", status: "active", created_at: "2026-09-21T12:00:00Z" },
-    { id: "team", planter_id: "sample-planter", category_id: "church", title: "Grow a team that serves together", description: "Help our core team discover their gifts and find meaningful ways to serve.", cadence: "monthly", status: "active", created_at: "2026-09-22T12:00:00Z" },
+    { id: "neighbours", planter_id: "sample-planter", category_id: "city", title: "Build deeper roots in our neighbourhood", description: "Make space for genuine relationships with the people who call this neighbourhood home.", cadence: "weekly", status: "active", created_at: "2026-09-20T12:00:00Z", due_date: null, team_visible: false },
+    { id: "table", planter_id: "sample-planter", category_id: "disciples", title: "Make room around the table", description: "Start a small group where questions are welcome and people can explore faith together.", cadence: "weekly", status: "active", created_at: "2026-09-21T12:00:00Z", due_date: null, team_visible: false },
+    { id: "team", planter_id: "sample-planter", category_id: "church", title: "Grow a team that serves together", description: "Help our core team discover their gifts and find meaningful ways to serve.", cadence: "monthly", status: "active", created_at: "2026-09-22T12:00:00Z", due_date: null, team_visible: false },
   ],
   activities: [
     { id: "coffee", objective_id: "neighbours", description: "Share coffee with two neighbours", cadence: "weekly", status: "active" },
@@ -26,9 +26,9 @@ export const sampleWorkspace: WorkspaceData = {
     { id: "serve", objective_id: "team", description: "Serve at the community food pantry together", cadence: "monthly", status: "active" },
   ],
   progress: [
-    { id: "p1", objective_id: "neighbours", activity_id: "coffee", note: "Had coffee with two neighbours this week. One shared that they’ve been looking for a place to belong. We’re meeting again next Tuesday.", value: 2, created_at: "2026-10-02T15:30:00Z" },
-    { id: "p2", objective_id: "table", activity_id: "meal", note: "Our first dinner brought six people around the table. So many thoughtful questions, and a lot of laughter.", value: 6, created_at: "2026-09-30T18:00:00Z" },
-    { id: "p3", objective_id: "team", activity_id: "serve", note: "We found a Saturday that works for the core team to serve together.", value: null, created_at: "2026-09-28T12:00:00Z" },
+    { id: "p1", objective_id: "neighbours", activity_id: "coffee", note: "Had coffee with two neighbours this week. One shared that they’ve been looking for a place to belong. We’re meeting again next Tuesday.", value: 2, created_at: "2026-10-02T15:30:00Z", author_id: "sample-planter",},
+    { id: "p2", objective_id: "table", activity_id: "meal", note: "Our first dinner brought six people around the table. So many thoughtful questions, and a lot of laughter.", value: 6, created_at: "2026-09-30T18:00:00Z", author_id: "sample-planter", },
+    { id: "p3", objective_id: "team", activity_id: "serve", note: "We found a Saturday that works for the core team to serve together.", value: null, created_at: "2026-09-28T12:00:00Z", author_id: "sample-planter", },
   ],
   messages: [
     { id: "m1", objective_id: "neighbours", author_id: "sample-catalyst", body: "I love how you’re making space to listen. Those small conversations matter. How can I support you as these relationships grow?", created_at: "2026-10-02T17:00:00Z" },
