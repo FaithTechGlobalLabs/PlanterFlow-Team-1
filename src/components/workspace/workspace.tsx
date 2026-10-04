@@ -1565,12 +1565,12 @@ export function Workspace({
           }
           close={() => setModal(null)}
         >
-          <p className="ff-muted ff-objective-draft-introduction">
+          <p className="ff-muted objective-form-introduction">
             Start with something meaningful and achievable.
           </p>
           <SaveForm
             intent="objective"
-            className="ff-objective-draft-form"
+            className="objective-form"
             perform={perform}
             submit={editObjective ? "Save objective" : "Create objective"}
             onDraftChange={form => setObjectiveDrafts(current => ({
@@ -1589,10 +1589,10 @@ export function Workspace({
             {editObjective && (
               <input type="hidden" name="id" value={editObjective.id} />
             )}
-            <label className="ff-objective-draft-field">
+            <label className="objective-form-field objective-form-category-field">
               Category
               <select
-                className="ff-objective-draft-category"
+                className="objective-form-category-select"
                 name="category_id"
                 defaultValue={objectiveDraft?.category_id ?? editObjective?.category_id ?? ""}
                 required
@@ -1607,10 +1607,10 @@ export function Workspace({
                 ))}
               </select>
             </label>
-            <label className="ff-objective-draft-field">
+            <label className="objective-form-field objective-form-title-field">
               What are you working toward?
               <input
-                className="ff-objective-draft-title"
+                className="objective-form-title-input"
                 name="title"
                 required
                 maxLength={160}
@@ -1618,28 +1618,28 @@ export function Workspace({
                 placeholder="e.g. Build relationships in our neighbourhood"
               />
             </label>
-            <label className="ff-objective-draft-field">
+            <label className="objective-form-field objective-form-description-field">
               Why does it matter? (optional)
               <textarea
-                className="ff-objective-draft-description"
+                className="objective-form-description-textarea"
                 name="description"
                 maxLength={2000}
                 defaultValue={objectiveDraft?.description ?? editObjective?.description ?? ""}
                 placeholder="A little context for you and your Catalyst…"
               />
             </label>
-            <label className="ff-objective-draft-field">
+            <label className="objective-form-field objective-form-target-date-field">
               Target date (optional)
               <input
                 type="date"
-                className="ff-objective-draft-due-date"
+                className="objective-form-target-date-input"
                 name="due_date"
                 defaultValue={objectiveDraft?.due_date ?? editObjective?.due_date ?? ""}
               />
             </label>
             <input type="hidden" name="team_visible_present" value="1" />
             <label
-              className="ff-objective-draft-field ff-objective-draft-sharing-field"
+              className="objective-form-field objective-form-team-sharing-field"
               style={{
                 display: "flex",
                 flexDirection: "row",
@@ -1650,7 +1650,7 @@ export function Workspace({
             >
               <input
                 type="checkbox"
-                className="ff-objective-draft-sharing"
+                className="objective-form-team-sharing-checkbox"
                 name="team_visible"
                 defaultChecked={objectiveDraft?.team_visible ?? editObjective?.team_visible ?? false}
                 style={{
@@ -1661,12 +1661,12 @@ export function Workspace({
                   accentColor: "#315c49",
                 }}
               />
-              <span>Share with Church Team</span>
+              <span className="objective-form-team-sharing-label">Share with Church Team</span>
             </label>
-            <label className="ff-objective-draft-field">
+            <label className="objective-form-field objective-form-progress-rhythm-field">
               Progress rhythm
               <select
-                className="ff-objective-draft-cadence"
+                className="objective-form-progress-rhythm-select"
                 name="cadence"
                 defaultValue={objectiveDraft?.cadence ?? editObjective?.cadence ?? "weekly"}
               >
@@ -1674,12 +1674,12 @@ export function Workspace({
                 <option value="monthly">Monthly</option>
               </select>
             </label>
-            <p className="ff-field-help ff-objective-draft-help">
+            <p className="ff-field-help objective-form-visibility-help">
               Your objective and updates are visible to your Catalyst. Select
               sharing to also include your Church Team. Private conversations
               stay private.
             </p>
-            <button type="button" className="ff-text-button ff-objective-draft-discard" onClick={() => {
+            <button type="button" className="ff-text-button objective-form-discard-draft-button" onClick={() => {
               clearObjectiveDraft(objectiveDraftKey);
               setModal(null);
               setEditObjective(null);
