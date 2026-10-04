@@ -2,9 +2,9 @@ import { useFormatter, useTranslations } from "next-intl";
 import type { InviteView } from "./invite-status";
 
 const statusBadgeVariant: Record<InviteView["status"], string> = {
-  pending: "status-badge-pending bg-[var(--color-sage)] text-[var(--color-green)]",
-  accepted: "status-badge-accepted bg-[var(--color-canvas)] text-[var(--color-muted)]",
-  expired: "status-badge-expired bg-[var(--color-canvas)] text-[var(--color-ink)]",
+  pending: "status-badge-pending bg-amber-100 text-amber-900 border border-amber-200",
+  accepted: "status-badge-accepted bg-emerald-100 text-emerald-800 border border-emerald-200",
+  expired: "status-badge-expired bg-red-100 text-red-800 border border-red-200",
 };
 
 export function InviteList({ invites }: { invites: InviteView[] }) {

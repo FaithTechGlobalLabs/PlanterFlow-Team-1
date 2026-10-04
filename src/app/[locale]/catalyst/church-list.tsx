@@ -9,13 +9,13 @@ export function StatusBadges({ church }: { church: GardenChurch }) {
   return (
     <span className="status-badges flex flex-wrap gap-2">
       {church.supportRequested && (
-        <span className={`${statusBadge} status-badge-support bg-[var(--color-blue)] text-white`}>{t("support_requested")}</span>
+        <span className={`${statusBadge} status-badge-support bg-red-100 text-red-800 border border-red-200`}>{t("support_requested")}</span>
       )}
       {church.replyDue && !church.supportRequested && (
-        <span className={`${statusBadge} status-badge-review bg-[var(--color-sage)] text-[var(--color-ink)]`}>{t("review_check_in")}</span>
+        <span className={`${statusBadge} status-badge-review bg-amber-100 text-amber-900 border border-amber-200`}>{t("review_check_in")}</span>
       )}
       {church.checkInDue && (
-        <span className={`${statusBadge} status-badge-due bg-[var(--color-sage)] text-[var(--color-green)]`}>{t("check_in_due")}</span>
+        <span className={`${statusBadge} status-badge-due bg-amber-100 text-amber-900 border border-amber-200`}>{t("check_in_due")}</span>
       )}
     </span>
   );
