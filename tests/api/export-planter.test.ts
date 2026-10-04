@@ -8,8 +8,8 @@ const mocks = vi.hoisted(() => ({
     user: { id: string } | null;
     profile: { role: string; is_admin?: boolean; org_id?: string } | null;
   },
-  planter: { id: "planter-1", display_name: "Alex Pastor", role: "planter", org_id: "org-1" } as any,
-  church: { name: "Grace Church", city: "Vancouver", planting_start_date: "2025-01-01" } as any,
+  planter: { id: "planter-1", display_name: "Alex Pastor", role: "planter", org_id: "org-1" } as { id: string; display_name: string; role: string; org_id: string } | null,
+  church: { name: "Grace Church", city: "Vancouver", planting_start_date: "2025-01-01" } as { name: string; city: string; planting_start_date: string } | null,
   categories: [{ id: "cat-1", title: "Discipleship", sort_order: 1 }],
   objectives: [
     {
@@ -35,8 +35,8 @@ const mocks = vi.hoisted(() => ({
   progress: [{ objective_id: "obj-1", note: "3 new leaders trained", value: 3, created_at: "2026-02-02" }],
   messages: [{ id: "msg-1", objective_id: "obj-1", author_id: "catalyst-1", body: "Great progress!", created_at: "2026-02-03" }],
   authors: [{ id: "catalyst-1", display_name: "Coach Olivia" }],
-  assignedChurch: { id: "c1" } as any,
-  queryError: null as any,
+  assignedChurch: { id: "c1" } as { id: string } | null,
+  queryError: null as { message: string; code?: string } | null,
 }));
 
 vi.mock("@/lib/auth/session", () => ({
@@ -48,7 +48,7 @@ vi.mock("@/lib/supabase/server", () => ({
     from(table: string) {
       const builder = {
         select: () => builder,
-        eq: (_col: string, val: any) => {
+        eq: (_col: string, val: unknown) => {
           if (table === "profiles" && val === "planter-1") {
             return {
               maybeSingle: async () =>
@@ -76,7 +76,7 @@ vi.mock("@/lib/supabase/server", () => ({
           if (table === "churches") return { data: mocks.assignedChurch ? mocks.church : null, error: null };
           return { data: null, error: null };
         },
-        then: (resolve: any) => {
+        then: (resolve: (value: unknown) => void) => {
           if (mocks.queryError) {
             resolve({ data: null, error: mocks.queryError });
             return;

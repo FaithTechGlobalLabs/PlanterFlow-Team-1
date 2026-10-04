@@ -1,6 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
+
+function useExportReportTranslation() {
+  try {
+    return useTranslations("catalyst.exportReport");
+  } catch {
+    return (key: string) => {
+      const map: Record<string, string> = {
+        buttonLabel: "Export PDF Report",
+        generating: "Generating PDF...",
+        failedExport: "Failed to export report.",
+        unexpectedError: "An unexpected error occurred while exporting.",
+      };
+      return map[key] ?? key;
+    };
+  }
+}
 
 export function ExportReportButton({
   planterId,
@@ -10,6 +27,7 @@ export function ExportReportButton({
   planterName?: string;
   className?: string;
 }) {
+  const t = useExportReportTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,7 +37,7 @@ export function ExportReportButton({
     try {
       const response = await fetch(`/api/export/planter/${planterId}.pdf`);
       if (!response.ok) {
-        let errorMsg = "Export failed.";
+        let errorMsg = t("failedExport");
         try {
           const body = await response.json();
           if (body.error) errorMsg = body.error;
@@ -42,7 +60,7 @@ export function ExportReportButton({
       window.URL.revokeObjectURL(url);
       setLoading(false);
     } catch {
-      setError("An unexpected error occurred while exporting.");
+      setError(t("unexpectedError"));
       setLoading(false);
     }
   }
@@ -54,19 +72,19 @@ export function ExportReportButton({
         onClick={handleExport}
         disabled={loading}
         className="ff-export-button inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg border border-[var(--color-sage-dark,#b2bfa0)] bg-[var(--color-canvas,#fbfbfa)] text-[var(--color-ink,#283618)] hover:bg-[var(--color-sage,#e8eedc)] transition-colors disabled:opacity-60 disabled:cursor-wait"
-        aria-label="Export PDF report"
+        aria-label={t("buttonLabel")}
       >
         {loading ? (
           <>
             <span className="animate-spin inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full" aria-hidden="true" />
-            <span>Generating PDF...</span>
+            <span>{t("generating")}</span>
           </>
         ) : (
           <>
             <svg className="w-3.5 h-3.5 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <span>Export PDF Report</span>
+            <span>{t("buttonLabel")}</span>
           </>
         )}
       </button>

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { PDFDocument, StandardFonts, rgb, PDFFont } from "pdf-lib";
 import { getSessionProfile } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { hasAdminCredentials, createAdminClient } from "@/lib/supabase/admin";
@@ -99,7 +99,7 @@ async function generatePdfReport(data: {
     }
   }
 
-  function wrapText(text: string, textFont: any, fontSize: number, maxWidth: number): string[] {
+  function wrapText(text: string, textFont: PDFFont, fontSize: number, maxWidth: number): string[] {
     const cleanText = sanitizePdfText(text);
     const words = cleanText.split(/\s+/);
     const lines: string[] = [];
@@ -333,10 +333,48 @@ export async function GET(
   // Support both /api/export/planter/[id] and /api/export/planter/[id].pdf (Issue #10 route alignment)
   const planterId = rawId.endsWith(".pdf") ? rawId.slice(0, -4) : rawId;
 
+  // Load i18n text
+  const rawCatalyst = (enMessages as Record<string, unknown>).catalyst as Record<string, unknown> | undefined;
+  const i18n = (rawCatalyst?.exportReport as typeof enMessages.catalyst.exportReport | undefined) ?? {
+    header: "FIRST FRUITS · AUTHORIZED PLANTER REPORT",
+    churchMeta: "Church: {church}",
+    exportDateMeta: "Export Date: {date}",
+    checkInHistory: "Check-in History",
+    noCheckIns: "No check-ins recorded yet.",
+    checkInTitle: "Check-in · {date}",
+    feeling: "Feeling",
+    momentum: "Momentum",
+    notes: "Notes",
+    supportNeeded: "Support Needed",
+    objectivesAndDialogue: "Objectives & Dialogue",
+    noObjectives: "No objectives added yet.",
+    progressUpdates: "Progress Updates:",
+    dialogue: "Dialogue:",
+    notAvailable: "N/A",
+    generalCategory: "General",
+    categoryHeader: "Category: {category}",
+    recorded: "Recorded",
+    fallbackAuthor: "Author",
+    fallbackPlanterName: "Planter",
+    errors: {
+      unauthorized: "Unauthorized",
+      forbidden: "Forbidden: You are not authorized to export these records.",
+      planterNotFound: "Planter not found",
+      failedDb: "Failed to fetch database records.",
+      failedChurch: "Failed to fetch church details.",
+      failedCategories: "Failed to fetch categories.",
+      failedObjectives: "Failed to fetch objectives.",
+      failedCheckIns: "Failed to fetch check-ins.",
+      failedProgress: "Failed to fetch progress entries.",
+      failedDialogue: "Failed to fetch dialogue messages.",
+      failedAuthors: "Failed to fetch message author profiles.",
+    },
+  };
+
   const { user, profile } = await getSessionProfile();
 
   if (!user || !profile) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: i18n.errors?.unauthorized ?? "Unauthorized" }, { status: 401 });
   }
 
   // Use service role admin client when available to bypass RLS policies for report generation
@@ -348,7 +386,7 @@ export async function GET(
   if (user.id === planterId && profile.role === "planter") {
     planter = {
       id: user.id,
-      display_name: profile.display_name || "Planter",
+      display_name: profile.display_name || i18n.fallbackPlanterName || "Planter",
       role: profile.role,
       org_id: profile.org_id || "",
     };
@@ -361,7 +399,7 @@ export async function GET(
 
     if (planterError) {
       console.error("[export-planter] Error fetching planter profile:", planterError);
-      return NextResponse.json({ error: "Failed to fetch database records." }, { status: 500 });
+      return NextResponse.json({ error: i18n.errors?.failedDb ?? "Failed to fetch database records." }, { status: 500 });
     }
 
     if (dbPlanter && dbPlanter.role === "planter") {
@@ -370,7 +408,7 @@ export async function GET(
   }
 
   if (!planter) {
-    return NextResponse.json({ error: "Planter not found" }, { status: 404 });
+    return NextResponse.json({ error: i18n.errors?.planterNotFound ?? "Planter not found" }, { status: 404 });
   }
 
   // 2. Validate authorization
@@ -391,7 +429,7 @@ export async function GET(
 
     if (churchCheckError) {
       console.error("[export-planter] Error checking church assignment:", churchCheckError);
-      return NextResponse.json({ error: "Failed to verify authorization." }, { status: 500 });
+      return NextResponse.json({ error: i18n.errors?.failedDb ?? "Failed to verify authorization." }, { status: 500 });
     }
 
     if (church) {
@@ -401,7 +439,7 @@ export async function GET(
 
   if (!isAuthorized) {
     return NextResponse.json(
-      { error: "Forbidden: You are not authorized to export these records." },
+      { error: i18n.errors?.forbidden ?? "Forbidden: You are not authorized to export these records." },
       { status: 403 }
     );
   }
@@ -415,7 +453,7 @@ export async function GET(
 
   if (churchError) {
     console.error("[export-planter] Error fetching church details:", churchError);
-    return NextResponse.json({ error: "Failed to fetch church details." }, { status: 500 });
+    return NextResponse.json({ error: i18n.errors?.failedChurch ?? "Failed to fetch church details." }, { status: 500 });
   }
 
   // 4. Fetch Categories, Objectives, Check-ins
@@ -435,15 +473,15 @@ export async function GET(
 
   if (categoriesRes.error) {
     console.error("[export-planter] Error fetching categories:", categoriesRes.error);
-    return NextResponse.json({ error: "Failed to fetch categories." }, { status: 500 });
+    return NextResponse.json({ error: i18n.errors?.failedCategories ?? "Failed to fetch categories." }, { status: 500 });
   }
   if (objectivesRes.error) {
     console.error("[export-planter] Error fetching objectives:", objectivesRes.error);
-    return NextResponse.json({ error: "Failed to fetch objectives." }, { status: 500 });
+    return NextResponse.json({ error: i18n.errors?.failedObjectives ?? "Failed to fetch objectives." }, { status: 500 });
   }
   if (checkInsRes.error) {
     console.error("[export-planter] Error fetching check-ins:", checkInsRes.error);
-    return NextResponse.json({ error: "Failed to fetch check-ins." }, { status: 500 });
+    return NextResponse.json({ error: i18n.errors?.failedCheckIns ?? "Failed to fetch check-ins." }, { status: 500 });
   }
 
   const categories = categoriesRes.data ?? [];
@@ -471,11 +509,11 @@ export async function GET(
 
     if (progressRes.error) {
       console.error("[export-planter] Error fetching progress entries:", progressRes.error);
-      return NextResponse.json({ error: "Failed to fetch progress entries." }, { status: 500 });
+      return NextResponse.json({ error: i18n.errors?.failedProgress ?? "Failed to fetch progress entries." }, { status: 500 });
     }
     if (messagesRes.error) {
       console.error("[export-planter] Error fetching dialogue messages:", messagesRes.error);
-      return NextResponse.json({ error: "Failed to fetch dialogue messages." }, { status: 500 });
+      return NextResponse.json({ error: i18n.errors?.failedDialogue ?? "Failed to fetch dialogue messages." }, { status: 500 });
     }
 
     progressData = progressRes.data ?? [];
@@ -489,35 +527,13 @@ export async function GET(
     const authorsRes = await supabase.from("profiles").select("id, display_name").in("id", authorIds);
     if (authorsRes.error) {
       console.error("[export-planter] Error fetching author profiles:", authorsRes.error);
-      return NextResponse.json({ error: "Failed to fetch message author profiles." }, { status: 500 });
+      return NextResponse.json({ error: i18n.errors?.failedAuthors ?? "Failed to fetch message author profiles." }, { status: 500 });
     }
     authorsData = authorsRes.data ?? [];
   }
 
   const authorNameMap = new Map(authorsData.map((a) => [a.id, a.display_name]));
   const categoryMap = new Map(categories.map((c) => [c.id, c.title]));
-
-  // Load i18n text
-  const i18n = (enMessages as any).catalyst?.exportReport ?? {
-    header: "FIRST FRUITS · AUTHORIZED PLANTER REPORT",
-    churchMeta: "Church: {church}",
-    exportDateMeta: "Export Date: {date}",
-    checkInHistory: "Check-in History",
-    noCheckIns: "No check-ins recorded yet.",
-    checkInTitle: "Check-in · {date}",
-    feeling: "Feeling",
-    momentum: "Momentum",
-    notes: "Notes",
-    supportNeeded: "Support Needed",
-    objectivesAndDialogue: "Objectives & Dialogue",
-    noObjectives: "No objectives added yet.",
-    progressUpdates: "Progress Updates:",
-    dialogue: "Dialogue:",
-    notAvailable: "N/A",
-    generalCategory: "General",
-    categoryHeader: "Category: {category}",
-    recorded: "Recorded",
-  };
 
   // Group objectives by Category & sort progress/dialogue in ascending date order
   const categoryGroupsMap = new Map<string, ObjectiveExportData[]>();
@@ -537,7 +553,7 @@ export async function GET(
       .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
       .map((m) => ({
         created_at: m.created_at,
-        authorName: authorNameMap.get(m.author_id) ?? "Author",
+        authorName: authorNameMap.get(m.author_id) ?? i18n.fallbackAuthor ?? "Author",
         body: m.body,
       }));
 
@@ -596,7 +612,7 @@ export async function GET(
   // 7. Render Binary PDF Document
   const pdfBytes = await generatePdfReport({
     planterName: planter.display_name,
-    churchName: church?.name ?? "N/A",
+    churchName: church?.name ?? i18n.notAvailable ?? "N/A",
     churchCity: church?.city ?? "",
     exportDate,
     checkIns,

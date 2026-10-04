@@ -1,7 +1,24 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
+
+function useExportReportTranslation() {
+  try {
+    return useTranslations("catalyst.exportReport");
+  } catch {
+    return (key: string) => {
+      const map: Record<string, string> = {
+        buttonLabel: "Export PDF Report",
+        generating: "Generating PDF...",
+        failedExport: "Failed to export report.",
+        unexpectedError: "An unexpected error occurred while exporting.",
+      };
+      return map[key] ?? key;
+    };
+  }
+}
 
 interface ExportButtonProps {
   planterId: string;
@@ -11,9 +28,11 @@ interface ExportButtonProps {
 
 export function ExportButton({
   planterId,
-  label = "Export PDF Report",
+  label,
   className = "",
 }: ExportButtonProps) {
+  const t = useExportReportTranslation();
+  const displayLabel = label ?? t("buttonLabel");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,7 +42,7 @@ export function ExportButton({
     try {
       const response = await fetch(`/api/export/planter/${planterId}.pdf`);
       if (!response.ok) {
-        let errorMsg = "Failed to export report.";
+        let errorMsg = t("failedExport");
         try {
           const body = await response.json();
           if (body.error) errorMsg = body.error;
@@ -46,7 +65,7 @@ export function ExportButton({
       window.URL.revokeObjectURL(downloadUrl);
       setLoading(false);
     } catch {
-      setError("An unexpected error occurred while exporting.");
+      setError(t("unexpectedError"));
       setLoading(false);
     }
   };
@@ -63,10 +82,10 @@ export function ExportButton({
         {loading ? (
           <>
             <span className="animate-spin inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full mr-2" aria-hidden="true" />
-            <span>Generating PDF...</span>
+            <span>{t("generating")}</span>
           </>
         ) : (
-          <>📄 {label}</>
+          <>📄 {displayLabel}</>
         )}
       </Button>
       {error && (

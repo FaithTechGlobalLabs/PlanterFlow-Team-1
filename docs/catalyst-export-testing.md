@@ -2,6 +2,9 @@
 
 This task-based guide provides detailed step-by-step instructions for thoroughly testing the **Catalyst / Planter PDF Export** feature ([#10](https://github.com/FaithTechGlobalLabs/PlanterFlow-Team-1/issues/10)), covering automated vitest runs, manual browser workflows, report content verification, print/PDF layout rendering, and security/authorization edge cases.
 
+> [!NOTE]
+> **Architecture Decision (Issue #10)**: We intentionally use [`pdf-lib`](https://pdf-lib.js.org/) instead of `@react-pdf/renderer` for PDF report generation. `@react-pdf/renderer` relies on native Node/DOM canvas bindings (`yoga-layout` / `canvas`), which fail in Cloudflare Workers and OpenNext edge runtimes. `pdf-lib` is zero-dependency, pure JavaScript, and 100% compatible with Cloudflare Workers / Edge runtimes.
+
 ---
 
 ## 📋 Prerequisites & Local Setup

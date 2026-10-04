@@ -154,7 +154,7 @@ export function CatalystHome({
               Find a church
               <input
                 type="search"
-                placeholder="Search church by;church name, pastor, or city…"
+                placeholder="Search church;church name, pastor, or city"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />

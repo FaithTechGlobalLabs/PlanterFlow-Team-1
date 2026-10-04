@@ -37,7 +37,7 @@ describe("InviteList", () => {
       { id: "b", email: "amy@river.ca", churchName: "River Fellowship", status: "accepted", sentAt: "2026-10-01T18:00:00Z" },
     ]);
 
-    const input = screen.getByPlaceholderText("Search invitations by email or church...");
+    const input = screen.getByPlaceholderText(/Search invitations by email or church/i);
     expect(input).toBeInTheDocument();
 
     fireEvent.change(input, { target: { value: "River" } });
