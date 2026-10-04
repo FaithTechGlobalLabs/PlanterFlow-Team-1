@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { buildGarden, daysSince, needsPresence } from "@/app/[locale]/catalyst/garden-status";
+import {
+  buildGarden,
+  daysSince,
+  needsPresence,
+} from "@/app/[locale]/catalyst/garden-status";
 
 const now = new Date("2026-10-03T19:00:00Z");
 
@@ -11,7 +15,12 @@ const church = (id: string, pastor: string, name: string) => ({
   pastor_id: pastor,
 });
 
-const checkIn = (id: string, planter: string, support: string, created_at: string) => ({
+const checkIn = (
+  id: string,
+  planter: string,
+  support: string,
+  created_at: string,
+) => ({
   id,
   planter_id: planter,
   support,
@@ -19,7 +28,10 @@ const checkIn = (id: string, planter: string, support: string, created_at: strin
 });
 
 const base = {
-  churches: [church("c1", "p1", "Hope Church"), church("c2", "p2", "River Church")],
+  churches: [
+    church("c1", "p1", "Hope Church"),
+    church("c2", "p2", "River Church"),
+  ],
   pastors: [
     { id: "p1", display_name: "Daniel Park" },
     { id: "p2", display_name: "Jamie Lee" },
@@ -35,14 +47,25 @@ const base = {
 
 describe("buildGarden", () => {
   it("flags a support request until the Catalyst acknowledges that check-in", () => {
-    const checkIns = [checkIn("ci1", "p1", "Pray for our family", "2026-10-03T16:00:00Z")];
+    const checkIns = [
+      checkIn("ci1", "p1", "Pray for our family", "2026-10-03T16:00:00Z"),
+    ];
     const [hope] = buildGarden({ ...base, checkIns }, now);
-    expect(hope).toMatchObject({ churchName: "Hope Church", supportRequested: true, replyDue: true, checkInDue: false });
+    expect(hope).toMatchObject({
+      churchName: "Hope Church",
+      supportRequested: true,
+      replyDue: true,
+      checkInDue: false,
+    });
 
-    const acknowledged = buildGarden({ ...base, checkIns, acknowledgedCheckInIds: ["ci1"] }, now).find(
-      (c) => c.churchId === "c1",
-    );
-    expect(acknowledged).toMatchObject({ supportRequested: false, replyDue: false });
+    const acknowledged = buildGarden(
+      { ...base, checkIns, acknowledgedCheckInIds: ["ci1"] },
+      now,
+    ).find((c) => c.churchId === "c1");
+    expect(acknowledged).toMatchObject({
+      supportRequested: false,
+      replyDue: false,
+    });
   });
 
   it("does not count an acknowledgement of an older check-in as reviewing the latest", () => {
@@ -61,14 +84,24 @@ describe("buildGarden", () => {
   });
 
   it("puts a new check-in without a support request in the presence list for review", () => {
-    const garden = buildGarden({ ...base, checkIns: [checkIn("ci1", "p1", "", "2026-10-03T16:00:00Z")] }, now);
+    const garden = buildGarden(
+      { ...base, checkIns: [checkIn("ci1", "p1", "", "2026-10-03T16:00:00Z")] },
+      now,
+    );
     const hope = garden.find((c) => c.churchId === "c1")!;
-    expect(hope).toMatchObject({ supportRequested: false, checkInDue: false, replyDue: true });
+    expect(hope).toMatchObject({
+      supportRequested: false,
+      checkInDue: false,
+      replyDue: true,
+    });
     expect(needsPresence(hope)).toBe(true);
   });
 
   it("marks a check-in due after a quiet week or when there has never been one", () => {
-    const garden = buildGarden({ ...base, checkIns: [checkIn("ci1", "p1", "", "2026-09-20T16:00:00Z")] }, now);
+    const garden = buildGarden(
+      { ...base, checkIns: [checkIn("ci1", "p1", "", "2026-09-20T16:00:00Z")] },
+      now,
+    );
     expect(garden.find((c) => c.churchId === "c1")?.checkInDue).toBe(true);
     expect(garden.find((c) => c.churchId === "c2")?.checkInDue).toBe(true);
   });
@@ -97,8 +130,13 @@ describe("buildGarden", () => {
       },
       now,
     );
-    expect(garden.map((c) => c.churchName)).toEqual(["River Church", "Hope Church"]);
-    expect(garden.filter(needsPresence).map((c) => c.churchName)).toEqual(["River Church"]);
+    expect(garden.map((c) => c.churchName)).toEqual([
+      "River Church",
+      "Hope Church",
+    ]);
+    expect(garden.filter(needsPresence).map((c) => c.churchName)).toEqual([
+      "River Church",
+    ]);
   });
 
   it("derives the tree stage from the planting start date", () => {
@@ -112,4 +150,36 @@ describe("daysSince", () => {
     expect(daysSince("2026-09-26T19:00:00Z", now)).toBe(7);
     expect(daysSince("2026-10-04T19:00:00Z", now)).toBe(0);
   });
+});
+
+it("keeps explicit completed outcomes visible even after a long time away", () => {
+  const input = {
+    churches: [
+      {
+        id: "church",
+        name: "Real church",
+        city: null,
+        planting_start_date: "2024-01-01",
+        pastor_id: "pastor",
+      },
+    ],
+    pastors: [{ id: "pastor", display_name: "Pastor" }],
+    checkIns: [],
+    objectives: [
+      { id: "done", planter_id: "pastor", title: "An outcome", status: "done" },
+      {
+        id: "active",
+        planter_id: "pastor",
+        title: "Next step",
+        status: "active",
+      },
+    ],
+    progress: [],
+    acknowledgedCheckInIds: [],
+  };
+  const current = buildGarden(input, new Date("2026-10-04T12:00:00Z"))[0];
+  const later = buildGarden(input, new Date("2027-10-04T12:00:00Z"))[0];
+  expect(current.completedObjectives).toBe(1);
+  expect(later.completedObjectives).toBe(1);
+  expect(later.currentObjective).toBe("Next step");
 });
