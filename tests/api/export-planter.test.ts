@@ -118,14 +118,15 @@ describe("GET /api/export/planter/[id]", () => {
     expect(data.objectives[0].title).toBe("Launch Life Groups");
   });
 
-  it("renders printable HTML export for assigned Catalyst", async () => {
+  it("generates binary PDF export for assigned Catalyst", async () => {
     const req = new Request("http://localhost/api/export/planter/planter-1");
     const res = await GET(req, { params: Promise.resolve({ id: "planter-1" }) });
     expect(res.status).toBe(200);
+    expect(res.headers.get("content-type")).toBe("application/pdf");
+    expect(res.headers.get("content-disposition")).toContain("filename=\"planter-report-planter-1.pdf\"");
 
-    const html = await res.text();
-    expect(html).toContain("Alex Pastor");
-    expect(html).toContain("Grace Church");
-    expect(html).toContain("FIRST FRUITS · AUTHORIZED PLANTER REPORT");
+    const buffer = await res.arrayBuffer();
+    const pdfHeader = new TextDecoder().decode(buffer.slice(0, 4));
+    expect(pdfHeader).toBe("%PDF");
   });
 });

@@ -1,6 +1,263 @@
 import { NextResponse } from "next/server";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { getSessionProfile } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+
+function sanitizePdfText(str: string | null | undefined): string {
+  if (!str) return "";
+  return str
+    .replace(/[’‘`]/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/[—–]/g, "-")
+    .replace(/…/g, "...")
+    .replace(/[^\x00-\xFF]/g, "");
+}
+
+async function generatePdfReport(data: {
+  planterName: string;
+  churchName: string;
+  churchCity: string;
+  exportDate: string;
+  checkIns: Array<{
+    created_at: string;
+    note: string | null;
+    feeling: string | null;
+    momentum: string | null;
+    support: string | null;
+  }>;
+  objectives: Array<{
+    title: string;
+    description: string | null;
+    status: string;
+    categoryTitle: string;
+    progress: Array<{ created_at: string; value: number | null; note: string | null }>;
+    messages: Array<{ created_at: string; authorName: string; body: string }>;
+  }>;
+}): Promise<Uint8Array> {
+  const pdfDoc = await PDFDocument.create();
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const fontOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+
+  let page = pdfDoc.addPage([595.28, 841.89]); // A4
+  const { width, height } = page.getSize();
+  const margin = 50;
+  const contentWidth = width - margin * 2;
+  let y = height - margin;
+
+  const brandColor = rgb(0.23, 0.32, 0.29); // #3B5249
+  const darkColor = rgb(0.1, 0.1, 0.1);
+  const grayColor = rgb(0.4, 0.4, 0.4);
+  const borderColor = rgb(0.88, 0.91, 0.94); // #E2E8F0
+
+  function checkPageSpace(requiredHeight: number) {
+    if (y - requiredHeight < margin) {
+      page = pdfDoc.addPage([595.28, 841.89]);
+      y = height - margin;
+    }
+  }
+
+  function wrapText(text: string, textFont: any, fontSize: number, maxWidth: number): string[] {
+    const cleanText = sanitizePdfText(text);
+    const words = cleanText.split(/\s+/);
+    const lines: string[] = [];
+    let currentLine = "";
+
+    for (const word of words) {
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      const w = textFont.widthOfTextAtSize(testLine, fontSize);
+      if (w <= maxWidth) {
+        currentLine = testLine;
+      } else {
+        if (currentLine) lines.push(currentLine);
+        currentLine = word;
+      }
+    }
+    if (currentLine) lines.push(currentLine);
+    return lines.length ? lines : [""];
+  }
+
+  function drawWrappedText(
+    text: string,
+    x: number,
+    textFont = font,
+    fontSize = 10,
+    textColor = darkColor,
+    maxW = contentWidth
+  ) {
+    const lines = wrapText(text, textFont, fontSize, maxW);
+    for (const line of lines) {
+      checkPageSpace(fontSize + 4);
+      page.drawText(line, { x, y: y - fontSize, size: fontSize, font: textFont, color: textColor });
+      y -= fontSize + 4;
+    }
+  }
+
+  // Header
+  page.drawText("FIRST FRUITS · AUTHORIZED PLANTER REPORT", {
+    x: margin,
+    y: y - 10,
+    size: 10,
+    font: fontBold,
+    color: brandColor,
+  });
+  y -= 28;
+
+  page.drawText(sanitizePdfText(data.planterName), {
+    x: margin,
+    y: y - 18,
+    size: 22,
+    font: fontBold,
+    color: darkColor,
+  });
+  y -= 32;
+
+  const churchLabel = sanitizePdfText(data.churchName) + (data.churchCity ? ` (${sanitizePdfText(data.churchCity)})` : "");
+  const metaText = `Church: ${churchLabel}   |   Export Date: ${sanitizePdfText(data.exportDate)}`;
+  page.drawText(metaText, {
+    x: margin,
+    y: y - 10,
+    size: 10,
+    font,
+    color: grayColor,
+  });
+  y -= 20;
+
+  page.drawLine({
+    start: { x: margin, y },
+    end: { x: width - margin, y },
+    thickness: 1.5,
+    color: brandColor,
+  });
+  y -= 25;
+
+  // Check-in History Section
+  checkPageSpace(30);
+  page.drawText("Check-in History", {
+    x: margin,
+    y: y - 14,
+    size: 14,
+    font: fontBold,
+    color: brandColor,
+  });
+  y -= 22;
+  page.drawLine({
+    start: { x: margin, y },
+    end: { x: width - margin, y },
+    thickness: 0.5,
+    color: borderColor,
+  });
+  y -= 15;
+
+  if (data.checkIns.length === 0) {
+    drawWrappedText("No check-ins recorded yet.", margin, fontOblique, 10, grayColor);
+    y -= 10;
+  } else {
+    for (const c of data.checkIns) {
+      checkPageSpace(45);
+      const dateStr = new Date(c.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+
+      page.drawText(`Check-in  ·  ${dateStr}`, {
+        x: margin,
+        y: y - 11,
+        size: 11,
+        font: fontBold,
+        color: darkColor,
+      });
+      y -= 16;
+
+      page.drawText(`Feeling: ${sanitizePdfText(c.feeling) || "N/A"}  |  Momentum: ${sanitizePdfText(c.momentum) || "N/A"}`, {
+        x: margin + 10,
+        y: y - 9,
+        size: 9,
+        font: fontOblique,
+        color: grayColor,
+      });
+      y -= 14;
+
+      if (c.note) {
+        drawWrappedText(`Notes: ${c.note}`, margin + 10, font, 9.5, darkColor, contentWidth - 10);
+      }
+      if (c.support) {
+        drawWrappedText(`Support Needed: ${c.support}`, margin + 10, font, 9.5, brandColor, contentWidth - 10);
+      }
+      y -= 12;
+    }
+  }
+
+  // Objectives & Dialogue Section
+  y -= 10;
+  checkPageSpace(30);
+  page.drawText("Objectives & Dialogue", {
+    x: margin,
+    y: y - 14,
+    size: 14,
+    font: fontBold,
+    color: brandColor,
+  });
+  y -= 22;
+  page.drawLine({
+    start: { x: margin, y },
+    end: { x: width - margin, y },
+    thickness: 0.5,
+    color: borderColor,
+  });
+  y -= 15;
+
+  if (data.objectives.length === 0) {
+    drawWrappedText("No objectives added yet.", margin, fontOblique, 10, grayColor);
+  } else {
+    for (const o of data.objectives) {
+      checkPageSpace(45);
+
+      const headerText = `${sanitizePdfText(o.title)}  [${o.status.toUpperCase()} · ${sanitizePdfText(o.categoryTitle)}]`;
+      drawWrappedText(headerText, margin, fontBold, 11, darkColor);
+
+      if (o.description) {
+        drawWrappedText(o.description, margin + 10, font, 9.5, grayColor, contentWidth - 10);
+      }
+
+      if (o.progress.length > 0) {
+        checkPageSpace(20);
+        page.drawText("Progress Updates:", {
+          x: margin + 10,
+          y: y - 10,
+          size: 9.5,
+          font: fontBold,
+          color: brandColor,
+        });
+        y -= 14;
+
+        for (const p of o.progress) {
+          const pDate = new Date(p.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+          const valStr = p.value !== null ? ` (Recorded: ${p.value})` : "";
+          drawWrappedText(`• ${pDate}${valStr}: ${p.note || ""}`, margin + 20, font, 9, darkColor, contentWidth - 20);
+        }
+      }
+
+      if (o.messages.length > 0) {
+        checkPageSpace(20);
+        page.drawText("Dialogue:", {
+          x: margin + 10,
+          y: y - 10,
+          size: 9.5,
+          font: fontBold,
+          color: brandColor,
+        });
+        y -= 14;
+
+        for (const m of o.messages) {
+          const mDate = new Date(m.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+          drawWrappedText(`${m.authorName} (${mDate}): ${m.body}`, margin + 20, font, 9, darkColor, contentWidth - 20);
+        }
+      }
+
+      y -= 14;
+    }
+  }
+
+  return await pdfDoc.save();
+}
 
 export async function GET(
   request: Request,
@@ -134,230 +391,33 @@ export async function GET(
     });
   }
 
-  // 7. Render Print-Ready Export HTML (Save to PDF)
-  const htmlContent = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>First Fruits Export - ${escapeHtml(planter.display_name)}</title>
-  <style>
-    @media print {
-      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .no-print { display: none !important; }
-      .page-break { page-break-after: always; }
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      color: #1A1A1A;
-      line-height: 1.5;
-      padding: 32px;
-      max-width: 800px;
-      margin: 0 auto;
-      background: #FFFFFF;
-    }
-    .header {
-      border-bottom: 2px solid #3B5249;
-      padding-bottom: 16px;
-      margin-bottom: 24px;
-    }
-    .brand {
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      color: #3B5249;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-    .title {
-      font-size: 28px;
-      font-weight: 800;
-      color: #1A1A1A;
-      margin: 0 0 8px 0;
-    }
-    .meta {
-      font-size: 14px;
-      color: #555555;
-    }
-    .actions {
-      margin-bottom: 24px;
-      display: flex;
-      gap: 12px;
-    }
-    .btn {
-      background: #3B5249;
-      color: #FFFFFF;
-      border: none;
-      padding: 10px 20px;
-      font-size: 14px;
-      font-weight: 600;
-      border-radius: 6px;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    .btn:hover { background: #2D3E38; }
-    .section {
-      margin-bottom: 28px;
-    }
-    .section-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #3B5249;
-      border-bottom: 1px solid #E2E8F0;
-      padding-bottom: 6px;
-      margin-bottom: 12px;
-    }
-    .card {
-      background: #F8FAF9;
-      border: 1px solid #E2E8F0;
-      border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 8px;
-    }
-    .card-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin: 0;
-    }
-    .badge {
-      font-size: 12px;
-      padding: 2px 8px;
-      border-radius: 12px;
-      background: #E2E8F0;
-      color: #2D3748;
-      font-weight: 600;
-    }
-    .badge.active { background: #D1FAE5; color: #065F46; }
-    .badge.done { background: #E0E7FF; color: #3730A3; }
-    .timeline-item {
-      padding: 8px 0;
-      border-bottom: 1px dashed #E2E8F0;
-      font-size: 14px;
-    }
-    .timeline-item:last-child { border-bottom: none; }
-    .author { font-weight: 600; color: #3B5249; }
-    .date { font-size: 12px; color: #718096; margin-left: 8px; }
-  </style>
-</head>
-<body>
-  <div class="actions no-print">
-    <button onclick="window.print()" class="btn">🖨️ Print / Save as PDF</button>
-  </div>
+  // 7. Render Binary PDF Document
+  const pdfBytes = await generatePdfReport({
+    planterName: planter.display_name,
+    churchName: church?.name ?? "N/A",
+    churchCity: church?.city ?? "",
+    exportDate,
+    checkIns: checkIns.data ?? [],
+    objectives: (objectives.data ?? []).map((o) => ({
+      title: o.title,
+      description: o.description,
+      status: o.status,
+      categoryTitle: categoryMap.get(o.category_id) ?? "General",
+      progress: (progress.data ?? []).filter((p) => p.objective_id === o.id),
+      messages: (messages.data ?? []).filter((m) => m.objective_id === o.id).map((m) => ({
+        created_at: m.created_at,
+        authorName: authorNameMap.get(m.author_id) ?? "Author",
+        body: m.body,
+      })),
+    })),
+  });
 
-  <div class="header">
-    <div class="brand">FIRST FRUITS · AUTHORIZED PLANTER REPORT</div>
-    <h1 class="title">${escapeHtml(planter.display_name)}</h1>
-    <div class="meta">
-      <strong>Church:</strong> ${escapeHtml(church?.name ?? "N/A")}${church?.city ? ` (${escapeHtml(church.city)})` : ""}
-      &nbsp;·&nbsp; <strong>Export Date:</strong> ${exportDate}
-    </div>
-  </div>
-
-  <div class="section">
-    <h2 class="section-title">Check-in History</h2>
-    ${
-      (checkIns.data ?? []).length === 0
-        ? `<p class="meta">No check-ins recorded yet.</p>`
-        : (checkIns.data ?? [])
-            .map(
-              (c) => `
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">Check-in</span>
-          <span class="date">${new Date(c.created_at).toLocaleDateString()}</span>
-        </div>
-        ${c.note ? `<p><strong>Notes:</strong> ${escapeHtml(c.note)}</p>` : ""}
-        <p class="meta">Feeling: ${escapeHtml(c.feeling ?? "N/A")} · Momentum: ${escapeHtml(c.momentum ?? "N/A")}</p>
-        ${c.support ? `<p><strong>Support Needed:</strong> ${escapeHtml(c.support)}</p>` : ""}
-      </div>`
-            )
-            .join("")
-    }
-  </div>
-
-  <div class="section">
-    <h2 class="section-title">Objectives & Dialogue</h2>
-    ${
-      (objectives.data ?? []).length === 0
-        ? `<p class="meta">No objectives added yet.</p>`
-        : (objectives.data ?? [])
-            .map((o) => {
-              const objProgress = (progress.data ?? []).filter((p) => p.objective_id === o.id);
-              const objMessages = (messages.data ?? []).filter((m) => m.objective_id === o.id);
-              const catTitle = categoryMap.get(o.category_id) ?? "General";
-
-              return `
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">${escapeHtml(o.title)}</h3>
-          <span class="badge ${o.status === "done" ? "done" : "active"}">${escapeHtml(o.status)} · ${escapeHtml(catTitle)}</span>
-        </div>
-        ${o.description ? `<p>${escapeHtml(o.description)}</p>` : ""}
-        
-        ${
-          objProgress.length > 0
-            ? `
-          <div style="margin-top: 12px;">
-            <strong>Progress Updates:</strong>
-            ${objProgress
-              .map(
-                (p) => `
-              <div class="timeline-item">
-                <span class="date">${new Date(p.created_at).toLocaleDateString()}</span>
-                ${p.value !== null ? `<span> (Value: ${p.value})</span>` : ""}
-                ${p.note ? `<br/>${escapeHtml(p.note)}` : ""}
-              </div>`
-              )
-              .join("")}
-          </div>`
-            : ""
-        }
-
-        ${
-          objMessages.length > 0
-            ? `
-          <div style="margin-top: 12px;">
-            <strong>Dialogue:</strong>
-            ${objMessages
-              .map(
-                (m) => `
-              <div class="timeline-item">
-                <span class="author">${escapeHtml(authorNameMap.get(m.author_id) ?? "Author")}</span>
-                <span class="date">${new Date(m.created_at).toLocaleString()}</span>
-                <div>${escapeHtml(m.body)}</div>
-              </div>`
-              )
-              .join("")}
-          </div>`
-            : ""
-        }
-      </div>`;
-            })
-            .join("")
-    }
-  </div>
-</body>
-</html>`;
-
-  return new NextResponse(htmlContent, {
+  return new NextResponse(Buffer.from(pdfBytes), {
     status: 200,
     headers: {
-      "Content-Type": "text/html; charset=utf-8",
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="planter-report-${planterId}.pdf"`,
       "Cache-Control": "private, no-store",
     },
   });
-}
-
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
 }
