@@ -27,7 +27,7 @@ export function CatalystShell({
         <Link href="/catalyst" className="garden-brand">
           <Brand />
         </Link>
-<div className="garden-topbar__actions">
+        <div className="garden-topbar__actions">
           <SendNetworkLogo className="garden-topbar__partner-logo h-5 w-auto" />
           <AccountMenu name={name} preview={preview} />
         </div>

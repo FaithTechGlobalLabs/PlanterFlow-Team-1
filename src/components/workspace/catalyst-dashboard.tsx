@@ -149,7 +149,7 @@ export function CatalystDashboard({
           <Brand />
         </Link>
         <div className="ff-topbar-right">
-          <SendNetworkLogo className="h-5 w-auto" />
+          <SendNetworkLogo className="ff-topbar__partner-logo h-5 w-auto" />
           <span className="ff-connected">
             <i />
             {preview ? "Sample data preview" : data.organization}

@@ -21,13 +21,25 @@ export function TreeMeaning({ growth }: { growth?: ChurchGrowth }) {
         </p>
       )}
       <details className="church-growth__meaning">
-        <summary>{t("meaning")}</summary>
-        <p>{t("roots")}</p>
-        <p>{t("age")}</p>
-        <p>{t("progress")}</p>
-        <p>{t("outcomes")}</p>
-        <p>{t("quiet")}</p>
-        <p>{t("corrections")}</p>
+        <summary className="church-growth__toggle">{t("meaning")}</summary>
+        <p className="church-growth__explanation church-growth__explanation--roots">
+          {t("roots")}
+        </p>
+        <p className="church-growth__explanation church-growth__explanation--age">
+          {t("age")}
+        </p>
+        <p className="church-growth__explanation church-growth__explanation--progress">
+          {t("progress")}
+        </p>
+        <p className="church-growth__explanation church-growth__explanation--outcomes">
+          {t("outcomes")}
+        </p>
+        <p className="church-growth__explanation church-growth__explanation--quiet">
+          {t("quiet")}
+        </p>
+        <p className="church-growth__explanation church-growth__explanation--corrections">
+          {t("corrections")}
+        </p>
       </details>
     </div>
   );

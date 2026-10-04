@@ -4,7 +4,7 @@ Verified locally on the feature branch after integrating merged PR69, PR71 and P
 
 | Check                         | Result                                                                                                                                                 |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Vitest                        | 238 passing tests across 44 files                                                                                                                      |
+| Vitest                        | 243 passing tests across 44 files                                                                                                                      |
 | TypeScript                    | `tsc --noEmit` passed                                                                                                                                  |
 | ESLint                        | 0 errors; 7 existing `next/no-img-element` warnings in unchanged artwork components                                                                    |
 | Production build              | Next.js production build passed                                                                                                                        |
@@ -50,3 +50,7 @@ No live account credentials or configured Supabase project were available. No re
 9. Check email delivery and persisted updates against the project's actual policies and deployment environment.
 
 Blossoms remain intentionally deferred because no explicit milestone source exists. Pre-migration reopened/archived outcomes with no saved completion history remain unknowable. These are documented data limits; they are never converted into invented growth.
+
+## Styling feedback and rebase validation
+
+Rebased onto main `371566d` (PR75 branding and PR76 draft protection). Component styling hooks replace anonymous descendant/order selectors in the new UI; Journey imports its own scoped stylesheet. Repeated the 60-case rendered matrix after fixing narrow-screen logo/header wrapping: zero overflow or automated axe violations. The unsaved-objective draft regression tests remain passing.

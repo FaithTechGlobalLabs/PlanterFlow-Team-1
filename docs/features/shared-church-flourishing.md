@@ -1,6 +1,6 @@
 # Shared church flourishing and platform polish
 
-Implemented on merged main c153f33, including PR69 (e76a236), PR71 (0b74326), and PR72 (c153f33). The platform remains First Fruits with SEND Network branding and the existing role, invitation, objective, support and review workflows.
+Implemented on merged main c153f33, including PR69 (e76a236), PR71 (0b74326), and PR72 (c153f33). Rebased onto main 371566d, retaining PR75 SEND Network branding and PR76 unsaved objective drafts. The platform remains First Fruits with SEND Network branding and the existing role, invitation, objective, support and review workflows.
 
 The meaning is: **A living record of how you and your community have shown up for what matters.** No spiritual quality, success ranking or inferred causal impact is calculated.
 
@@ -78,3 +78,5 @@ Touched components use `component__element` and `component--state` where useful,
 ## Validation and release requirements
 
 See the accompanying validation report and screenshots for actual checks and their limits. No remote migration, merge, deployment or live authenticated mutation has occurred. Before release, apply the migration through your normal reviewed process, then verify configured sign-in, invitation acceptance, onboarding, objective/progress saves and status changes, support/prayer replies, review persistence, team permissions, PDF downloads and sign-out against staging. Unit/integration and preview checks do not substitute for those authenticated live workflows.
+
+For explicit component and element styling hooks, see [flourishing-styling.md](flourishing-styling.md).

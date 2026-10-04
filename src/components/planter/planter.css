@@ -906,3 +906,23 @@
 .planter-brand > span {
   color: var(--color-muted);
 }
+
+.planter-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+.planter-topbar__partner-logo {
+  flex-shrink: 0;
+}
+
+@media (max-width: 520px) {
+  .planter-topbar {
+    flex-wrap: wrap;
+    row-gap: 12px;
+  }
+  .planter-topbar__actions {
+    margin-left: auto;
+  }
+}

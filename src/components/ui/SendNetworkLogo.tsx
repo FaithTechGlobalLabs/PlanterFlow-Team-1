@@ -11,7 +11,7 @@ export function SendNetworkLogo({
       alt="Send Network Logo"
       width={138}
       height={24}
-      className={`object-contain ${className}`}
+      className={`send-network-logo object-contain ${className}`}
       priority
     />
   );

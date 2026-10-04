@@ -53,6 +53,7 @@ export function ChurchTree({
         </linearGradient>
       </defs>
       <ellipse
+        className="church-tree__shadow"
         cx="100"
         cy="213"
         rx={early ? 36 : 65}
@@ -76,6 +77,7 @@ export function ChurchTree({
             />
             {stage === "seed" && (
               <ellipse
+                className="church-tree__seed"
                 cx="100"
                 cy="198"
                 rx="15"
@@ -86,6 +88,7 @@ export function ChurchTree({
               />
             )}
             <path
+              className="church-tree__stem"
               d={`M100 207 Q89 165 102 ${stage === "seed" ? 130 : 70}`}
               fill="none"
               stroke="var(--tree-bark)"
@@ -115,6 +118,7 @@ export function ChurchTree({
               strokeLinecap="round"
             />
             <path
+              className="church-tree__trunk"
               d="M95 212 Q103 177 97 130 L68 94 L74 90 L103 119 L125 86 L132 89 L107 138 Q105 180 114 211Z"
               fill={`url(#${id}-bark)`}
             />
@@ -145,6 +149,7 @@ export function ChurchTree({
                 return (
                   <ellipse
                     key={i}
+                    className="church-tree__texture-leaf"
                     cx={x}
                     cy={y}
                     rx={5 + (i % 5)}
@@ -191,6 +196,7 @@ export function ChurchTree({
       {Array.from({ length: count(completed, GROWTH_LIMITS.fruit) }, (_, i) => (
         <g key={i} className="church-tree__fruit">
           <circle
+            className="church-tree__fruit-body"
             cx={100 + (i % 2 ? 1 : -1) * (18 + (i % 3) * 14) * size}
             cy={210 - (105 + (i % 3) * 24) * size}
             r="7"
@@ -199,6 +205,7 @@ export function ChurchTree({
             strokeWidth="2"
           />
           <circle
+            className="church-tree__fruit-highlight"
             cx={98 + (i % 2 ? 1 : -1) * (18 + (i % 3) * 14) * size}
             cy={208 - (105 + (i % 3) * 24) * size}
             r="2"

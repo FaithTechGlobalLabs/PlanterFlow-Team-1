@@ -10,7 +10,7 @@ function AccountActions() {
   const { pending } = useFormStatus();
   return (
     <>
-      <button type="submit" disabled={pending}>
+      <button className="ff-account__action" type="submit" disabled={pending}>
         {pending ? "Signing out…" : "Sign out"}
       </button>
     </>
@@ -37,7 +37,9 @@ export function AccountMenu({
     function escape(event: KeyboardEvent) {
       if (event.key === "Escape" && root.current?.open) {
         root.current.open = false;
-        root.current.querySelector("summary")?.focus();
+        root.current
+          .querySelector<HTMLElement>(".ff-account__trigger")
+          ?.focus();
       }
     }
     document.addEventListener("pointerdown", outside);
@@ -56,23 +58,34 @@ export function AccountMenu({
       .join("") || "?";
   return (
     <details className="ff-account" ref={root}>
-      <summary aria-label={`Account options for ${name || "your account"}`}>
-        <span className="ff-avatar" aria-hidden="true">
+      <summary
+        className="ff-account__trigger"
+        aria-label={`Account options for ${name || "your account"}`}
+      >
+        <span className="ff-account__avatar ff-avatar" aria-hidden="true">
           {initials}
         </span>
-        <span>{name || "Your account"}</span>
-        <span aria-hidden="true">▾</span>
+        <span className="ff-account__name">{name || "Your account"}</span>
+        <span className="ff-account__chevron" aria-hidden="true">
+          ▾
+        </span>
       </summary>
-      <div className="ff-account-panel">
-        <strong>{name || "Your account"}</strong>
+      <div className="ff-account__panel">
+        <strong className="ff-account__identity">
+          {name || "Your account"}
+        </strong>
         {preview ? (
           <>
-            <p>Sample account. Sign in to open your workspace.</p>
-            <Link href="/login">Sign in</Link>
+            <p className="ff-account__preview-note">
+              Sample account. Sign in to open your workspace.
+            </p>
+            <Link className="ff-account__action" href="/login">
+              Sign in
+            </Link>
           </>
         ) : (
           <>
-            <form action={signOut}>
+            <form className="ff-account__form" action={signOut}>
               <AccountActions />
             </form>
           </>

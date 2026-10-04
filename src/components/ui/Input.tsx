@@ -24,7 +24,7 @@ export function Input({
   const errorId = `${inputId}-error`;
 
   return (
-    <div className="w-full">
+    <div className="ff-field ff-field--input w-full">
       {label && (
         <label htmlFor={inputId} className={labelClassName}>
           {label}

@@ -1196,7 +1196,7 @@
   .ff-topbar {
     padding: 0 20px;
   }
-  .ff-topbar-right > span:last-child {
+  .ff-topbar-right > .ff-connected {
     display: none;
   }
   .ff-page-heading {
@@ -1742,5 +1742,22 @@
   .ff-modal select,
   .ff-modal textarea {
     font-size: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .ff-app .ff-topbar {
+    height: auto;
+    min-height: 74px;
+    padding-block: 14px;
+    flex-wrap: wrap;
+    row-gap: 12px;
+  }
+  .ff-app .ff-topbar .ff-topbar-right {
+    max-width: 100%;
+    margin-left: auto;
+  }
+  .ff-app .ff-topbar .ff-connected {
+    display: none;
   }
 }

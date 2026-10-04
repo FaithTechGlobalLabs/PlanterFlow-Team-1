@@ -25,7 +25,7 @@ export function PlanterHomeShell({
         <Link href="/" className="planter-brand" aria-label="First Fruits home">
           <Brand />
         </Link>
-<div className="planter-topbar__actions">
+        <div className="planter-topbar__actions">
           <SendNetworkLogo className="planter-topbar__partner-logo h-5 w-auto" />
           <AccountMenu name={name} preview={preview} />
         </div>

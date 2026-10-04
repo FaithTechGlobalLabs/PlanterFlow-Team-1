@@ -2,7 +2,7 @@
   position: relative;
   font-size: 14px;
 }
-.ff-account > summary {
+.ff-account__trigger {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -11,14 +11,14 @@
   border-radius: 6px;
   padding: 8px;
 }
-.ff-account > summary::-webkit-details-marker {
+.ff-account__trigger::-webkit-details-marker {
   display: none;
 }
-.ff-account > summary:focus-visible {
-  outline: 2px solid #d7e6b6;
+.ff-account__trigger:focus-visible {
+  outline: 3px solid var(--color-green);
   outline-offset: 3px;
 }
-.ff-account-panel {
+.ff-account__panel {
   position: absolute;
   right: 0;
   top: calc(100% + 12px);
@@ -32,18 +32,17 @@
   box-shadow: 0 10px 30px #0003;
   z-index: 100;
 }
-.ff-account-panel strong {
+.ff-account__identity {
   display: block;
   overflow-wrap: anywhere;
 }
-.ff-account-panel p {
+.ff-account__preview-note {
   font-size: 12px;
   line-height: 1.6;
   color: var(--color-muted);
   margin: 10px 0;
 }
-.ff-account-panel button,
-.ff-account-panel a {
+.ff-account__action {
   display: block;
   width: 100%;
   text-align: left;
@@ -56,21 +55,20 @@
   font: inherit;
   cursor: pointer;
 }
-.ff-account-panel button:hover,
-.ff-account-panel a:hover {
+.ff-account__action:hover {
   background: var(--color-sage);
 }
-.ff-account-panel button:disabled {
+.ff-account__action:disabled {
   opacity: 0.6;
   cursor: wait;
 }
 
-.ff-account summary > span:nth-child(2) {
+.ff-account__name {
   max-width: min(28vw, 240px);
   overflow-wrap: anywhere;
 }
 @media (max-width: 420px) {
-  .ff-account > summary {
+  .ff-account__trigger {
     gap: 6px;
     font-size: 12px;
   }

@@ -25,18 +25,18 @@
   font-size: 13px;
   line-height: 1.6;
 }
-.church-growth__meaning summary {
+.church-growth__toggle {
   display: list-item;
   padding: 12px 0;
   cursor: pointer;
   font-weight: 600;
   color: var(--color-green);
 }
-.church-growth__meaning p {
+.church-growth__explanation {
   max-width: 65ch;
   margin: 8px 0;
 }
-.church-growth__meaning summary:focus-visible {
+.church-growth__toggle:focus-visible {
   outline: 3px solid var(--color-green);
   outline-offset: 4px;
 }
@@ -45,30 +45,3 @@
   animation: none;
 }
 /* No perpetual growth animation or replay on mount. */
-
-.church-journey {
-  padding: 20px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  background: var(--color-surface);
-}
-.church-journey h2 {
-  font-size: 20px;
-  margin-bottom: 12px;
-}
-.church-journey p {
-  font-size: 14px;
-  line-height: 1.6;
-  overflow-wrap: anywhere;
-}
-.church-journey ol {
-  margin-top: 16px;
-}
-.church-journey li {
-  padding: 12px 0;
-  border-top: 1px solid var(--color-border);
-}
-.church-journey time {
-  font-size: 12px;
-  color: var(--color-muted);
-}

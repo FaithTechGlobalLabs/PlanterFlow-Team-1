@@ -25,7 +25,7 @@ export function Select({
   const errorId = `${selectId}-error`;
 
   return (
-    <div className="w-full">
+    <div className="ff-field ff-field--select w-full">
       {label && (
         <label htmlFor={selectId} className={labelClassName}>
           {label}

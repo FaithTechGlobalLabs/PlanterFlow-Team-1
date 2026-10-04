@@ -1,0 +1,29 @@
+.church-journey {
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+.church-journey__title {
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+.church-journey__summary,
+.church-journey__description,
+.church-journey__empty,
+.church-journey__more {
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.church-journey__list {
+  margin-top: 16px;
+}
+.church-journey__moment {
+  padding: 12px 0;
+  border-top: 1px solid var(--color-border);
+}
+.church-journey__date {
+  font-size: 12px;
+  color: var(--color-muted);
+}
