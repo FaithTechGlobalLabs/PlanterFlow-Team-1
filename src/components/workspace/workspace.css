@@ -167,7 +167,11 @@
   color: #315640;
   font-weight: 700;
 }
-.ff-nav-item span {
+.ff-nav-item .ff-icon {
+  flex-shrink: 0;
+  display: inline-block;
+}
+.ff-nav-item span:not(.ff-icon) {
   margin-left: auto;
   background: #e9efdf;
   border-radius: 5px;
@@ -1161,7 +1165,7 @@
     justify-content: center;
     padding: 13px;
   }
-  .ff-nav-item span {
+  .ff-nav-item span:not(.ff-icon) {
     display: none;
   }
   .ff-main {

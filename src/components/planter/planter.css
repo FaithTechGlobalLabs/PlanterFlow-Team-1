@@ -755,7 +755,7 @@
     font-size: 11px !important;
     gap: 7px;
   }
-  .ff-planter-app .ff-nav-item > span {
+  .ff-planter-app .ff-nav-item > span:not(.ff-icon) {
     display: none;
   }
   .ff-planter-app .ff-page-heading {
