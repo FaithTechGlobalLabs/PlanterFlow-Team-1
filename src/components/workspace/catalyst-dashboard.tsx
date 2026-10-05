@@ -132,9 +132,9 @@ export function CatalystDashboard({
     { id: "attention", label: "Needs attention", icon: "heart" },
     { id: "churches", label: "Churches", icon: "home" },
     { id: "support", label: "Support & conversations", icon: "chat" },
-    { id: "prayers", label: "Prayer requests", icon: "heart" },
-    { id: "categories", label: "Objective categories", icon: "leaf" },
-    { id: "journey", label: "Journey", icon: "leaf" },
+    { id: "prayers", label: "Prayer requests", icon: "prayer" },
+    { id: "categories", label: "Objective categories", icon: "objective" },
+    { id: "journey", label: "Journey", icon: "journey" },
   ] as const;
   return (
     <div className="ff-app ff-living-catalyst">

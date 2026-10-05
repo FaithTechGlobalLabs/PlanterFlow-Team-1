@@ -37,66 +37,9 @@ import {
 import "@/components/planter/planter.css";
 import { ConversationThreadView } from "./conversation-thread-view";
 import { ExportReportButton } from "./export-report-button";
-type IconName =
-  | "home"
-  | "leaf"
-  | "heart"
-  | "chat"
-  | "arrow"
-  | "plus"
-  | "check"
-  | "globe"
-  | "close";
-export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
-  const paths: Record<IconName, ReactNode> = {
-    home: (
-      <>
-        <path d="m3 10 9-7 9 7v10H3Z" />
-        <path d="M9 20v-7h6v7" />
-      </>
-    ),
-    leaf: (
-      <>
-        <path d="M20 3C8 2 2 8 5 16c8 4 15-1 15-13Z" />
-        <path d="m3 21 12-12" />
-      </>
-    ),
-    heart: (
-      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" />
-    ),
-    chat: <path d="M21 11a9 9 0 0 1-9 9H3l1.7-4A9 9 0 1 1 21 11Z" />,
-    arrow: (
-      <>
-        <path d="M4 12h16M14 6l6 6-6 6" />
-      </>
-    ),
-    plus: <path d="M12 5v14M5 12h14" />,
-    check: <path d="m5 12 4 4L19 6" />,
-    globe: (
-      <>
-        <circle cx="12" cy="12" r="9" />
-        <ellipse cx="12" cy="12" rx="4" ry="9" />
-        <path d="M3 12h18" />
-      </>
-    ),
-    close: <path d="m6 6 12 12M6 18 18 6" />,
-  };
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      {paths[name]}
-    </svg>
-  );
-}
+import { Icon, IconName } from "./icons";
+export { Icon, IconName };
+export type { IconProps } from "./icons";
 function date(value: string) {
   return new Intl.DateTimeFormat("en", {
     month: "short",
@@ -449,7 +392,7 @@ export function Workspace({
                       icon: "home" as const,
                     },
                   ]),
-              { id: "objectives", label: "Objectives", icon: "leaf" },
+              { id: "objectives", label: "Objectives", icon: "objective" as const },
               ...(!isOwner
                 ? [
                     {
@@ -462,12 +405,12 @@ export function Workspace({
               {
                 id: "prayers",
                 label: isPeer ? "Shared prayers" : "Prayer & support",
-                icon: "heart",
+                icon: "prayer" as const,
               },
               ...(isOwner
                 ? [
                     { id: "team", label: "Team", icon: "chat" as const },
-                    { id: "journey", label: "Journey", icon: "leaf" as const },
+                    { id: "journey", label: "Journey", icon: "journey" as const },
                   ]
                 : []),
             ] as const
